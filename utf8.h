@@ -183,11 +183,10 @@ size_t utf8spn(const void* src, const void* accept) {
           a++;
         } else {
           // need to march a onwards and reset
-          a++;
-          while ('\0' != *a && (0x80 == (0xc0 & *a))) {
-            a++;
-          }
           offset = 0;
+          do {
+            a++;
+          } while ('\0' != *a && (0x80 == (0xc0 & *a)));
         }
       }
     }
