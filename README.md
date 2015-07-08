@@ -31,7 +31,7 @@ The utf8.h API matches the string.h API as much as possible by design. There are
 
 I use void* instead of char* when passing around utf8 strings. My reasoning is that I really don't want people accidentally thinking they can use integer arthimetic on the pointer and always get a valid character like you would with an ASCII string. Having it as a void* forces a user to explicitly cast the utf8 string to char* such that the onus is on them not to break the code anymore!
 
-Anywhere in the string.h documentation where it refers to 'bytes' I have changed that to utf8 codepoints. For instance, utf8len will return the number of utf8 codepoints in a utf8 string - which does no necessarily equate to the number of bytes.
+Anywhere in the string.h documentation where it refers to 'bytes' I have changed that to utf8 codepoints. For instance, utf8len will return the number of utf8 codepoints in a utf8 string - which does not necessarily equate to the number of bytes.
 
 ## Todo ##
 
@@ -45,7 +45,8 @@ The current feature list is;
 - Add utf8size to allow users to get the size in bytes of a utf8 string.
 - Add utf8valid to check that a given utf8 string is actually a valid utf8 string.
 - Add NULL pointer support. Should I NULL check the arguments to the API?
-- Add Doxygen similar to the Unix man pages for string.h.
+- Add Doxygen (or similar) to the Unix man pages for string.h.
+- Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by https://twitter.com/FlohOfWoe/status/618669237771608064)
 
 ## License ##
 
