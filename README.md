@@ -46,8 +46,8 @@ The current feature list is;
 - Add utf8valid to check that a given utf8 string is actually a valid utf8 string.
 - Add NULL pointer support. Should I NULL check the arguments to the API?
 - Add Doxygen (or similar) to the Unix man pages for string.h.
-- Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by https://twitter.com/FlohOfWoe/status/618669237771608064)
-- Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by https://twitter.com/KmBenzie)
+- Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
+- Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
 
 ## License ##
 
