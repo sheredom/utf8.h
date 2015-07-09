@@ -11,7 +11,7 @@ strchr | utf8chr | &#10004;
 strcmp | utf8cmp | &#10004;
 strcoll | utf8coll |
 strcpy | utf8cpy | &#10004;
-strcspn | utf8cspn |
+strcspn | utf8cspn | &#10004;
 strdup | utf8dup |
 strfry | utf8fry |
 strlen | utf8len | &#10004;
@@ -38,7 +38,7 @@ Anywhere in the string.h documentation where it refers to 'bytes' I have changed
 The current feature list is;
 
 - Implement utf8coll (akin to strcoll).
-- Implement utf8cspn (akin to strcspn).
+- ~~Implement utf8cspn (akin to strcspn).~~
 - Implement utf8dup (akin to strdup).
 - Implement utf8fry (akin to strfry).
 - Implement utf8rchr (akin to strrchr).
@@ -48,6 +48,9 @@ The current feature list is;
 - Add Doxygen (or similar) to the Unix man pages for string.h.
 - Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
 - Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
+- Investigate changing to [Creation Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) as suggested by [@mcclure111](https://twitter.com/mcclure111)
+- Document the code to make it more understandable as suggested by [@mcclure111](https://twitter.com/mcclure111)
+- Add strn* variants (should n by bytes or utf8 codepoints though?)
 
 ## License ##
 
