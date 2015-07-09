@@ -12,7 +12,7 @@ strcmp | utf8cmp | &#10004;
 strcoll | utf8coll |
 strcpy | utf8cpy | &#10004;
 strcspn | utf8cspn | &#10004;
-strdup | utf8dup |
+strdup | utf8dup | &#10004;
 strfry | utf8fry |
 strlen | utf8len | &#10004;
 strrchr | utf8rchr | &#10004;
@@ -39,7 +39,7 @@ The current feature list is;
 
 - Implement utf8coll (akin to strcoll).
 - ~~Implement utf8cspn (akin to strcspn).~~
-- Implement utf8dup (akin to strdup).
+- ~~Implement utf8dup (akin to strdup).~~
 - Implement utf8fry (akin to strfry).
 - ~~Implement utf8rchr (akin to strrchr).~~
 - Add utf8size to allow users to get the size in bytes of a utf8 string.
@@ -50,7 +50,7 @@ The current feature list is;
 - Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
 - Investigate changing to [Creative Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) (as suggested by [@mcclure111](https://twitter.com/mcclure111))
 - Document the code to make it more understandable (as suggested by [@mcclure111](https://twitter.com/mcclure111))
-- Add strn* variants (should n by bytes or utf8 codepoints though?)
+- Add strn* variants (should n be by bytes or utf8 codepoints though?)
 
 ## License ##
 

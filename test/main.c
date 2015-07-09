@@ -303,5 +303,17 @@ int main(const int argc, const char* const argv[]) {
     return 26;
   }
 
+  void* dup = utf8dup(data);
+  if (53 != utf8len(dup)) {
+    return 27;
+  }
+  free(dup);
+
+  dup = utf8dup("ab");
+  if (2 != utf8len(dup)) {
+    return 27;
+  }
+  free(dup);
+
   return 0;
 }

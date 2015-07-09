@@ -27,6 +27,7 @@
 #define __UTF8_H__
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #if defined(__cplusplus) && defined(__clang__)
 #pragma clang diagnostic push
@@ -49,6 +50,7 @@ utf8_pure utf8_weak void* utf8chr(const void* src, int chr);
 utf8_pure utf8_weak int utf8cmp(const void* src1, const void* src2);
 utf8_pure utf8_weak void* utf8cpy(void* dst, const void* src);
 utf8_pure utf8_weak size_t utf8cspn(const void* src, const void* reject);
+utf8_pure utf8_weak void* utf8dup(const void* src);
 utf8_pure utf8_weak size_t utf8len(const void* str);
 utf8_pure utf8_weak void* utf8rchr(const void* src, int chr);
 utf8_pure utf8_weak size_t utf8spn(const void* src, const void* accept);
@@ -171,7 +173,29 @@ size_t utf8cspn(const void* src, const void* reject) {
   return chars;
 }
 
-void* utf8dup(const void* src);
+void* utf8dup(const void* src) {
+  const char* s = (const char* )src;
+  size_t bytes = 0;
+  char* n = 0;
+
+  while ('\0' != s[bytes]) {
+    bytes++;
+  }
+
+  n = (char* )malloc(bytes);
+
+  if (0 == n) {
+    return 0;
+  } else {
+    bytes = 0;
+    while ('\0' != s[bytes]) {
+      n[bytes] = s[bytes];
+      bytes++;
+    }
+    n[bytes] = '\0';
+    return n;
+  }
+}
 
 void* utf8fry(const void* str);
 
