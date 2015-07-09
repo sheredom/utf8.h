@@ -48,8 +48,8 @@ The current feature list is;
 - Add Doxygen (or similar) to the Unix man pages for string.h.
 - Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
 - Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
-- Investigate changing to [Creative Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) as suggested by [@mcclure111](https://twitter.com/mcclure111)
-- Document the code to make it more understandable as suggested by [@mcclure111](https://twitter.com/mcclure111)
+- Investigate changing to [Creative Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) (as suggested by [@mcclure111](https://twitter.com/mcclure111))
+- Document the code to make it more understandable (as suggested by [@mcclure111](https://twitter.com/mcclure111))
 - Add strn* variants (should n by bytes or utf8 codepoints though?)
 
 ## License ##
