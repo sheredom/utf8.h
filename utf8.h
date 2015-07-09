@@ -48,6 +48,7 @@ utf8_pure utf8_weak void* utf8cat(void* dst, const void* src);
 utf8_pure utf8_weak void* utf8chr(const void* src, int chr);
 utf8_pure utf8_weak int utf8cmp(const void* src1, const void* src2);
 utf8_pure utf8_weak void* utf8cpy(void* dst, const void* src);
+utf8_pure utf8_weak size_t utf8cspn(const void* src, const void* reject);
 utf8_pure utf8_weak size_t utf8len(const void* str);
 utf8_pure utf8_weak size_t utf8spn(const void* src, const void* accept);
 utf8_pure utf8_weak void* utf8str(const void*, const void*);
@@ -134,7 +135,40 @@ void* utf8cpy(void* dst, const void* src) {
   return dst;
 }
 
-size_t utf8cspn(const void* src, const void* reject);
+size_t utf8cspn(const void* src, const void* reject) {
+  const char* s = (const char* )src;
+  size_t chars = 0;
+
+  while('\0' != *s) {
+    const char* r = (const char* )reject;
+    size_t offset = 0;
+
+    while ('\0' != *r) {
+      if ((0x80 != (0xc0 & *r)) && (0 < offset)) {
+        // found a match
+        return chars;
+      } else {
+        if (*r == s[offset]) {
+          offset++;
+          r++;
+        } else {
+          // need to march a onwards and reset
+          offset = 0;
+          do {
+            r++;
+          } while ((0x80 == (0xc0 & *r)));
+        }
+      }
+    }
+
+    do {
+      s++;
+    } while ((0x80 == (0xc0 & *s)));
+    chars++;
+  }
+
+  return chars;
+}
 
 void* utf8dup(const void* src);
 

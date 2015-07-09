@@ -279,5 +279,17 @@ int main(const int argc, const char* const argv[]) {
     return 20;
   }
 
+  if (0 != utf8cspn(data, spn)) {
+    return 21;
+  }
+
+  if (0 != utf8cspn(data, data)) {
+    return 22;
+  }
+
+  if (53 != utf8cspn(data, "ab")) {
+    return 23;
+  }
+
   return 0;
 }
