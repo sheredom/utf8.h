@@ -15,7 +15,7 @@ strcspn | utf8cspn | &#10004;
 strdup | utf8dup |
 strfry | utf8fry |
 strlen | utf8len | &#10004;
-strrchr | utf8rchr |
+strrchr | utf8rchr | &#10004;
 strspn | utf8spn | &#10004;
 strstr | utf8str |  &#10004;
 
@@ -41,7 +41,7 @@ The current feature list is;
 - ~~Implement utf8cspn (akin to strcspn).~~
 - Implement utf8dup (akin to strdup).
 - Implement utf8fry (akin to strfry).
-- Implement utf8rchr (akin to strrchr).
+- ~~Implement utf8rchr (akin to strrchr).~~
 - Add utf8size to allow users to get the size in bytes of a utf8 string.
 - Add utf8valid to check that a given utf8 string is actually a valid utf8 string.
 - Add NULL pointer support. Should I NULL check the arguments to the API?

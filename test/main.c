@@ -291,5 +291,17 @@ int main(const int argc, const char* const argv[]) {
     return 23;
   }
 
+  if (data + 21 != utf8rchr(data, 0x3bc)) {
+    return 24;
+  }
+
+  if (0 != utf8rchr(data, 0x20ac)) {
+    return 25;
+  }
+
+  if (data + 104 != utf8rchr(data, '\0')) {
+    return 26;
+  }
+
   return 0;
 }

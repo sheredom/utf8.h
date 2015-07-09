@@ -50,6 +50,7 @@ utf8_pure utf8_weak int utf8cmp(const void* src1, const void* src2);
 utf8_pure utf8_weak void* utf8cpy(void* dst, const void* src);
 utf8_pure utf8_weak size_t utf8cspn(const void* src, const void* reject);
 utf8_pure utf8_weak size_t utf8len(const void* str);
+utf8_pure utf8_weak void* utf8rchr(const void* src, int chr);
 utf8_pure utf8_weak size_t utf8spn(const void* src, const void* accept);
 utf8_pure utf8_weak void* utf8str(const void*, const void*);
 
@@ -195,7 +196,56 @@ size_t utf8len(const void* str) {
   return length;
 }
 
-void* utf8rchr(const void* src, int c);
+void* utf8rchr(const void* src, int chr) {
+  const char* s = (const char* )src;
+  const char* match = 0;
+  char c[5] = {'\0', '\0', '\0', '\0', '\0'};
+
+  if (0 == chr) {
+    while ('\0' != *s) {
+      s++;
+    }
+    return (void * )s;
+  } else if (0 == ((int)0xffffff80 & chr)) {
+    // ascii
+    c[0] = (char)chr;
+  } else if (0 == ((int)0xfffff800 & chr)) {
+    c[0] = 0xc0 | (char)(chr >> 6);
+    c[1] = 0x80 | (char)(chr & 0x3f);
+  } else if (0 == ((int)0xffff0000 & chr)) {
+    c[0] = 0xe0 | (char)(chr >> 12);
+    c[1] = 0x80 | (char)((chr >> 6) & 0x3f);
+    c[2] = 0x80 | (char)(chr & 0x3f);
+  } else { // if (0 == ((int)0xffe00000 & chr)) {
+    c[0] = 0xf0 | (char)(chr >> 18);
+    c[1] = 0x80 | (char)((chr >> 12) & 0x3f);
+    c[2] = 0x80 | (char)((chr >> 6) & 0x3f);
+    c[3] = 0x80 | (char)(chr & 0x3f);
+  }
+
+  while ('\0' != *s) {
+    size_t offset = 0;
+
+    while (s[offset] == c[offset]) {
+      offset++;
+    }
+
+    if ('\0' == c[offset]) {
+      match = s;
+      s += offset;
+    } else {
+      // need to march s along to next utf8 char start
+      s += offset;
+      if ('\0' != *s) {
+        do {
+          s++;
+        } while (0x80 == (0xc0 & *s));
+      }
+    }
+  }
+
+  return (void* )match;
+}
 
 size_t utf8spn(const void* src, const void* accept) {
   const char* s = (const char* )src;
