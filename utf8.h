@@ -157,7 +157,7 @@ size_t utf8cspn(const void* src, const void* reject) {
           offset = 0;
           do {
             r++;
-          } while ((0x80 == (0xc0 & *r)));
+          } while (0x80 == (0xc0 & *r));
         }
       }
     }
@@ -270,7 +270,7 @@ size_t utf8spn(const void* src, const void* accept) {
           offset = 0;
           do {
             a++;
-          } while ('\0' != *a && (0x80 == (0xc0 & *a)));
+          } while (0x80 == (0xc0 & *a));
         }
       }
     }
