@@ -45,16 +45,37 @@ extern "C" {
 #error Non clang, non gcc compiler found!
 #endif
 
+// Append the utf8 string src onto the utf8 string dst.
 utf8_pure utf8_weak void* utf8cat(void* dst, const void* src);
+
+// Find the first match of the utf8 codepoint chr in the utf8 string src.
 utf8_pure utf8_weak void* utf8chr(const void* src, int chr);
+
+// Return less than 0, 0, greater than 0 if src1 < src2,
+// src1 == src2, src1 > src2 respectively.
 utf8_pure utf8_weak int utf8cmp(const void* src1, const void* src2);
+
+// Copy the utf8 string src onto the memory allocated in dst.
 utf8_pure utf8_weak void* utf8cpy(void* dst, const void* src);
+
+// Number of utf8 codepoints in the utf8 string src that consists entirely
+// of utf8 codepoints not from the utf8 string reject.
 utf8_pure utf8_weak size_t utf8cspn(const void* src, const void* reject);
 utf8_pure utf8_weak void* utf8dup(const void* src);
+
+// Number of utf8 codepoints in the utf8 string str.
 utf8_pure utf8_weak size_t utf8len(const void* str);
+
+// Find the last match of the utf8 codepoint chr in the utf8 string src.
 utf8_pure utf8_weak void* utf8rchr(const void* src, int chr);
+
+// Number of utf8 codepoints in the utf8 string src that consists entirely
+// of utf8 codepoints from the utf8 string accept.
 utf8_pure utf8_weak size_t utf8spn(const void* src, const void* accept);
-utf8_pure utf8_weak void* utf8str(const void*, const void*);
+
+// The position of the utf8 string needle in the utf8 string haystack.
+utf8_pure utf8_weak void* utf8str(const void* haystack, const void* needle);
+
 
 #undef utf8_weak
 #undef utf8_pure
