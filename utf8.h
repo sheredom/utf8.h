@@ -84,6 +84,9 @@ utf8_pure utf8_weak size_t utf8spn(const void* src, const void* accept);
 // The position of the utf8 string needle in the utf8 string haystack.
 utf8_pure utf8_weak void* utf8str(const void* haystack, const void* needle);
 
+// Return 0 on success, or the position of the invalid
+// utf8 codepoint on failure.
+utf8_pure utf8_weak void* utf8valid(const void* str);
 
 #undef utf8_weak
 #undef utf8_pure
@@ -453,6 +456,82 @@ void* utf8str(const void* haystack, const void* needle) {
   // no match
   return 0;
 }
+
+void* utf8valid(const void* str) {
+  const char* s = (const char* )str;
+
+  while ('\0' != *s) {
+    if (0xf0 == (0xf8 & *s)) {
+      // ensure each of the 3 following bytes in this 4-byte
+      // utf8 codepoint began with 0b10xxxxxx
+      if ((0x80 != (0xc0 & s[1])) ||
+          (0x80 != (0xc0 & s[2])) ||
+          (0x80 != (0xc0 & s[3]))) {
+        return (void* )s;
+      }
+
+      // ensure that the top 5 bits of this 4-byte utf8
+      // codepoint were not 0, as then we could have used
+      // one of the smaller encodings
+      if ((0 == (0x07 & s[0])) && (0 == (0x30 & s[1]))) {
+        return (void* )s;
+      }
+
+      // 4-byte utf8 code point (began with 0b11110xxx)
+      s += 4;
+    } else if (0xe0 == (0xf0 & *s)) {
+      // ensure each of the 2 following bytes in this 3-byte
+      // utf8 codepoint began with 0b10xxxxxx
+      if ((0x80 != (0xc0 & s[1])) ||
+          (0x80 != (0xc0 & s[2]))) {
+        return (void* )s;
+      }
+
+      // ensure that the top 5 bits of this 3-byte utf8
+      // codepoint were not 0, as then we could have used
+      // one of the smaller encodings
+      if ((0 == (0x0f & s[0])) && (0 == (0x20 & s[1]))) {
+        return (void* )s;
+      }
+
+      // 3-byte utf8 code point (began with 0b1110xxxx)
+      s += 3;
+    } else if (0xc0 == (0xe0 & *s)) {
+      // ensure the 1 following byte in this 2-byte
+      // utf8 codepoint began with 0b10xxxxxx
+      if (0x80 != (0xc0 & s[1])) {
+        return (void* )s;
+      }
+
+      // ensure that the top 4 bits of this 2-byte utf8
+      // codepoint were not 0, as then we could have used
+      // one of the smaller encodings
+      if (0 == (0x1e & s[0])) {
+        return (void* )s;
+      }
+
+      // 2-byte utf8 code point (began with 0b110xxxxx)
+      s += 2;
+    } else if (0x00 == (0x80 & *s)) {
+      // 1-byte ascii (began with 0b0xxxxxxx)
+      s += 1;
+    } else {
+      // we have an invalid 0b1xxxxxxx utf8 code point entry
+      return (void* )s;
+    }
+  }
+
+  return 0;
+}
+
+// 1-byte/7-bit ascii
+// (0b0xxxxxxx)
+// 2-byte/11-bit utf8 code point
+// (0b110xxxxx 0b10xxxxxx)
+// 3-byte/16-bit utf8 code point
+// (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
+// 4-byte/21-bit utf8 code point
+// (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx)
 
 #ifdef __cplusplus
 } // extern "C"

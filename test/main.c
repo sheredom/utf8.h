@@ -327,5 +327,114 @@ int main(const int argc, const char* const argv[]) {
     return 30;
   }
 
-  return 0;
+  char invalid[5];
+
+  invalid[0] = '\xf0';
+  invalid[1] = '\x8f';
+  invalid[2] = '\xbf';
+  invalid[3] = '\xbf';
+  invalid[4] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 31;
+  }
+
+  invalid[0] = '\xf1';
+  invalid[1] = '\x3f';
+  invalid[2] = '\xbf';
+  invalid[3] = '\xbf';
+  invalid[4] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 32;
+  }
+
+  invalid[0] = '\xf1';
+  invalid[1] = '\xbf';
+  invalid[2] = '\x3f';
+  invalid[3] = '\xbf';
+  invalid[4] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 33;
+  }
+
+  invalid[0] = '\xf1';
+  invalid[1] = '\xbf';
+  invalid[2] = '\xbf';
+  invalid[3] = '\x3f';
+  invalid[4] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 34;
+  }
+
+  invalid[0] = '\xe0';
+  invalid[1] = '\x9f';
+  invalid[2] = '\xbf';
+  invalid[3] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 35;
+  }
+
+  invalid[0] = '\xef';
+  invalid[1] = '\x3f';
+  invalid[2] = '\xbf';
+  invalid[3] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 36;
+  }
+
+  invalid[0] = '\xef';
+  invalid[1] = '\xbf';
+  invalid[2] = '\x3f';
+  invalid[3] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 37;
+  }
+
+  invalid[0] = '\xc1';
+  invalid[1] = '\xbf';
+  invalid[2] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 38;
+  }
+
+  invalid[0] = '\xdf';
+  invalid[1] = '\x3f';
+  invalid[2] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 39;
+  }
+
+  invalid[0] = '\x80';
+  invalid[1] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 40;
+  }
+
+  invalid[0] = '\xf8';
+  invalid[1] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 41;
+  }
+
+  if (0 != utf8valid(data)) {
+    return 42;
+  }
+
+  if (0 != utf8valid("ab")) {
+    return 43;
+  }
+
+  if (0 != utf8valid("")) {
+    return 43;
+  }
 }
