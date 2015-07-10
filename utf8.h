@@ -245,6 +245,9 @@ void* utf8dup(const void* src) {
     bytes++;
   }
 
+  // need an extra byte allocated for the null terminating byte
+  bytes++;
+
   n = (char* )malloc(bytes);
 
   if (0 == n) {

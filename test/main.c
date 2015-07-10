@@ -315,16 +315,22 @@ int main(const int argc, const char* const argv[]) {
   }
   free(dup);
 
-  if (105 != utf8size(data)) {
+  dup = utf8dup("");
+  if (0 != utf8len(dup)) {
     return 28;
   }
+  free(dup);
 
-  if (3 != utf8size("ab")) {
+  if (105 != utf8size(data)) {
     return 29;
   }
 
-  if (1 != utf8size("")) {
+  if (3 != utf8size("ab")) {
     return 30;
+  }
+
+  if (1 != utf8size("")) {
+    return 31;
   }
 
   char invalid[5];
@@ -336,22 +342,12 @@ int main(const int argc, const char* const argv[]) {
   invalid[4] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 31;
+    return 32;
   }
 
   invalid[0] = '\xf1';
   invalid[1] = '\x3f';
   invalid[2] = '\xbf';
-  invalid[3] = '\xbf';
-  invalid[4] = '\0';
-
-  if (invalid != utf8valid(invalid)) {
-    return 32;
-  }
-
-  invalid[0] = '\xf1';
-  invalid[1] = '\xbf';
-  invalid[2] = '\x3f';
   invalid[3] = '\xbf';
   invalid[4] = '\0';
 
@@ -361,12 +357,22 @@ int main(const int argc, const char* const argv[]) {
 
   invalid[0] = '\xf1';
   invalid[1] = '\xbf';
+  invalid[2] = '\x3f';
+  invalid[3] = '\xbf';
+  invalid[4] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 34;
+  }
+
+  invalid[0] = '\xf1';
+  invalid[1] = '\xbf';
   invalid[2] = '\xbf';
   invalid[3] = '\x3f';
   invalid[4] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 34;
+    return 35;
   }
 
   invalid[0] = '\xe0';
@@ -375,7 +381,7 @@ int main(const int argc, const char* const argv[]) {
   invalid[3] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 35;
+    return 36;
   }
 
   invalid[0] = '\xef';
@@ -384,7 +390,7 @@ int main(const int argc, const char* const argv[]) {
   invalid[3] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 36;
+    return 37;
   }
 
   invalid[0] = '\xef';
@@ -393,7 +399,7 @@ int main(const int argc, const char* const argv[]) {
   invalid[3] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 37;
+    return 38;
   }
 
   invalid[0] = '\xc1';
@@ -401,7 +407,7 @@ int main(const int argc, const char* const argv[]) {
   invalid[2] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 38;
+    return 39;
   }
 
   invalid[0] = '\xdf';
@@ -409,32 +415,32 @@ int main(const int argc, const char* const argv[]) {
   invalid[2] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 39;
+    return 40;
   }
 
   invalid[0] = '\x80';
   invalid[1] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 40;
+    return 41;
   }
 
   invalid[0] = '\xf8';
   invalid[1] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 41;
-  }
-
-  if (0 != utf8valid(data)) {
     return 42;
   }
 
-  if (0 != utf8valid("ab")) {
+  if (0 != utf8valid(data)) {
     return 43;
   }
 
+  if (0 != utf8valid("ab")) {
+    return 44;
+  }
+
   if (0 != utf8valid("")) {
-    return 43;
+    return 45;
   }
 }
