@@ -35,8 +35,7 @@ Anywhere in the string.h documentation where it refers to 'bytes' I have changed
 
 ## Todo ##
 
-The current feature list is;
-
+- Add MSVC support.
 - Implement utf8coll (akin to strcoll).
 - ~~Implement utf8cspn (akin to strcspn).~~
 - ~~Implement utf8dup (akin to strdup).~~
