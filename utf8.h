@@ -473,6 +473,8 @@ void* utf8valid(const void* str) {
         return (void* )s;
       }
 
+      //
+
       // ensure that the top 5 bits of this 4-byte utf8
       // codepoint were not 0, as then we could have used
       // one of the smaller encodings
