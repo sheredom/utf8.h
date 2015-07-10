@@ -63,11 +63,16 @@ utf8_pure utf8_weak void* utf8cpy(void* dst, const void* src);
 utf8_pure utf8_weak size_t utf8cspn(const void* src, const void* reject);
 utf8_pure utf8_weak void* utf8dup(const void* src);
 
-// Number of utf8 codepoints in the utf8 string str.
+// Number of utf8 codepoints in the utf8 string str,
+// excluding the null terminating byte.
 utf8_pure utf8_weak size_t utf8len(const void* str);
 
 // Find the last match of the utf8 codepoint chr in the utf8 string src.
 utf8_pure utf8_weak void* utf8rchr(const void* src, int chr);
+
+// Number of bytes in the utf8 string str,
+// including the null terminating byte.
+utf8_pure utf8_weak size_t utf8size(const void* str);
 
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints from the utf8 string accept.
@@ -349,6 +354,18 @@ void* utf8rchr(const void* src, int chr) {
 
   // return the last match we found (or 0 if no match was found)
   return (void* )match;
+}
+
+size_t utf8size(const void* str) {
+  const char* s = (const char* )str;
+  size_t size = 0;
+  while ('\0' != s[size]) {
+    size++;
+  }
+
+  // we are including the null terminating byte in the size calculation
+  size++;
+  return size;
 }
 
 size_t utf8spn(const void* src, const void* accept) {

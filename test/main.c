@@ -315,5 +315,17 @@ int main(const int argc, const char* const argv[]) {
   }
   free(dup);
 
+  if (105 != utf8size(data)) {
+    return 28;
+  }
+
+  if (3 != utf8size("ab")) {
+    return 29;
+  }
+
+  if (1 != utf8size("")) {
+    return 30;
+  }
+
   return 0;
 }

@@ -42,7 +42,7 @@ The current feature list is;
 - ~~Implement utf8dup (akin to strdup).~~
 - Implement utf8fry (akin to strfry).
 - ~~Implement utf8rchr (akin to strrchr).~~
-- Add utf8size to allow users to get the size in bytes of a utf8 string.
+- ~~Add utf8size to allow users to get the size in bytes of a utf8 string.~~
 - Add utf8valid to check that a given utf8 string is actually a valid utf8 string.
 - Add NULL pointer support. Should I NULL check the arguments to the API?
 - Add Doxygen (or similar) to mimic the Unix man pages for string.h.
