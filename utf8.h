@@ -61,6 +61,9 @@ utf8_pure utf8_weak void* utf8cpy(void* dst, const void* src);
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints not from the utf8 string reject.
 utf8_pure utf8_weak size_t utf8cspn(const void* src, const void* reject);
+
+// Duplicate the utf8 string src by getting its size, malloc'ing a new buffer
+// copying over the data, and returning that. Or 0 if malloc failed.
 utf8_pure utf8_weak void* utf8dup(const void* src);
 
 // Number of utf8 codepoints in the utf8 string str,
