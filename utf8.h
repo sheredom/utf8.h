@@ -473,7 +473,10 @@ void* utf8valid(const void* str) {
         return (void* )s;
       }
 
-      //
+      // ensure that our utf8 codepoint ended after 4 bytes
+      if (0x80 == (0xc0 & s[4])) {
+        return (void* )s;
+      }
 
       // ensure that the top 5 bits of this 4-byte utf8
       // codepoint were not 0, as then we could have used
@@ -492,6 +495,11 @@ void* utf8valid(const void* str) {
         return (void* )s;
       }
 
+      // ensure that our utf8 codepoint ended after 3 bytes
+      if (0x80 == (0xc0 & s[3])) {
+        return (void* )s;
+      }
+
       // ensure that the top 5 bits of this 3-byte utf8
       // codepoint were not 0, as then we could have used
       // one of the smaller encodings
@@ -505,6 +513,11 @@ void* utf8valid(const void* str) {
       // ensure the 1 following byte in this 2-byte
       // utf8 codepoint began with 0b10xxxxxx
       if (0x80 != (0xc0 & s[1])) {
+        return (void* )s;
+      }
+
+      // ensure that our utf8 codepoint ended after 2 bytes
+      if (0x80 == (0xc0 & s[2])) {
         return (void* )s;
       }
 

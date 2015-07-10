@@ -452,6 +452,25 @@ int main(const int argc, const char* const argv[]) {
   invalid[5] = '\0';
 
   if (invalid != utf8valid(invalid)) {
-    return 33;
+    return 46;
+  }
+
+  invalid[0] = '\xef';
+  invalid[1] = '\xbf';
+  invalid[2] = '\xbf';
+  invalid[3] = '\xbf';
+  invalid[4] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 47;
+  }
+
+  invalid[0] = '\xdf';
+  invalid[1] = '\xbf';
+  invalid[2] = '\xbf';
+  invalid[3] = '\0';
+
+  if (invalid != utf8valid(invalid)) {
+    return 48;
   }
 }
