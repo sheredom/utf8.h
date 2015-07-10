@@ -524,15 +524,6 @@ void* utf8valid(const void* str) {
   return 0;
 }
 
-// 1-byte/7-bit ascii
-// (0b0xxxxxxx)
-// 2-byte/11-bit utf8 code point
-// (0b110xxxxx 0b10xxxxxx)
-// 3-byte/16-bit utf8 code point
-// (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
-// 4-byte/21-bit utf8 code point
-// (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx)
-
 #ifdef __cplusplus
 } // extern "C"
 #endif
