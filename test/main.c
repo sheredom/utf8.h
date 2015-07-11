@@ -473,4 +473,6 @@ int main(const int argc, const char* const argv[]) {
   if (invalid != utf8valid(invalid)) {
     return 48;
   }
+
+  return 0;
 }

@@ -41,6 +41,9 @@ extern "C" {
 #if defined(__clang__) || defined(__gcc__)
 #define utf8_pure __attribute__((pure))
 #define utf8_weak __attribute__((weak))
+#elif  defined(_MSC_VER)
+#define utf8_pure
+#define utf8_weak __inline
 #else
 #error Non clang, non gcc compiler found!
 #endif
