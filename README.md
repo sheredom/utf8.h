@@ -23,7 +23,9 @@ strstr | utf8str |  &#10004;
 
 Just include utf8.h in your code!
 
-The current supported compilers are gcc and clang - with MSVC support coming soon (I simply haven't had time to test and port to windows yet to be sure).
+The current supported compilers are gcc, clang and msvc.
+
+The current tested compiler versions are gcc 4.8.2, clang 3.5 and MSVC 18.0.21005.1.
 
 ## Design ##
 
@@ -35,7 +37,7 @@ Anywhere in the string.h documentation where it refers to 'bytes' I have changed
 
 ## Todo ##
 
-- Add MSVC support.
+- ~~Add MSVC support.~~
 - Implement utf8coll (akin to strcoll).
 - ~~Implement utf8cspn (akin to strcspn).~~
 - ~~Implement utf8dup (akin to strdup).~~
