@@ -474,5 +474,26 @@ int main(const int argc, const char* const argv[]) {
     return 48;
   }
 
+  cat[0] = 'a';
+  cat[1] = '\0';
+
+  if (2 != utf8len(utf8ncat(cat, data, 2))) {
+    return 49;
+  }
+
+  if (4 != utf8len(utf8ncat(cat, data, 4))) {
+    return 50;
+  }
+
+  cat[0] = '\0';
+  if (53 != utf8len(utf8ncat(cat, data, 4000))) {
+    return 51;
+  }
+
+  cat[0] = '\0';
+  if (cat != utf8valid(utf8ncat(cat, data, 1))) {
+    return 52;
+  }
+
   return 0;
 }

@@ -73,6 +73,11 @@ utf8_pure utf8_weak void* utf8dup(const void* src);
 // excluding the null terminating byte.
 utf8_pure utf8_weak size_t utf8len(const void* str);
 
+// Append the utf8 string src onto the utf8 string dst,
+// writing at most n+1 bytes. Can produce an invalid utf8
+// string if n falls partway through a utf8 codepoint.
+utf8_pure utf8_weak void* utf8ncat(void* dst, const void* src, size_t n);
+
 // Find the last match of the utf8 codepoint chr in the utf8 string src.
 utf8_pure utf8_weak void* utf8rchr(const void* src, int chr);
 
@@ -298,6 +303,27 @@ size_t utf8len(const void* str) {
   }
 
   return length;
+}
+
+void* utf8ncat(void* dst, const void* src, size_t n) {
+  char* d = (char* )dst;
+  const char* s = (const char* )src;
+
+  // find the null terminating byte in dst
+  while ('\0' != *d) {
+    d++;
+  }
+
+  // overwriting the null terminating byte in dst, append src byte-by-byte
+  // stopping if we run out of space
+  do {
+    *d++ = *s++;
+  } while (('\0' != *s) && (0 != --n));
+
+  // write out a new null terminating byte into dst
+  *d = '\0';
+
+  return dst;
 }
 
 void* utf8rchr(const void* src, int chr) {

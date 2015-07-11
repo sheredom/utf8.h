@@ -15,9 +15,18 @@ strcspn | utf8cspn | &#10004;
 strdup | utf8dup | &#10004;
 strfry | utf8fry |
 strlen | utf8len | &#10004;
+strncat | utf8ncat |
+strncmp | utf8ncmp |
+strncpy | utf8ncpy |
+strpbrk | utf8pbrk |
 strrchr | utf8rchr | &#10004;
+strsep | utf8sep |
+ | utf8size | &#10004;
 strspn | utf8spn | &#10004;
-strstr | utf8str |  &#10004;
+strstr | utf8str | &#10004;
+strtok | utf8tok |
+ | utf8valid | &#10004;
+strxfrm | utf8xfrm |
 
 ## Usage ##
 
