@@ -78,6 +78,11 @@ utf8_pure utf8_weak size_t utf8len(const void* str);
 // string if n falls partway through a utf8 codepoint.
 utf8_pure utf8_weak void* utf8ncat(void* dst, const void* src, size_t n);
 
+// Return less than 0, 0, greater than 0 if src1 < src2,
+// src1 == src2, src1 > src2 respectively. Checking at most n
+// bytes of each utf8 string.
+utf8_pure utf8_weak int utf8ncmp(const void* src1, const void* src2, size_t n);
+
 // Find the last match of the utf8 codepoint chr in the utf8 string src.
 utf8_pure utf8_weak void* utf8rchr(const void* src, int chr);
 
@@ -325,6 +330,26 @@ void* utf8ncat(void* dst, const void* src, size_t n) {
 
   return dst;
 }
+
+int utf8ncmp(const void* src1, const void* src2, size_t n) {
+  const unsigned char* s1 = (const unsigned char* )src1;
+  const unsigned char* s2 = (const unsigned char* )src2;
+
+  while ((('\0' != *s1) || ('\0' != *s2)) && (0 != n--)) {
+    if (*s1 < *s2) {
+      return -1;
+    } else if (*s1 > *s2) {
+      return 1;
+    }
+
+    s1++;
+    s2++;
+  }
+
+  // both utf8 strings matched
+  return 0;
+}
+
 
 void* utf8rchr(const void* src, int chr) {
   const char* s = (const char* )src;

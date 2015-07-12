@@ -495,5 +495,29 @@ int main(const int argc, const char* const argv[]) {
     return 52;
   }
 
+  if (0 >= utf8ncmp(data, lt, 4000)) {
+    return 53;
+  }
+
+  if (0 != utf8ncmp(data, lt, 7)) {
+    return 54;
+  }
+
+  if (0 != utf8ncmp(data, data, 4000)) {
+    return 55;
+  }
+
+  if (0 != utf8ncmp(data, data, 7)) {
+    return 56;
+  }
+
+  if (0 <= utf8ncmp(data, gt, 4000)) {
+    return 16;
+  }
+
+  if (0 != utf8ncmp(data, gt, 7)) {
+    return 16;
+  }
+
   return 0;
 }
