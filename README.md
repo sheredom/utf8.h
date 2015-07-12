@@ -15,7 +15,7 @@ strcspn | utf8cspn | &#10004;
 strdup | utf8dup | &#10004;
 strfry | utf8fry |
 strlen | utf8len | &#10004;
-strncat | utf8ncat |
+strncat | utf8ncat | &#10004;
 strncmp | utf8ncmp |
 strncpy | utf8ncpy |
 strpbrk | utf8pbrk |
