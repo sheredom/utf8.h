@@ -83,6 +83,15 @@ utf8_pure utf8_weak void* utf8ncat(void* dst, const void* src, size_t n);
 // bytes of each utf8 string.
 utf8_pure utf8_weak int utf8ncmp(const void* src1, const void* src2, size_t n);
 
+// Copy the utf8 string src onto the memory allocated in dst.
+// Copies at most n bytes. If there is no terminating null byte in
+// the first n bytes of src, the string placed into dst will not be
+// null-terminated. If the size (in bytes) of src is less than n,
+// extra null terminating bytes are appended to dst such that at
+// total of n bytes are written. Can produce an invalid utf8
+// string if n falls partway through a utf8 codepoint.
+utf8_pure utf8_weak void* utf8ncpy(void* dst, const void* src, size_t n);
+
 // Find the last match of the utf8 codepoint chr in the utf8 string src.
 utf8_pure utf8_weak void* utf8rchr(const void* src, int chr);
 
@@ -350,6 +359,24 @@ int utf8ncmp(const void* src1, const void* src2, size_t n) {
   return 0;
 }
 
+void* utf8ncpy(void* dst, const void* src, size_t n) {
+  char* d = (char* )dst;
+  const char* s = (const char* )src;
+
+  // overwriting anything previously in dst, write byte-by-byte
+  // from src
+  do {
+    *d++ = *s++;
+  } while (('\0' != *s) && (0 != --n));
+
+  // append null terminating byte
+  while (0 != n) {
+    *d++ = '\0';
+    n--;
+  }
+
+  return dst;
+}
 
 void* utf8rchr(const void* src, int chr) {
   const char* s = (const char* )src;

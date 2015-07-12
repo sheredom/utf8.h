@@ -512,11 +512,19 @@ int main(const int argc, const char* const argv[]) {
   }
 
   if (0 <= utf8ncmp(data, gt, 4000)) {
-    return 16;
+    return 57;
   }
 
   if (0 != utf8ncmp(data, gt, 7)) {
-    return 16;
+    return 58;
+  }
+
+  if ('\0' != *((char* )utf8ncpy(cpy, data, 106) + 105)) {
+    return 59;
+  }
+
+  if (53 != utf8len(utf8ncpy(cpy, data, 105))) {
+    return 60;
   }
 
   return 0;

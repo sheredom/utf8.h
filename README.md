@@ -17,7 +17,7 @@ strfry | utf8fry |
 strlen | utf8len | &#10004;
 strncat | utf8ncat | &#10004;
 strncmp | utf8ncmp | &#10004;
-strncpy | utf8ncpy |
+strncpy | utf8ncpy | &#10004;
 strpbrk | utf8pbrk |
 strrchr | utf8rchr | &#10004;
 strsep | utf8sep |
@@ -60,7 +60,7 @@ Anywhere in the string.h documentation where it refers to 'bytes' I have changed
 - Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
 - Investigate changing to [Creative Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) (as suggested by [@mcclure111](https://twitter.com/mcclure111))
 - ~~Document the code to make it more understandable (as suggested by [@mcclure111](https://twitter.com/mcclure111))~~
-- Add strn* variants (should n be by bytes or utf8 codepoints though?)
+- ~~Add strn* variants (should n be by bytes or utf8 codepoints though?)~~
 
 ## License ##
 
