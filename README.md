@@ -18,7 +18,7 @@ strlen | utf8len | &#10004;
 strncat | utf8ncat | &#10004;
 strncmp | utf8ncmp | &#10004;
 strncpy | utf8ncpy | &#10004;
-strpbrk | utf8pbrk |
+strpbrk | utf8pbrk | &#10004;
 strrchr | utf8rchr | &#10004;
 strsep | utf8sep |
  | utf8size | &#10004;

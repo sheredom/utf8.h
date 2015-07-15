@@ -92,6 +92,10 @@ utf8_pure utf8_weak int utf8ncmp(const void* src1, const void* src2, size_t n);
 // string if n falls partway through a utf8 codepoint.
 utf8_pure utf8_weak void* utf8ncpy(void* dst, const void* src, size_t n);
 
+// Locates the first occurence in the utf8 string str of any byte in the
+// utf8 string accept, or 0 if no match was found.
+utf8_pure utf8_weak void* utf8pbrk(const void* str, const void* accept);
+
 // Find the last match of the utf8 codepoint chr in the utf8 string src.
 utf8_pure utf8_weak void* utf8rchr(const void* src, int chr);
 
@@ -444,6 +448,55 @@ void* utf8rchr(const void* src, int chr) {
 
   // return the last match we found (or 0 if no match was found)
   return (void* )match;
+}
+
+void* utf8pbrk(const void* str, const void* accept) {
+  const char* s = (const char* )str;
+
+  while('\0' != *s) {
+    const char* a = (const char* )accept;
+    size_t offset = 0;
+
+    while ('\0' != *a) {
+      // checking that if *a is the start of a utf8 codepoint
+      // (it is not 0b10xxxxxx) and we have successfully matched
+      // a previous character (0 < offset) - we found a match
+      if ((0x80 != (0xc0 & *a)) && (0 < offset)) {
+        return (void* )s;
+      } else {
+        if (*a == s[offset]) {
+          // part of a utf8 codepoint matched, so move our checking
+          // onwards to the next byte
+          offset++;
+          a++;
+        } else {
+          // r could be in the middle of an unmatching utf8 code point,
+          // so we need to march it on to the next character beginning,
+
+          do {
+            a++;
+          } while (0x80 == (0xc0 & *a));
+
+          // reset offset too as we found a mismatch
+          offset = 0;
+        }
+      }
+    }
+
+    // we found a match on the last utf8 codepoint
+    if (0 < offset) {
+      return (void* )s;
+    }
+
+    // the current utf8 codepoint in src did not match accept, but src
+    // could have been partway through a utf8 codepoint, so we need to
+    // march it onto the next utf8 codepoint starting byte
+    do {
+      s++;
+    } while ((0x80 == (0xc0 & *s)));
+  }
+
+  return 0;
 }
 
 size_t utf8size(const void* str) {

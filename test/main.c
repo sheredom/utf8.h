@@ -527,5 +527,22 @@ int main(const int argc, const char* const argv[]) {
     return 60;
   }
 
+  const char pbrk[] = {
+    '\xcf',
+    '\x82',
+    '\x20',
+    '\xce',
+    '\xb5',
+    '\0'
+  };
+
+  if (data + 8 != utf8pbrk(data, pbrk)) {
+    return 61;
+  }
+
+  if (data != utf8pbrk(data, data)) {
+    return 62;
+  }
+
   return 0;
 }
