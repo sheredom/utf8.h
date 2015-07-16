@@ -544,5 +544,13 @@ int main(const int argc, const char* const argv[]) {
     return 62;
   }
 
+  if (data + 12 != utf8chr(data, 0x20)) {
+    return 63;
+  }
+
+  if (data + 90 != utf8rchr(data, 0x20)) {
+    return 64;
+  }
+
   return 0;
 }
