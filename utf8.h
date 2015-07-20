@@ -38,7 +38,7 @@
 extern "C" {
 #endif
 
-#if defined(__clang__) || defined(__gcc__)
+#if defined(__clang__) || defined(__GNUC__)
 #define utf8_pure __attribute__((pure))
 #define utf8_weak __attribute__((weak))
 #elif  defined(_MSC_VER)
