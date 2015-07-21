@@ -45,7 +45,7 @@ extern "C" {
 #define utf8_pure
 #define utf8_weak __inline
 #else
-#error Non clang, non gcc compiler found!
+#error Non clang, non gcc, non MSVC compiler found!
 #endif
 
 // Append the utf8 string src onto the utf8 string dst.
