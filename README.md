@@ -28,6 +28,11 @@ strtok | utf8tok |
  | utf8valid | &#10004;
 strxfrm | utf8xfrm |
 
+strings.h | utf8.h | complete
+---------|--------|---------
+strcasecmp | utf8casecmp |
+strncasecmp | utf8ncasecmp |
+
 ## Usage ##
 
 Just include utf8.h in your code!
