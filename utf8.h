@@ -130,11 +130,12 @@ int utf8casecmp(const void* src1, const void* src2) {
     unsigned char a = *s1;
     unsigned char b = *s2;
 
-    // check if both our input chars are ASCII
-    if ((0 == (0x80 & a)) && (0 == (0x80 & b))) {
-      // flatten the case of both of them
-      a += (('A' <= a) && ('Z' >= a)) ? 'a' - 'A' : 0;
-      b += (('A' <= b) && ('Z' >= b)) ? 'a' - 'A' : 0;
+    if (('A' <= a) && ('Z' >= a)) {
+      a |= 0x20; // make a lowercase
+    }
+
+    if (('A' <= b) && ('Z' >= b)) {
+      b |= 0x20; // make b lowercase
     }
 
     if (a < b) {

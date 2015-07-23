@@ -571,5 +571,13 @@ int main(const int argc, const char* const argv[]) {
     return 68;
   }
 
+  const char allascii1[] = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWYZ";
+  const char allascii2[] = "ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwyz";
+
+  if (0 != utf8casecmp(allascii1, allascii2)) {
+    return 69;
+  }
+
+
   return 0;
 }
