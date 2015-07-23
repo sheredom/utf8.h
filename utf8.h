@@ -48,6 +48,11 @@ extern "C" {
 #error Non clang, non gcc, non MSVC compiler found!
 #endif
 
+// While ignoring the case of ASCII characters, return less
+// than 0, 0, greater than 0 if src1 < src2, src1 == src2,
+// src1 > src2 respectively.
+utf8_pure utf8_weak int utf8casecmp(const void* src1, const void* src2);
+
 // Append the utf8 string src onto the utf8 string dst.
 utf8_pure utf8_weak void* utf8cat(void* dst, const void* src);
 
@@ -116,6 +121,35 @@ utf8_pure utf8_weak void* utf8valid(const void* str);
 
 #undef utf8_weak
 #undef utf8_pure
+
+int utf8casecmp(const void* src1, const void* src2) {
+  const unsigned char* s1 = (const unsigned char* )src1;
+  const unsigned char* s2 = (const unsigned char* )src2;
+
+  while (('\0' != *s1) || ('\0' != *s2)) {
+    unsigned char a = *s1;
+    unsigned char b = *s2;
+
+    // check if both our input chars are ASCII
+    if ((0 == (0x80 & a)) && (0 == (0x80 & b))) {
+      // flatten the case of both of them
+      a += (('A' <= a) && ('Z' >= a)) ? 'a' - 'A' : 0;
+      b += (('A' <= b) && ('Z' >= b)) ? 'a' - 'A' : 0;
+    }
+
+    if (a < b) {
+      return -1;
+    } else if (a > b) {
+      return 1;
+    }
+
+    s1++;
+    s2++;
+  }
+
+  // both utf8 strings matched
+  return 0;
+}
 
 void* utf8cat(void* dst, const void* src) {
   char* d = (char* )dst;
