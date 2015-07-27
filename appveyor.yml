@@ -1,8 +1,19 @@
 version: '{build}'
+
 skip_tags: true
+
 install: []
+
+platform:
+  - x86
+  - x64
+
+configuration:
+  - Debug
+  - Release
+
 build_script:
   - md build
   - cd build
   - cmake -G "Visual Studio 12" ..
-  - msbuild /m /p:Configuration=Release /p:Platform="Win32" utf8.sln
+  - msbuild /m /p:Configuration="%CONFIGURATION%" /p:Platform="%PLATFORM%" utf8.sln
