@@ -28,6 +28,11 @@ strtok | utf8tok |
  | utf8valid | &#10004;
 strxfrm | utf8xfrm |
 
+strings.h | utf8.h | complete
+---------|--------|---------
+strcasecmp | utf8casecmp | ~~&#10004;~~
+strncasecmp | utf8ncasecmp |
+
 ## Usage ##
 
 Just include utf8.h in your code!
@@ -61,7 +66,8 @@ Anywhere in the string.h documentation where it refers to 'bytes' I have changed
 - Investigate changing to [Creative Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) (as suggested by [@mcclure111](https://twitter.com/mcclure111))
 - ~~Document the code to make it more understandable (as suggested by [@mcclure111](https://twitter.com/mcclure111))~~
 - ~~Add strn* variants (should n be by bytes or utf8 codepoints though?)~~
-- Add utf8casecmp and utf8ncasecmp to compare two strings case-insensitively (as insensitively suggested by [@daniel_collin](https://twitter.com/daniel_collin))
+- Add ~~utf8casecmp and~~ utf8ncasecmp to compare two strings case-insensitively (as insensitively suggested by [@daniel_collin](https://twitter.com/daniel_collin))
+- Extend utf8casecmp range to consume non-ASCII case differences too (I don't even rightly know if there are any!)
 
 ## License ##
 

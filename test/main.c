@@ -552,5 +552,32 @@ int main(const int argc, const char* const argv[]) {
     return 64;
   }
 
+  const char ascii1[] = "I lIke GOATS YARHAR.";
+  const char ascii2[] = "i LIKE goats yarHAR.";
+
+  if (0 != utf8casecmp(ascii1, ascii2)) {
+    return 65;
+  }
+
+  if (0 >= utf8casecmp(data, lt)) {
+    return 66;
+  }
+
+  if (0 != utf8casecmp(data, data)) {
+    return 67;
+  }
+
+  if (0 <= utf8casecmp(data, gt)) {
+    return 68;
+  }
+
+  const char allascii1[] = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWYZ";
+  const char allascii2[] = "ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwyz";
+
+  if (0 != utf8casecmp(allascii1, allascii2)) {
+    return 69;
+  }
+
+
   return 0;
 }
