@@ -4,6 +4,8 @@ A simple one header solution to supporting utf8 strings in C and C++.
 
 Functions are provided to match the string.h header but with a utf8* prefix instead of the str* prefix from string.h.
 
+![Build status](https://ci.appveyor.com/api/projects/status/phfjjahhs9j4gxvs?svg=true)](https://ci.appveyor.com/project/sheredom/utf8-h)
+
 string.h | utf8.h | complete
 ---------|--------|---------
 strcat | utf8cat | &#10004;
