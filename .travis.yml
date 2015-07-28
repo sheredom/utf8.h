@@ -9,9 +9,7 @@ env:
   - CONFIGURATION=Release
 
 script:
-  - env
-  - echo $CONFIGURATION
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE="$CONFIGURATION" ..
+  - cmake -DCMAKE_BUILD_TYPE=$CONFIGURATION ..
   - make
