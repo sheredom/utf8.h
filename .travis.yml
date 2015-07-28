@@ -1,0 +1,15 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+env:
+  - CONFIGURATION=Debug
+  - CONFIGURATION=Release
+
+script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE:STRING=$CONFIGURATION ..
+  - make
