@@ -21,5 +21,5 @@ build_script:
   - md build
   - cd build
   - if "%PLATFORM%"=="x64" cmake -G "%VSVERSION% Win64" ..
-  - if "%PLATFORM%"=="Win32" cmake -G "%VSVERSION% 12" ..
+  - if "%PLATFORM%"=="Win32" cmake -G "%VSVERSION%" ..
   - msbuild /m /p:Configuration="%CONFIGURATION%" /p:Platform="%PLATFORM%" utf8.sln
