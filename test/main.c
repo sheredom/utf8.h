@@ -133,12 +133,71 @@ const char data[] = {
   '\0'
 };
 
+const char cmp[] = { '\xce', '\xbc', '\xcf', '\x85', '\0' };
+  
+const char lt[] = {
+  '\xce',
+  '\x93',
+  '\xce',
+  '\xb1',
+  '\xce',
+  '\xb6',
+  '\xce',
+  '\xac',
+  '\0'};
+
+const char gt[] = {
+  '\xce',
+  '\x93',
+  '\xce',
+  '\xb1',
+  '\xce',
+  '\xb6',
+  '\xce',
+  '\xae',
+  '\0'};
+
+const char spn[] = {
+  '\xce',
+  '\x93',
+  '\xce',
+  '\xb1',
+  '\xce',
+  '\xb6',
+  '\xce',
+  '\xad',
+  '\xce',
+  '\xb5',
+  '\xcf',
+  '\x82',
+  '\x20',
+  '\xce',
+  '\xba',
+  '\0'};
+
+const char pbrk[] = {
+  '\xcf',
+  '\x82',
+  '\x20',
+  '\xce',
+  '\xb5',
+  '\0'};
+
+const char ascii1[] = "I lIke GOATS YARHAR.";
+const char ascii2[] = "i LIKE goats yarHAR.";
+const char allascii1[] = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWYZ";
+const char allascii2[] = "ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwyz";
+
 int main(const int argc, const char* const argv[]) {
+  char cat[512] = {'\0'};
+  char cpy[512] = {'\0'};
+  void* dup = 0;
+  char invalid[6] = {'\0'};
+
   if(53 != utf8len(data)) {
     return 1;
   }
 
-  char cat[512] = {'\0'};
   if (53 != utf8len(utf8cat(cat, data))) {
     return 2;
   }
@@ -183,8 +242,6 @@ int main(const int argc, const char* const argv[]) {
     return 7;
   }
 
-  const char cmp[] = { '\xce', '\xbc', '\xcf', '\x85', '\0' };
-
   if (data + 21 != utf8str(data, cmp)) {
     return 8;
   }
@@ -209,17 +266,6 @@ int main(const int argc, const char* const argv[]) {
     return 13;
   }
 
-  const char lt[] = {
-    '\xce',
-    '\x93',
-    '\xce',
-    '\xb1',
-    '\xce',
-    '\xb6',
-    '\xce',
-    '\xac',
-    '\0'};
-
   if (0 >= utf8cmp(data, lt)) {
     return 14;
   }
@@ -228,44 +274,13 @@ int main(const int argc, const char* const argv[]) {
     return 15;
   }
 
-  const char gt[] = {
-    '\xce',
-    '\x93',
-    '\xce',
-    '\xb1',
-    '\xce',
-    '\xb6',
-    '\xce',
-    '\xae',
-    '\0'};
-
   if (0 <= utf8cmp(data, gt)) {
     return 16;
   }
 
-  char cpy[512];
-
   if (53 != utf8len(utf8cpy(cpy, data))) {
     return 17;
   }
-
-  const char spn[] = {
-    '\xce',
-    '\x93',
-    '\xce',
-    '\xb1',
-    '\xce',
-    '\xb6',
-    '\xce',
-    '\xad',
-    '\xce',
-    '\xb5',
-    '\xcf',
-    '\x82',
-    '\x20',
-    '\xce',
-    '\xba',
-    '\0'};
 
   if (7 != utf8spn(data, spn)) {
     return 18;
@@ -303,7 +318,7 @@ int main(const int argc, const char* const argv[]) {
     return 26;
   }
 
-  void* dup = utf8dup(data);
+  dup = utf8dup(data);
   if (53 != utf8len(dup)) {
     return 27;
   }
@@ -332,8 +347,6 @@ int main(const int argc, const char* const argv[]) {
   if (1 != utf8size("")) {
     return 31;
   }
-
-  char invalid[6];
 
   invalid[0] = '\xf0';
   invalid[1] = '\x8f';
@@ -527,15 +540,6 @@ int main(const int argc, const char* const argv[]) {
     return 60;
   }
 
-  const char pbrk[] = {
-    '\xcf',
-    '\x82',
-    '\x20',
-    '\xce',
-    '\xb5',
-    '\0'
-  };
-
   if (data + 8 != utf8pbrk(data, pbrk)) {
     return 61;
   }
@@ -552,9 +556,6 @@ int main(const int argc, const char* const argv[]) {
     return 64;
   }
 
-  const char ascii1[] = "I lIke GOATS YARHAR.";
-  const char ascii2[] = "i LIKE goats yarHAR.";
-
   if (0 != utf8casecmp(ascii1, ascii2)) {
     return 65;
   }
@@ -570,9 +571,6 @@ int main(const int argc, const char* const argv[]) {
   if (0 <= utf8casecmp(data, gt)) {
     return 68;
   }
-
-  const char allascii1[] = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWYZ";
-  const char allascii2[] = "ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwyz";
 
   if (0 != utf8casecmp(allascii1, allascii2)) {
     return 69;
