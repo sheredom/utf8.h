@@ -24,7 +24,7 @@
 # For more information, please refer to <http://unlicense.org/>
 
 project(utf8)
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 2.8.7)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
