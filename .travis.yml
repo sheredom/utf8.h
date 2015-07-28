@@ -10,7 +10,8 @@ env:
 
 script:
   - env
+  - echo $CONFIGURATION
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE:STRING=${CONFIGURATION} ..
+  - cmake -DCMAKE_BUILD_TYPE:STRING=$CONFIGURATION ..
   - make
