@@ -4,6 +4,11 @@ skip_tags: true
 
 install: []
 
+environment:
+  matrix:
+    - VSVERSION: Visual Studio 11
+    - VSVERSION: Visual Studio 12
+
 platform:
   - Win32
   - x64
@@ -15,6 +20,6 @@ configuration:
 build_script:
   - md build
   - cd build
-  - if "%PLATFORM%"=="x64" cmake -G "Visual Studio 12 Win64" ..
-  - if "%PLATFORM%"=="Win32" cmake -G "Visual Studio 12" ..
+  - if "%PLATFORM%"=="x64" cmake -G "%VSVERSION% Win64" ..
+  - if "%PLATFORM%"=="Win32" cmake -G "%VSVERSION% 12" ..
   - msbuild /m /p:Configuration="%CONFIGURATION%" /p:Platform="%PLATFORM%" utf8.sln
