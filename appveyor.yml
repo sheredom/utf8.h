@@ -8,6 +8,7 @@ environment:
   matrix:
     - VSVERSION: Visual Studio 11
     - VSVERSION: Visual Studio 12
+    - VSVERSION: Visual Studio 14
 
 platform:
   - Win32
