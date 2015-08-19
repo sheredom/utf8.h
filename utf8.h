@@ -23,8 +23,8 @@
 //
 // For more information, please refer to <http://unlicense.org/>
 
-#ifndef __UTF8_H__
-#define __UTF8_H__
+#ifndef SHEREDOM_UTF8_H_INCLUDED
+#define SHEREDOM_UTF8_H_INCLUDED
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -719,4 +719,4 @@ void* utf8valid(const void* str) {
 #pragma clang diagnostic pop
 #endif
 
-#endif//__UTF8_H__
+#endif//SHEREDOM_UTF8_H_INCLUDED
