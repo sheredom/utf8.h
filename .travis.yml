@@ -11,5 +11,5 @@ env:
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=$CONFIGURATION ..
+  - cmake -DCMAKE_BUILD_TYPE=$CONFIGURATION ../test
   - make

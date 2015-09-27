@@ -26,24 +26,24 @@
 project(utf8)
 cmake_minimum_required(VERSION 2.8.7)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 add_executable(utf8_test
-  test/main.c
-  test/test.c
-  test/test.cpp
+  main.c
+  test.c
+  test.cpp
 )
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
-  set_source_files_properties(test/test.c test/test.cpp PROPERTIES
+  set_source_files_properties(test.c test.cpp PROPERTIES
     COMPILE_FLAGS "-Wall -Wextra -Werror"
   )
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
-  set_source_files_properties(test/test.c test/test.cpp PROPERTIES
+  set_source_files_properties(test.c test.cpp PROPERTIES
     COMPILE_FLAGS "-Wall -Wextra -Weverything -Werror"
   )
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
-  set_source_files_properties(test/test.c test/test.cpp PROPERTIES
+  set_source_files_properties(test.c test.cpp PROPERTIES
     COMPILE_FLAGS "/Wall /WX /wd4514"
   )
 else()
