@@ -55,21 +55,13 @@ Anywhere in the string.h documentation where it refers to 'bytes' I have changed
 
 ## Todo ##
 
-- ~~Add MSVC support.~~
 - Implement utf8coll (akin to strcoll).
-- ~~Implement utf8cspn (akin to strcspn).~~
-- ~~Implement utf8dup (akin to strdup).~~
 - Implement utf8fry (akin to strfry).
-- ~~Implement utf8rchr (akin to strrchr).~~
-- ~~Add utf8size to allow users to get the size in bytes of a utf8 string.~~
-- ~~Add utf8valid to check that a given utf8 string is actually a valid utf8 string.~~
 - Add NULL pointer support. Should I NULL check the arguments to the API?
 - Add Doxygen (or similar) to mimic the Unix man pages for string.h.
 - Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
 - Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
 - Investigate changing to [Creative Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) (as suggested by [@mcclure111](https://twitter.com/mcclure111))
-- ~~Document the code to make it more understandable (as suggested by [@mcclure111](https://twitter.com/mcclure111))~~
-- ~~Add strn* variants (should n be by bytes or utf8 codepoints though?)~~
 - Add ~~utf8casecmp and~~ utf8ncasecmp to compare two strings case-insensitively (as insensitively suggested by [@daniel_collin](https://twitter.com/daniel_collin))
 - Extend utf8casecmp range to consume non-ASCII case differences too (I don't even rightly know if there are any!)
 
