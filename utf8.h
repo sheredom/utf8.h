@@ -597,7 +597,7 @@ void* utf8str(const void* haystack, const void* needle) {
 
   // if needle has no utf8 codepoints before the null terminating
   // byte then return haystack
-  if ('\0' == (const char* )needle) {
+  if ('\0' == *((const char* )needle)) {
     return (void* )haystack;
   }
 
