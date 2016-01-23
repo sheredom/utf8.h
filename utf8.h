@@ -240,9 +240,9 @@ void* utf8cpy(void* dst, const void* src) {
 
   // overwriting anything previously in dst, write byte-by-byte
   // from src
-  do {
+  while ('\0' != *s) {
     *d++ = *s++;
-  } while ('\0' != *s);
+  }
 
   // append null terminating byte
   *d = '\0';
