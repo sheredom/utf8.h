@@ -162,9 +162,9 @@ void* utf8cat(void* dst, const void* src) {
   }
 
   // overwriting the null terminating byte in dst, append src byte-by-byte
-  do {
+  while ('\0' != *s) {
     *d++ = *s++;
-  } while ('\0' != *s);
+  }
 
   // write out a new null terminating byte into dst
   *d = '\0';
