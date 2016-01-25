@@ -1,5 +1,9 @@
 language: cpp
 
+os:
+  - linux
+  - osx
+
 compiler:
   - gcc
   - clang
@@ -13,3 +17,4 @@ script:
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=$CONFIGURATION ../test
   - make
+  - ./utf8_test

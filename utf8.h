@@ -57,7 +57,7 @@ utf8_pure utf8_weak int utf8casecmp(const void* src1, const void* src2);
 utf8_pure utf8_weak void* utf8cat(void* dst, const void* src);
 
 // Find the first match of the utf8 codepoint chr in the utf8 string src.
-utf8_pure utf8_weak void* utf8chr(const void* src, int chr);
+utf8_pure utf8_weak void* utf8chr(const void* src, long chr);
 
 // Return less than 0, 0, greater than 0 if src1 < src2,
 // src1 == src2, src1 > src2 respectively.
@@ -172,7 +172,7 @@ void* utf8cat(void* dst, const void* src) {
   return dst;
 }
 
-void* utf8chr(const void* src, int chr) {
+void* utf8chr(const void* src, long chr) {
   char c[5] = {'\0', '\0', '\0', '\0', '\0'};
 
   if (0 == chr) {
@@ -183,16 +183,16 @@ void* utf8chr(const void* src, int chr) {
       s++;
     }
     return (void * )s;
-  } else if (0 == ((int)0xffffff80 & chr)) {
+  } else if (0 == ((long)0xffffff80 & chr)) {
     // 1-byte/7-bit ascii
     // (0b0xxxxxxx)
     c[0] = (char)chr;
-  } else if (0 == ((int)0xfffff800 & chr)) {
+  } else if (0 == ((long)0xfffff800 & chr)) {
     // 2-byte/11-bit utf8 code point
     // (0b110xxxxx 0b10xxxxxx)
     c[0] = 0xc0 | (char)(chr >> 6);
     c[1] = 0x80 | (char)(chr & 0x3f);
-  } else if (0 == ((int)0xffff0000 & chr)) {
+  } else if (0 == ((long)0xffff0000 & chr)) {
     // 3-byte/16-bit utf8 code point
     // (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
     c[0] = 0xe0 | (char)(chr >> 12);
