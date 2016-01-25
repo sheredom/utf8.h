@@ -296,18 +296,14 @@ size_t utf8cspn(const void* src, const void* reject) {
   return chars;
 }
 
+size_t utf8size(const void* str);
+
 void* utf8dup(const void* src) {
   const char* s = (const char* )src;
-  size_t bytes = 0;
   char* n = 0;
 
-  // figure out how many bytes we need to copy first
-  while ('\0' != s[bytes]) {
-    bytes++;
-  }
-
-  // need an extra byte allocated for the null terminating byte
-  bytes++;
+  // figure out how many bytes (including the terminator) we need to copy first
+  size_t bytes = utf8size(src);
 
   n = (char* )malloc(bytes);
 
