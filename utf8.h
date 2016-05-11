@@ -54,7 +54,7 @@ extern "C" {
 utf8_pure utf8_weak int utf8casecmp(const void* src1, const void* src2);
 
 // Append the utf8 string src onto the utf8 string dst.
-utf8_pure utf8_weak void* utf8cat(void* dst, const void* src);
+utf8_weak void* utf8cat(void* dst, const void* src);
 
 // Find the first match of the utf8 codepoint chr in the utf8 string src.
 utf8_pure utf8_weak void* utf8chr(const void* src, int chr);
@@ -64,7 +64,7 @@ utf8_pure utf8_weak void* utf8chr(const void* src, int chr);
 utf8_pure utf8_weak int utf8cmp(const void* src1, const void* src2);
 
 // Copy the utf8 string src onto the memory allocated in dst.
-utf8_pure utf8_weak void* utf8cpy(void* dst, const void* src);
+utf8_weak void* utf8cpy(void* dst, const void* src);
 
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints not from the utf8 string reject.
@@ -72,7 +72,7 @@ utf8_pure utf8_weak size_t utf8cspn(const void* src, const void* reject);
 
 // Duplicate the utf8 string src by getting its size, malloc'ing a new buffer
 // copying over the data, and returning that. Or 0 if malloc failed.
-utf8_pure utf8_weak void* utf8dup(const void* src);
+utf8_weak void* utf8dup(const void* src);
 
 // Number of utf8 codepoints in the utf8 string str,
 // excluding the null terminating byte.
@@ -81,7 +81,7 @@ utf8_pure utf8_weak size_t utf8len(const void* str);
 // Append the utf8 string src onto the utf8 string dst,
 // writing at most n+1 bytes. Can produce an invalid utf8
 // string if n falls partway through a utf8 codepoint.
-utf8_pure utf8_weak void* utf8ncat(void* dst, const void* src, size_t n);
+utf8_weak void* utf8ncat(void* dst, const void* src, size_t n);
 
 // Return less than 0, 0, greater than 0 if src1 < src2,
 // src1 == src2, src1 > src2 respectively. Checking at most n
@@ -95,7 +95,7 @@ utf8_pure utf8_weak int utf8ncmp(const void* src1, const void* src2, size_t n);
 // extra null terminating bytes are appended to dst such that at
 // total of n bytes are written. Can produce an invalid utf8
 // string if n falls partway through a utf8 codepoint.
-utf8_pure utf8_weak void* utf8ncpy(void* dst, const void* src, size_t n);
+utf8_weak void* utf8ncpy(void* dst, const void* src, size_t n);
 
 // Locates the first occurence in the utf8 string str of any byte in the
 // utf8 string accept, or 0 if no match was found.
