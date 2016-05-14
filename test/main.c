@@ -134,7 +134,7 @@ const char data[] = {
 };
 
 const char cmp[] = { '\xce', '\xbc', '\xcf', '\x85', '\0' };
-  
+
 const char lt[] = {
   '\xce',
   '\x93',
@@ -574,6 +574,30 @@ int main(const int argc, const char* const argv[]) {
 
   if (0 != utf8casecmp(allascii1, allascii2)) {
     return 69;
+  }
+
+  if (0 >= utf8ncasecmp(data, lt, 4000)) {
+    return 70;
+  }
+
+  if (0 != utf8ncasecmp(data, lt, 7)) {
+    return 71;
+  }
+
+  if (0 != utf8ncasecmp(data, data, 4000)) {
+    return 72;
+  }
+
+  if (0 != utf8ncasecmp(data, data, 7)) {
+    return 73;
+  }
+
+  if (0 <= utf8ncasecmp(data, gt, 4000)) {
+    return 74;
+  }
+
+  if (0 != utf8ncasecmp(data, gt, 7)) {
+    return 75;
   }
 
 

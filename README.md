@@ -35,7 +35,7 @@ strxfrm | utf8xfrm |
 strings.h | utf8.h | complete
 ---------|--------|---------
 strcasecmp | utf8casecmp | ~~&#10004;~~
-strncasecmp | utf8ncasecmp |
+strncasecmp | utf8ncasecmp | ~~&#10004;~~
 
 ## Usage ##
 
@@ -62,7 +62,7 @@ Anywhere in the string.h documentation where it refers to 'bytes' I have changed
 - Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
 - Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
 - Investigate changing to [Creative Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) (as suggested by [@mcclure111](https://twitter.com/mcclure111))
-- Add ~~utf8casecmp and~~ utf8ncasecmp to compare two strings case-insensitively (as insensitively suggested by [@daniel_collin](https://twitter.com/daniel_collin))
+- ~~Add utf8casecmp and utf8ncasecmp to compare two strings case-insensitively (as insensitively suggested by [@daniel_collin](https://twitter.com/daniel_collin))~~
 - Extend utf8casecmp range to consume non-ASCII case differences too (I don't even rightly know if there are any!)
 
 ## License ##
