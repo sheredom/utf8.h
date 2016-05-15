@@ -78,6 +78,13 @@ utf8_weak void* utf8dup(const void* src);
 // excluding the null terminating byte.
 utf8_pure utf8_weak size_t utf8len(const void* str);
 
+// While ignoring the case of ASCII characters, return less
+// than 0, 0, greater than 0 if src1 < src2, src1 == src2,
+// src1 > src2 respectively. Checking at most n
+// bytes of each utf8 string.
+utf8_pure utf8_weak int utf8ncasecmp(const void* src1, const void* src2,
+                                     size_t n);
+
 // Append the utf8 string src onto the utf8 string dst,
 // writing at most n+1 bytes. Can produce an invalid utf8
 // string if n falls partway through a utf8 codepoint.
@@ -352,6 +359,36 @@ size_t utf8len(const void* str) {
   }
 
   return length;
+}
+
+int utf8ncasecmp(const void* src1, const void* src2, size_t n) {
+  const unsigned char* s1 = (const unsigned char* )src1;
+  const unsigned char* s2 = (const unsigned char* )src2;
+
+  while ((('\0' != *s1) || ('\0' != *s2)) && (0 != n--)) {
+    unsigned char a = *s1;
+    unsigned char b = *s2;
+
+    if (('A' <= a) && ('Z' >= a)) {
+      a |= 0x20; // make a lowercase
+    }
+
+    if (('A' <= b) && ('Z' >= b)) {
+      b |= 0x20; // make b lowercase
+    }
+
+    if (a < b) {
+      return -1;
+    } else if (a > b) {
+      return 1;
+    }
+
+    s1++;
+    s2++;
+    }
+
+    // both utf8 strings matched
+    return 0;
 }
 
 void* utf8ncat(void* dst, const void* src, size_t n) {
@@ -706,6 +743,7 @@ void* utf8valid(const void* str) {
 
   return 0;
 }
+
 
 #ifdef __cplusplus
 } // extern "C"
