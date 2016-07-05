@@ -122,6 +122,9 @@ utf8_pure utf8_weak size_t utf8spn(const void* src, const void* accept);
 // The position of the utf8 string needle in the utf8 string haystack.
 utf8_pure utf8_weak void* utf8str(const void* haystack, const void* needle);
 
+// The position of the utf8 string needle in the utf8 string haystack, case instensitive.
+utf8_pure utf8_weak void* utf8casestr(const void* haystack, const void* needle);
+
 // Return 0 on success, or the position of the invalid
 // utf8 codepoint on failure.
 utf8_pure utf8_weak void* utf8valid(const void* str);
@@ -660,6 +663,55 @@ void* utf8str(const void* haystack, const void* needle) {
 
   // no match
   return 0;
+}
+
+void* utf8casestr(const void* haystack, const void* needle) {
+	const char* h = (const char*)haystack;
+
+	// if needle has no utf8 codepoints before the null terminating
+	// byte then return haystack
+	if ('\0' == *((const char*)needle)) {
+		return (void*)haystack;
+	}
+
+	while ('\0' != *h) {
+		const char* maybeMatch = h;
+		const char* n = (const char*)needle;
+
+		unsigned short looping = 1;
+		while (looping) {
+			char a = *h;
+			char b = *n;
+			// not entirely correct, but good enough
+			if (('A' <= a) && ('Z' >= a)) {
+				a |= 0x20; // make a lowercase
+			}
+
+			if (('A' <= b) && ('Z' >= b)) {
+				b |= 0x20; // make b lowercase
+			}
+			if (a != b) looping = 0;
+			n++;
+			h++;
+		}
+
+		if ('\0' == *n) {
+			// we found the whole utf8 string for needle in haystack at
+			// maybeMatch, so return it
+			return (void*)maybeMatch;
+		} else {
+			// h could be in the middle of an unmatching utf8 codepoint,
+			// so we need to march it on to the next character beginning,
+			if ('\0' != *h) {
+				do {
+					h++;
+				} while (0x80 == (0xc0 & *h));
+			}
+		}
+	}
+
+	// no match
+	return 0;
 }
 
 void* utf8valid(const void* str) {
