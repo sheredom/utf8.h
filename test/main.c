@@ -30,171 +30,39 @@
 #include "utf8.h"
 
 const char data[] = {
-  '\xce',
-  '\x93',
-  '\xce',
-  '\xb1',
-  '\xce',
-  '\xb6',
-  '\xce',
-  '\xad',
-  '\xce',
-  '\xb5',
-  '\xcf',
-  '\x82',
-  '\x20',
-  '\xce',
-  '\xba',
-  '\xce',
-  '\xb1',
-  '\xe1',
-  '\xbd',
-  '\xb6',
-  '\x20',
-  '\xce',
-  '\xbc',
-  '\xcf',
-  '\x85',
-  '\xcf',
-  '\x81',
-  '\xcf',
-  '\x84',
-  '\xce',
-  '\xb9',
-  '\xe1',
-  '\xbd',
-  '\xb2',
-  '\xcf',
-  '\x82',
-  '\x20',
-  '\xce',
-  '\xb4',
-  '\xe1',
-  '\xbd',
-  '\xb2',
-  '\xce',
-  '\xbd',
-  '\x20',
-  '\xce',
-  '\xb8',
-  '\xe1',
-  '\xbd',
-  '\xb0',
-  '\x20',
-  '\xce',
-  '\xb2',
-  '\xcf',
-  '\x81',
-  '\xe1',
-  '\xbf',
-  '\xb6',
-  '\x20',
-  '\xcf',
-  '\x80',
-  '\xce',
-  '\xb9',
-  '\xe1',
-  '\xbd',
-  '\xb0',
-  '\x20',
-  '\xcf',
-  '\x83',
-  '\xcf',
-  '\x84',
-  '\xe1',
-  '\xbd',
-  '\xb8',
-  '\x20',
-  '\xcf',
-  '\x87',
-  '\xcf',
-  '\x81',
-  '\xcf',
-  '\x85',
-  '\xcf',
-  '\x83',
-  '\xce',
-  '\xb1',
-  '\xcf',
-  '\x86',
-  '\xe1',
-  '\xbd',
-  '\xb6',
-  '\x20',
-  '\xce',
-  '\xbe',
-  '\xce',
-  '\xad',
-  '\xcf',
-  '\x86',
-  '\xcf',
-  '\x89',
-  '\xcf',
-  '\x84',
-  '\xce',
-  '\xbf',
-  '\x0a',
-  '\0'
-};
+    '\xce', '\x93', '\xce', '\xb1', '\xce', '\xb6', '\xce', '\xad', '\xce',
+    '\xb5', '\xcf', '\x82', '\x20', '\xce', '\xba', '\xce', '\xb1', '\xe1',
+    '\xbd', '\xb6', '\x20', '\xce', '\xbc', '\xcf', '\x85', '\xcf', '\x81',
+    '\xcf', '\x84', '\xce', '\xb9', '\xe1', '\xbd', '\xb2', '\xcf', '\x82',
+    '\x20', '\xce', '\xb4', '\xe1', '\xbd', '\xb2', '\xce', '\xbd', '\x20',
+    '\xce', '\xb8', '\xe1', '\xbd', '\xb0', '\x20', '\xce', '\xb2', '\xcf',
+    '\x81', '\xe1', '\xbf', '\xb6', '\x20', '\xcf', '\x80', '\xce', '\xb9',
+    '\xe1', '\xbd', '\xb0', '\x20', '\xcf', '\x83', '\xcf', '\x84', '\xe1',
+    '\xbd', '\xb8', '\x20', '\xcf', '\x87', '\xcf', '\x81', '\xcf', '\x85',
+    '\xcf', '\x83', '\xce', '\xb1', '\xcf', '\x86', '\xe1', '\xbd', '\xb6',
+    '\x20', '\xce', '\xbe', '\xce', '\xad', '\xcf', '\x86', '\xcf', '\x89',
+    '\xcf', '\x84', '\xce', '\xbf', '\x0a', '\0'};
 
-const char cmp[] = { '\xce', '\xbc', '\xcf', '\x85', '\0' };
+const char cmp[] = {'\xce', '\xbc', '\xcf', '\x85', '\0'};
 
-const char lt[] = {
-  '\xce',
-  '\x93',
-  '\xce',
-  '\xb1',
-  '\xce',
-  '\xb6',
-  '\xce',
-  '\xac',
-  '\0'};
+const char lt[] = {'\xce', '\x93', '\xce', '\xb1', '\xce',
+                   '\xb6', '\xce', '\xac', '\0'};
 
-const char gt[] = {
-  '\xce',
-  '\x93',
-  '\xce',
-  '\xb1',
-  '\xce',
-  '\xb6',
-  '\xce',
-  '\xae',
-  '\0'};
+const char gt[] = {'\xce', '\x93', '\xce', '\xb1', '\xce',
+                   '\xb6', '\xce', '\xae', '\0'};
 
-const char spn[] = {
-  '\xce',
-  '\x93',
-  '\xce',
-  '\xb1',
-  '\xce',
-  '\xb6',
-  '\xce',
-  '\xad',
-  '\xce',
-  '\xb5',
-  '\xcf',
-  '\x82',
-  '\x20',
-  '\xce',
-  '\xba',
-  '\0'};
+const char spn[] = {'\xce', '\x93', '\xce', '\xb1', '\xce', '\xb6',
+                    '\xce', '\xad', '\xce', '\xb5', '\xcf', '\x82',
+                    '\x20', '\xce', '\xba', '\0'};
 
-const char pbrk[] = {
-  '\xcf',
-  '\x82',
-  '\x20',
-  '\xce',
-  '\xb5',
-  '\0'};
+const char pbrk[] = {'\xcf', '\x82', '\x20', '\xce', '\xb5', '\0'};
 
 const char ascii1[] = "I lIke GOATS YARHAR.";
 const char ascii2[] = "i LIKE goats yarHAR.";
 const char allascii1[] = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWYZ";
 const char allascii2[] = "ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwyz";
 
-UTEST(utf8len, data) {
-  ASSERT_EQ(53, utf8len(data));
-}
+UTEST(utf8len, data) { ASSERT_EQ(53, utf8len(data)); }
 
 UTEST(utf8cat, empty_cat_data) {
   char cat[512] = {'\0'};
@@ -262,45 +130,25 @@ UTEST(utf8cat, cat_data_data) {
   ASSERT_EQ(106, utf8len(utf8cat(utf8cat(cat, data), data)));
 }
 
-UTEST(utf8str, cmp) {
-  ASSERT_EQ(data + 21, utf8str(data, cmp));
-}
+UTEST(utf8str, cmp) { ASSERT_EQ(data + 21, utf8str(data, cmp)); }
 
-UTEST(utf8str, test) {
-  ASSERT_EQ(0, utf8str(data, "test"));
-}
+UTEST(utf8str, test) { ASSERT_EQ(0, utf8str(data, "test")); }
 
-UTEST(utf8str, empty) {
-  ASSERT_EQ(data, utf8str(data, ""));
-}
+UTEST(utf8str, empty) { ASSERT_EQ(data, utf8str(data, "")); }
 
-UTEST(utf8chr, a) {
-  ASSERT_EQ(data + 21, utf8chr(data, 0x3bc));
-}
+UTEST(utf8chr, a) { ASSERT_EQ(data + 21, utf8chr(data, 0x3bc)); }
 
-UTEST(utf8chr, b) {
-  ASSERT_EQ(0, utf8chr(data, 0x20ac));
-}
+UTEST(utf8chr, b) { ASSERT_EQ(0, utf8chr(data, 0x20ac)); }
 
-UTEST(utf8chr, null_terminator) {
-  ASSERT_EQ(data + 104, utf8chr(data, '\0'));
-}
+UTEST(utf8chr, null_terminator) { ASSERT_EQ(data + 104, utf8chr(data, '\0')); }
 
-UTEST(utf8chr, 0x20) {
-  ASSERT_EQ(data + 12, utf8chr(data, 0x20));
-}
+UTEST(utf8chr, 0x20) { ASSERT_EQ(data + 12, utf8chr(data, 0x20)); }
 
-UTEST(utf8cmp, lt) {
-  ASSERT_LT(0, utf8cmp(data, lt));
-}
+UTEST(utf8cmp, lt) { ASSERT_LT(0, utf8cmp(data, lt)); }
 
-UTEST(utf8cmp, eq) {
-  ASSERT_EQ(0, utf8cmp(data, data));
-}
+UTEST(utf8cmp, eq) { ASSERT_EQ(0, utf8cmp(data, data)); }
 
-UTEST(utf8cmp, gt) {
-  ASSERT_GT(0, utf8cmp(data, gt));
-}
+UTEST(utf8cmp, gt) { ASSERT_GT(0, utf8cmp(data, gt)); }
 
 UTEST(utf8cpy, data) {
   char cpy[512] = {'\0'};
@@ -308,78 +156,54 @@ UTEST(utf8cpy, data) {
   ASSERT_EQ(53, utf8len(utf8cpy(cpy, data)));
 }
 
-UTEST(utf8spn, spn) {
-  ASSERT_EQ(7, utf8spn(data, spn));
-}
+UTEST(utf8spn, spn) { ASSERT_EQ(7, utf8spn(data, spn)); }
 
-UTEST(utf8spn, data) {
-  ASSERT_EQ(52, utf8spn(data, data));
-}
+UTEST(utf8spn, data) { ASSERT_EQ(52, utf8spn(data, data)); }
 
-UTEST(utf8spn, ascii) {
-  ASSERT_EQ(0, utf8spn(data, "ab"));
-}
+UTEST(utf8spn, ascii) { ASSERT_EQ(0, utf8spn(data, "ab")); }
 
-UTEST(utf8cspn, spn) {
-  ASSERT_EQ(0, utf8cspn(data, spn));
-}
+UTEST(utf8cspn, spn) { ASSERT_EQ(0, utf8cspn(data, spn)); }
 
-UTEST(utf8cspn, data) {
-  ASSERT_EQ(0, utf8cspn(data, data));
-}
+UTEST(utf8cspn, data) { ASSERT_EQ(0, utf8cspn(data, data)); }
 
-UTEST(utf8cspn, ascii) {
-  ASSERT_EQ(53, utf8cspn(data, "ab"));
-}
+UTEST(utf8cspn, ascii) { ASSERT_EQ(53, utf8cspn(data, "ab")); }
 
-UTEST(utf8rchr, a) {
-  ASSERT_EQ(data + 21, utf8rchr(data, 0x3bc));
-}
+UTEST(utf8rchr, a) { ASSERT_EQ(data + 21, utf8rchr(data, 0x3bc)); }
 
-UTEST(utf8rchr, b) {
-  ASSERT_EQ(0, utf8rchr(data, 0x20ac));
-}
+UTEST(utf8rchr, b) { ASSERT_EQ(0, utf8rchr(data, 0x20ac)); }
 
 UTEST(utf8rchr, null_terminator) {
   ASSERT_EQ(data + 104, utf8rchr(data, '\0'));
 }
 
-UTEST(utf8rchr, 0x20) {
-  ASSERT_EQ(data + 90, utf8rchr(data, 0x20));
-}
+UTEST(utf8rchr, 0x20) { ASSERT_EQ(data + 90, utf8rchr(data, 0x20)); }
 
 UTEST(utf8dup, data) {
-  void* const dup = utf8dup(data);
+  void *const dup = utf8dup(data);
   ASSERT_TRUE(dup);
   ASSERT_EQ(53, utf8len(dup));
   free(dup);
 }
 
 UTEST(utf8dup, ascii) {
-  void* const dup = utf8dup("ab");
+  void *const dup = utf8dup("ab");
   ASSERT_TRUE(dup);
   ASSERT_EQ(2, utf8len(dup));
   free(dup);
 }
 
 UTEST(utf8dup, empty) {
-  void* const dup = utf8dup("");
+  void *const dup = utf8dup("");
   ASSERT_TRUE(dup);
   ASSERT_EQ(0, utf8len(dup));
   free(dup);
 }
 
-UTEST(utf8size, data) {
-  ASSERT_EQ(105, utf8size(data));
-}
+UTEST(utf8size, data) { ASSERT_EQ(105, utf8size(data)); }
 
-UTEST(utf8size, ascii) {
-  ASSERT_EQ(3, utf8size("ab"));
-}
+UTEST(utf8size, ascii) { ASSERT_EQ(3, utf8size("ab")); }
 
-UTEST(utf8size, empty) {
-  ASSERT_EQ(1, utf8size(""));
-}
+UTEST(utf8size, empty) { ASSERT_EQ(1, utf8size("")); }
 
 UTEST(utf8valid, a) {
   char invalid[6];
@@ -515,7 +339,7 @@ UTEST(utf8valid, l) {
 
 UTEST(utf8valid, m) {
   char invalid[6];
-  
+
   invalid[0] = '\xef';
   invalid[1] = '\xbf';
   invalid[2] = '\xbf';
@@ -536,17 +360,11 @@ UTEST(utf8valid, n) {
   ASSERT_EQ(invalid, utf8valid(invalid));
 }
 
-UTEST(utf8valid, data) {
-  ASSERT_EQ(0, utf8valid(data));
-}
+UTEST(utf8valid, data) { ASSERT_EQ(0, utf8valid(data)); }
 
-UTEST(utf8valid, ascii) {
-  ASSERT_EQ(0, utf8valid("ab"));
-}
+UTEST(utf8valid, ascii) { ASSERT_EQ(0, utf8valid("ab")); }
 
-UTEST(utf8valid, empty) {
-  ASSERT_EQ(0, utf8valid(""));
-}
+UTEST(utf8valid, empty) { ASSERT_EQ(0, utf8valid("")); }
 
 UTEST(utf8ncat, ascii_cat_data) {
   char cat[512] = {'\0'};
@@ -565,33 +383,21 @@ UTEST(utf8ncat, bad_cat) {
   ASSERT_EQ(cat, utf8valid(utf8ncat(cat, data, 1)));
 }
 
-UTEST(utf8ncmp, lt_large) {
-  ASSERT_LT(0, utf8ncmp(data, lt, 4000));
-}
+UTEST(utf8ncmp, lt_large) { ASSERT_LT(0, utf8ncmp(data, lt, 4000)); }
 
-UTEST(utf8ncmp, lt_small) {
-  ASSERT_EQ(0, utf8ncmp(data, lt, 7));
-}
+UTEST(utf8ncmp, lt_small) { ASSERT_EQ(0, utf8ncmp(data, lt, 7)); }
 
-UTEST(utf8ncmp, eq_large) {
-  ASSERT_EQ(0, utf8ncmp(data, data, 4000));
-}
+UTEST(utf8ncmp, eq_large) { ASSERT_EQ(0, utf8ncmp(data, data, 4000)); }
 
-UTEST(utf8ncmp, eq_small) {
-  ASSERT_EQ(0, utf8ncmp(data, data, 7));
-}
+UTEST(utf8ncmp, eq_small) { ASSERT_EQ(0, utf8ncmp(data, data, 7)); }
 
-UTEST(utf8ncmp, gt_large) {
-  ASSERT_GT(0, utf8ncmp(data, gt, 4000));
-}
+UTEST(utf8ncmp, gt_large) { ASSERT_GT(0, utf8ncmp(data, gt, 4000)); }
 
-UTEST(utf8ncmp, gt_small) {
-  ASSERT_EQ(0, utf8ncmp(data, gt, 7));
-}
+UTEST(utf8ncmp, gt_small) { ASSERT_EQ(0, utf8ncmp(data, gt, 7)); }
 
 UTEST(utf8ncpy, data_null_terminated) {
   char cpy[512] = {'\0'};
-  ASSERT_EQ('\0', *((char* )utf8ncpy(cpy, data, 106) + 105));
+  ASSERT_EQ('\0', *((char *)utf8ncpy(cpy, data, 106) + 105));
 }
 
 UTEST(utf8ncpy, data) {
@@ -599,56 +405,32 @@ UTEST(utf8ncpy, data) {
   ASSERT_EQ(53, utf8len(utf8ncpy(cpy, data, 105)));
 }
 
-UTEST(utf8pbrk, pbrk) {
-  ASSERT_EQ(data + 8, utf8pbrk(data, pbrk));
-}
+UTEST(utf8pbrk, pbrk) { ASSERT_EQ(data + 8, utf8pbrk(data, pbrk)); }
 
-UTEST(utf8pbrk, data) {
-  ASSERT_EQ(data, utf8pbrk(data, data));
-}
+UTEST(utf8pbrk, data) { ASSERT_EQ(data, utf8pbrk(data, data)); }
 
-UTEST(utf8casecmp, ascii) {
-  ASSERT_EQ(0, utf8casecmp(ascii1, ascii2));
-}
+UTEST(utf8casecmp, ascii) { ASSERT_EQ(0, utf8casecmp(ascii1, ascii2)); }
 
-UTEST(utf8casecmp, allascii) { 
+UTEST(utf8casecmp, allascii) {
   ASSERT_EQ(0, utf8casecmp(allascii1, allascii2));
 }
 
-UTEST(utf8casecmp, data_lt) {
-  ASSERT_LT(0, utf8casecmp(data, lt));
-}
+UTEST(utf8casecmp, data_lt) { ASSERT_LT(0, utf8casecmp(data, lt)); }
 
-UTEST(utf8casecmp, data_eq) {
-  ASSERT_EQ(0, utf8casecmp(data, data));
-}
+UTEST(utf8casecmp, data_eq) { ASSERT_EQ(0, utf8casecmp(data, data)); }
 
-UTEST(utf8casecmp, data_gt) {
-  ASSERT_GT(0, utf8casecmp(data, gt));
-}
+UTEST(utf8casecmp, data_gt) { ASSERT_GT(0, utf8casecmp(data, gt)); }
 
-UTEST(utf8ncasecmp, lt_large) {
-  ASSERT_LT(0, utf8ncasecmp(data, lt, 4000));
-}
+UTEST(utf8ncasecmp, lt_large) { ASSERT_LT(0, utf8ncasecmp(data, lt, 4000)); }
 
-UTEST(utf8ncasecmp, lt_small) {
-  ASSERT_EQ(0, utf8ncasecmp(data, lt, 7));
-}
+UTEST(utf8ncasecmp, lt_small) { ASSERT_EQ(0, utf8ncasecmp(data, lt, 7)); }
 
-UTEST(utf8ncasecmp, eq_large) {
-  ASSERT_EQ(0, utf8ncasecmp(data, data, 4000));
-}
+UTEST(utf8ncasecmp, eq_large) { ASSERT_EQ(0, utf8ncasecmp(data, data, 4000)); }
 
-UTEST(utf8ncasecmp, eq_small) {
-  ASSERT_EQ(0, utf8ncasecmp(data, data, 7));
-}
+UTEST(utf8ncasecmp, eq_small) { ASSERT_EQ(0, utf8ncasecmp(data, data, 7)); }
 
-UTEST(utf8ncasecmp, gt_large) {
-  ASSERT_GT(0, utf8ncasecmp(data, gt, 4000));
-}
+UTEST(utf8ncasecmp, gt_large) { ASSERT_GT(0, utf8ncasecmp(data, gt, 4000)); }
 
-UTEST(utf8ncasecmp, gt_small) {
-  ASSERT_EQ(0, utf8ncasecmp(data, gt, 7));
-}
+UTEST(utf8ncasecmp, gt_small) { ASSERT_EQ(0, utf8ncasecmp(data, gt, 7)); }
 
 UTEST_MAIN();
