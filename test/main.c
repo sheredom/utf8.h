@@ -132,7 +132,7 @@ UTEST(utf8cat, cat_data_data) {
 
 UTEST(utf8str, cmp) { ASSERT_EQ(data + 21, utf8str(data, cmp)); }
 
-UTEST(utf8str, test) { ASSERT_EQ(0, utf8str(data, "test")); }
+UTEST(utf8str, test) { ASSERT_EQ((void*)0, utf8str(data, "test")); }
 
 UTEST(utf8str, empty) { ASSERT_EQ(data, utf8str(data, "")); }
 

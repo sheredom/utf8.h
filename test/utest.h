@@ -240,6 +240,10 @@ UTEST_EXTERN struct utest_state_s utest_state;
 #endif
 
 #if defined(UTEST_OVERLOADABLE)
+UTEST_WEAK UTEST_OVERLOADABLE void utest_type_printer(const void* p);
+UTEST_WEAK UTEST_OVERLOADABLE void utest_type_printer(const void* p) {
+  UTEST_PRINTF("%p", p);
+}
 UTEST_WEAK UTEST_OVERLOADABLE void utest_type_printer(float f);
 UTEST_WEAK UTEST_OVERLOADABLE void utest_type_printer(float f) {
   UTEST_PRINTF("%f", UTEST_CAST(double, f));
