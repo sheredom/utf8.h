@@ -678,7 +678,7 @@ void* utf8casestr(const void* haystack, const void* needle) {
 		const char* maybeMatch = h;
 		const char* n = (const char*)needle;
 
-		while (1) {
+		for(;;) {
 			char a = *h;
 			char b = *n;
 			// not entirely correct, but good enough
@@ -689,7 +689,12 @@ void* utf8casestr(const void* haystack, const void* needle) {
 			if (('A' <= b) && ('Z' >= b)) {
 				b |= 0x20; // make b lowercase
 			}
-			if (a != b) break;
+
+      // if we find a mismatch, bail out!
+			if (a != b) {
+        break;
+      }
+      
 			n++;
 			h++;
 		}

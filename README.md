@@ -36,6 +36,7 @@ strings.h | utf8.h | complete
 ---------|--------|---------
 strcasecmp | utf8casecmp | ~~&#10004;~~
 strncasecmp | utf8ncasecmp | ~~&#10004;~~
+strcasestr | utf8casestr | ~~&#10004;~~
 
 ## Usage ##
 
