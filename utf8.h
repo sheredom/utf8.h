@@ -29,9 +29,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#if defined(__cplusplus) && defined(__clang__)
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wcast-qual"
 #endif
 
 #ifdef __cplusplus
@@ -41,7 +42,7 @@ extern "C" {
 #if defined(__clang__) || defined(__GNUC__)
 #define utf8_pure __attribute__((pure))
 #define utf8_weak __attribute__((weak))
-#elif  defined(_MSC_VER)
+#elif defined(_MSC_VER)
 #define utf8_pure
 #define utf8_weak __inline
 #else
@@ -51,49 +52,49 @@ extern "C" {
 // While ignoring the case of ASCII characters, return less
 // than 0, 0, greater than 0 if src1 < src2, src1 == src2,
 // src1 > src2 respectively.
-utf8_pure utf8_weak int utf8casecmp(const void* src1, const void* src2);
+utf8_pure utf8_weak int utf8casecmp(const void *src1, const void *src2);
 
 // Append the utf8 string src onto the utf8 string dst.
-utf8_weak void* utf8cat(void* dst, const void* src);
+utf8_weak void *utf8cat(void *dst, const void *src);
 
 // Find the first match of the utf8 codepoint chr in the utf8 string src.
-utf8_pure utf8_weak void* utf8chr(const void* src, long chr);
+utf8_pure utf8_weak void *utf8chr(const void *src, long chr);
 
 // Return less than 0, 0, greater than 0 if src1 < src2,
 // src1 == src2, src1 > src2 respectively.
-utf8_pure utf8_weak int utf8cmp(const void* src1, const void* src2);
+utf8_pure utf8_weak int utf8cmp(const void *src1, const void *src2);
 
 // Copy the utf8 string src onto the memory allocated in dst.
-utf8_weak void* utf8cpy(void* dst, const void* src);
+utf8_weak void *utf8cpy(void *dst, const void *src);
 
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints not from the utf8 string reject.
-utf8_pure utf8_weak size_t utf8cspn(const void* src, const void* reject);
+utf8_pure utf8_weak size_t utf8cspn(const void *src, const void *reject);
 
 // Duplicate the utf8 string src by getting its size, malloc'ing a new buffer
 // copying over the data, and returning that. Or 0 if malloc failed.
-utf8_weak void* utf8dup(const void* src);
+utf8_weak void *utf8dup(const void *src);
 
 // Number of utf8 codepoints in the utf8 string str,
 // excluding the null terminating byte.
-utf8_pure utf8_weak size_t utf8len(const void* str);
+utf8_pure utf8_weak size_t utf8len(const void *str);
 
 // While ignoring the case of ASCII characters, return less
 // than 0, 0, greater than 0 if src1 < src2, src1 == src2,
 // src1 > src2 respectively. Checking at most n
 // bytes of each utf8 string.
-utf8_pure utf8_weak int utf8ncasecmp(const void* src1, const void* src2,
+utf8_pure utf8_weak int utf8ncasecmp(const void *src1, const void *src2,
                                      size_t n);
 
 // Append the utf8 string src onto the utf8 string dst,
 // writing at most n+1 bytes. Can produce an invalid utf8
 // string if n falls partway through a utf8 codepoint.
-utf8_weak void* utf8ncat(void* dst, const void* src, size_t n);
+utf8_weak void *utf8ncat(void *dst, const void *src, size_t n);
 
 // Return less than 0, 0, greater than 0 if src1 < src2,
 // src1 == src2, src1 > src2 respectively. Checking at most n
 // bytes of each utf8 string.
-utf8_pure utf8_weak int utf8ncmp(const void* src1, const void* src2, size_t n);
+utf8_pure utf8_weak int utf8ncmp(const void *src1, const void *src2, size_t n);
 
 // Copy the utf8 string src onto the memory allocated in dst.
 // Copies at most n bytes. If there is no terminating null byte in
@@ -102,36 +103,40 @@ utf8_pure utf8_weak int utf8ncmp(const void* src1, const void* src2, size_t n);
 // extra null terminating bytes are appended to dst such that at
 // total of n bytes are written. Can produce an invalid utf8
 // string if n falls partway through a utf8 codepoint.
-utf8_weak void* utf8ncpy(void* dst, const void* src, size_t n);
+utf8_weak void *utf8ncpy(void *dst, const void *src, size_t n);
 
 // Locates the first occurence in the utf8 string str of any byte in the
 // utf8 string accept, or 0 if no match was found.
-utf8_pure utf8_weak void* utf8pbrk(const void* str, const void* accept);
+utf8_pure utf8_weak void *utf8pbrk(const void *str, const void *accept);
 
 // Find the last match of the utf8 codepoint chr in the utf8 string src.
-utf8_pure utf8_weak void* utf8rchr(const void* src, int chr);
+utf8_pure utf8_weak void *utf8rchr(const void *src, int chr);
 
 // Number of bytes in the utf8 string str,
 // including the null terminating byte.
-utf8_pure utf8_weak size_t utf8size(const void* str);
+utf8_pure utf8_weak size_t utf8size(const void *str);
 
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints from the utf8 string accept.
-utf8_pure utf8_weak size_t utf8spn(const void* src, const void* accept);
+utf8_pure utf8_weak size_t utf8spn(const void *src, const void *accept);
 
 // The position of the utf8 string needle in the utf8 string haystack.
-utf8_pure utf8_weak void* utf8str(const void* haystack, const void* needle);
+utf8_pure utf8_weak void *utf8str(const void *haystack, const void *needle);
+
+// The position of the utf8 string needle in the utf8 string haystack, case
+// instensitive.
+utf8_pure utf8_weak void *utf8casestr(const void *haystack, const void *needle);
 
 // Return 0 on success, or the position of the invalid
 // utf8 codepoint on failure.
-utf8_pure utf8_weak void* utf8valid(const void* str);
+utf8_pure utf8_weak void *utf8valid(const void *str);
 
 #undef utf8_weak
 #undef utf8_pure
 
-int utf8casecmp(const void* src1, const void* src2) {
-  const unsigned char* s1 = (const unsigned char* )src1;
-  const unsigned char* s2 = (const unsigned char* )src2;
+int utf8casecmp(const void *src1, const void *src2) {
+  const unsigned char *s1 = (const unsigned char *)src1;
+  const unsigned char *s2 = (const unsigned char *)src2;
 
   while (('\0' != *s1) || ('\0' != *s2)) {
     unsigned char a = *s1;
@@ -159,9 +164,9 @@ int utf8casecmp(const void* src1, const void* src2) {
   return 0;
 }
 
-void* utf8cat(void* dst, const void* src) {
-  char* d = (char* )dst;
-  const char* s = (const char* )src;
+void *utf8cat(void *dst, const void *src) {
+  char *d = (char *)dst;
+  const char *s = (const char *)src;
 
   // find the null terminating byte in dst
   while ('\0' != *d) {
@@ -179,27 +184,27 @@ void* utf8cat(void* dst, const void* src) {
   return dst;
 }
 
-void* utf8chr(const void* src, long chr) {
+void *utf8chr(const void *src, long chr) {
   char c[5] = {'\0', '\0', '\0', '\0', '\0'};
 
   if (0 == chr) {
     // being asked to return position of null terminating byte, so
     // just run s to the end, and return!
-    const char* s = (const char* )src;
+    const char *s = (const char *)src;
     while ('\0' != *s) {
       s++;
     }
-    return (void * )s;
-} else if (0 == ((long)0xffffff80 & chr)) {
+    return (void *)s;
+  } else if (0 == ((long)0xffffff80 & chr)) {
     // 1-byte/7-bit ascii
     // (0b0xxxxxxx)
     c[0] = (char)chr;
-} else if (0 == ((long)0xfffff800 & chr)) {
+  } else if (0 == ((long)0xfffff800 & chr)) {
     // 2-byte/11-bit utf8 code point
     // (0b110xxxxx 0b10xxxxxx)
     c[0] = 0xc0 | (char)(chr >> 6);
     c[1] = 0x80 | (char)(chr & 0x3f);
-} else if (0 == ((long)0xffff0000 & chr)) {
+  } else if (0 == ((long)0xffff0000 & chr)) {
     // 3-byte/16-bit utf8 code point
     // (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
     c[0] = 0xe0 | (char)(chr >> 12);
@@ -220,9 +225,9 @@ void* utf8chr(const void* src, long chr) {
   return utf8str(src, c);
 }
 
-int utf8cmp(const void* src1, const void* src2) {
-  const unsigned char* s1 = (const unsigned char* )src1;
-  const unsigned char* s2 = (const unsigned char* )src2;
+int utf8cmp(const void *src1, const void *src2) {
+  const unsigned char *s1 = (const unsigned char *)src1;
+  const unsigned char *s2 = (const unsigned char *)src2;
 
   while (('\0' != *s1) || ('\0' != *s2)) {
     if (*s1 < *s2) {
@@ -239,11 +244,11 @@ int utf8cmp(const void* src1, const void* src2) {
   return 0;
 }
 
-int utf8coll(const void* src1, const void* src2);
+int utf8coll(const void *src1, const void *src2);
 
-void* utf8cpy(void* dst, const void* src) {
-  char* d = (char* )dst;
-  const char* s = (const char* )src;
+void *utf8cpy(void *dst, const void *src) {
+  char *d = (char *)dst;
+  const char *s = (const char *)src;
 
   // overwriting anything previously in dst, write byte-by-byte
   // from src
@@ -257,12 +262,12 @@ void* utf8cpy(void* dst, const void* src) {
   return dst;
 }
 
-size_t utf8cspn(const void* src, const void* reject) {
-  const char* s = (const char* )src;
+size_t utf8cspn(const void *src, const void *reject) {
+  const char *s = (const char *)src;
   size_t chars = 0;
 
-  while('\0' != *s) {
-    const char* r = (const char* )reject;
+  while ('\0' != *s) {
+    const char *r = (const char *)reject;
     size_t offset = 0;
 
     while ('\0' != *r) {
@@ -303,16 +308,16 @@ size_t utf8cspn(const void* src, const void* reject) {
   return chars;
 }
 
-size_t utf8size(const void* str);
+size_t utf8size(const void *str);
 
-void* utf8dup(const void* src) {
-  const char* s = (const char* )src;
-  char* n = 0;
+void *utf8dup(const void *src) {
+  const char *s = (const char *)src;
+  char *n = 0;
 
   // figure out how many bytes (including the terminator) we need to copy first
   size_t bytes = utf8size(src);
 
-  n = (char* )malloc(bytes);
+  n = (char *)malloc(bytes);
 
   if (0 == n) {
     // out of memory so we bail
@@ -332,10 +337,10 @@ void* utf8dup(const void* src) {
   }
 }
 
-void* utf8fry(const void* str);
+void *utf8fry(const void *str);
 
-size_t utf8len(const void* str) {
-  const unsigned char* s = (const unsigned char* )str;
+size_t utf8len(const void *str) {
+  const unsigned char *s = (const unsigned char *)str;
   size_t length = 0;
 
   while ('\0' != *s) {
@@ -361,9 +366,9 @@ size_t utf8len(const void* str) {
   return length;
 }
 
-int utf8ncasecmp(const void* src1, const void* src2, size_t n) {
-  const unsigned char* s1 = (const unsigned char* )src1;
-  const unsigned char* s2 = (const unsigned char* )src2;
+int utf8ncasecmp(const void *src1, const void *src2, size_t n) {
+  const unsigned char *s1 = (const unsigned char *)src1;
+  const unsigned char *s2 = (const unsigned char *)src2;
 
   while ((('\0' != *s1) || ('\0' != *s2)) && (0 != n--)) {
     unsigned char a = *s1;
@@ -385,15 +390,15 @@ int utf8ncasecmp(const void* src1, const void* src2, size_t n) {
 
     s1++;
     s2++;
-    }
+  }
 
-    // both utf8 strings matched
-    return 0;
+  // both utf8 strings matched
+  return 0;
 }
 
-void* utf8ncat(void* dst, const void* src, size_t n) {
-  char* d = (char* )dst;
-  const char* s = (const char* )src;
+void *utf8ncat(void *dst, const void *src, size_t n) {
+  char *d = (char *)dst;
+  const char *s = (const char *)src;
 
   // find the null terminating byte in dst
   while ('\0' != *d) {
@@ -412,9 +417,9 @@ void* utf8ncat(void* dst, const void* src, size_t n) {
   return dst;
 }
 
-int utf8ncmp(const void* src1, const void* src2, size_t n) {
-  const unsigned char* s1 = (const unsigned char* )src1;
-  const unsigned char* s2 = (const unsigned char* )src2;
+int utf8ncmp(const void *src1, const void *src2, size_t n) {
+  const unsigned char *s1 = (const unsigned char *)src1;
+  const unsigned char *s2 = (const unsigned char *)src2;
 
   while ((('\0' != *s1) || ('\0' != *s2)) && (0 != n--)) {
     if (*s1 < *s2) {
@@ -431,9 +436,9 @@ int utf8ncmp(const void* src1, const void* src2, size_t n) {
   return 0;
 }
 
-void* utf8ncpy(void* dst, const void* src, size_t n) {
-  char* d = (char* )dst;
-  const char* s = (const char* )src;
+void *utf8ncpy(void *dst, const void *src, size_t n) {
+  char *d = (char *)dst;
+  const char *s = (const char *)src;
 
   // overwriting anything previously in dst, write byte-by-byte
   // from src
@@ -450,9 +455,9 @@ void* utf8ncpy(void* dst, const void* src, size_t n) {
   return dst;
 }
 
-void* utf8rchr(const void* src, int chr) {
-  const char* s = (const char* )src;
-  const char* match = 0;
+void *utf8rchr(const void *src, int chr) {
+  const char *s = (const char *)src;
+  const char *match = 0;
   char c[5] = {'\0', '\0', '\0', '\0', '\0'};
 
   if (0 == chr) {
@@ -461,7 +466,7 @@ void* utf8rchr(const void* src, int chr) {
     while ('\0' != *s) {
       s++;
     }
-    return (void * )s;
+    return (void *)s;
   } else if (0 == ((int)0xffffff80 & chr)) {
     // 1-byte/7-bit ascii
     // (0b0xxxxxxx)
@@ -515,14 +520,14 @@ void* utf8rchr(const void* src, int chr) {
   }
 
   // return the last match we found (or 0 if no match was found)
-  return (void* )match;
+  return (void *)match;
 }
 
-void* utf8pbrk(const void* str, const void* accept) {
-  const char* s = (const char* )str;
+void *utf8pbrk(const void *str, const void *accept) {
+  const char *s = (const char *)str;
 
-  while('\0' != *s) {
-    const char* a = (const char* )accept;
+  while ('\0' != *s) {
+    const char *a = (const char *)accept;
     size_t offset = 0;
 
     while ('\0' != *a) {
@@ -530,7 +535,7 @@ void* utf8pbrk(const void* str, const void* accept) {
       // (it is not 0b10xxxxxx) and we have successfully matched
       // a previous character (0 < offset) - we found a match
       if ((0x80 != (0xc0 & *a)) && (0 < offset)) {
-        return (void* )s;
+        return (void *)s;
       } else {
         if (*a == s[offset]) {
           // part of a utf8 codepoint matched, so move our checking
@@ -553,7 +558,7 @@ void* utf8pbrk(const void* str, const void* accept) {
 
     // we found a match on the last utf8 codepoint
     if (0 < offset) {
-      return (void* )s;
+      return (void *)s;
     }
 
     // the current utf8 codepoint in src did not match accept, but src
@@ -567,8 +572,8 @@ void* utf8pbrk(const void* str, const void* accept) {
   return 0;
 }
 
-size_t utf8size(const void* str) {
-  const char* s = (const char* )str;
+size_t utf8size(const void *str) {
+  const char *s = (const char *)str;
   size_t size = 0;
   while ('\0' != s[size]) {
     size++;
@@ -579,12 +584,12 @@ size_t utf8size(const void* str) {
   return size;
 }
 
-size_t utf8spn(const void* src, const void* accept) {
-  const char* s = (const char* )src;
+size_t utf8spn(const void *src, const void *accept) {
+  const char *s = (const char *)src;
   size_t chars = 0;
 
-  while('\0' != *s) {
-    const char* a = (const char* )accept;
+  while ('\0' != *s) {
+    const char *a = (const char *)accept;
     size_t offset = 0;
 
     while ('\0' != *a) {
@@ -625,18 +630,18 @@ size_t utf8spn(const void* src, const void* accept) {
   return chars;
 }
 
-void* utf8str(const void* haystack, const void* needle) {
-  const char* h = (const char* )haystack;
+void *utf8str(const void *haystack, const void *needle) {
+  const char *h = (const char *)haystack;
 
   // if needle has no utf8 codepoints before the null terminating
   // byte then return haystack
-  if ('\0' == *((const char* )needle)) {
-    return (void* )haystack;
+  if ('\0' == *((const char *)needle)) {
+    return (void *)haystack;
   }
 
   while ('\0' != *h) {
-    const char* maybeMatch = h;
-    const char* n = (const char* )needle;
+    const char *maybeMatch = h;
+    const char *n = (const char *)needle;
 
     while (*h == *n) {
       n++;
@@ -646,7 +651,7 @@ void* utf8str(const void* haystack, const void* needle) {
     if ('\0' == *n) {
       // we found the whole utf8 string for needle in haystack at
       // maybeMatch, so return it
-      return (void* )maybeMatch;
+      return (void *)maybeMatch;
     } else {
       // h could be in the middle of an unmatching utf8 codepoint,
       // so we need to march it on to the next character beginning,
@@ -662,29 +667,81 @@ void* utf8str(const void* haystack, const void* needle) {
   return 0;
 }
 
-void* utf8valid(const void* str) {
-  const char* s = (const char* )str;
+void *utf8casestr(const void *haystack, const void *needle) {
+  const char *h = (const char *)haystack;
+
+  // if needle has no utf8 codepoints before the null terminating
+  // byte then return haystack
+  if ('\0' == *((const char *)needle)) {
+    return (void *)haystack;
+  }
+
+  while ('\0' != *h) {
+    const char *maybeMatch = h;
+    const char *n = (const char *)needle;
+
+    for (;;) {
+      char a = *h;
+      char b = *n;
+      // not entirely correct, but good enough
+      if (('A' <= a) && ('Z' >= a)) {
+        a |= 0x20; // make a lowercase
+      }
+
+      if (('A' <= b) && ('Z' >= b)) {
+        b |= 0x20; // make b lowercase
+      }
+
+      // if we find a mismatch, bail out!
+      if (a != b) {
+        break;
+      }
+
+      n++;
+      h++;
+    }
+
+    if ('\0' == *n) {
+      // we found the whole utf8 string for needle in haystack at
+      // maybeMatch, so return it
+      return (void *)maybeMatch;
+    } else {
+      // h could be in the middle of an unmatching utf8 codepoint,
+      // so we need to march it on to the next character beginning,
+      if ('\0' != *h) {
+        do {
+          h++;
+        } while (0x80 == (0xc0 & *h));
+      }
+    }
+  }
+
+  // no match
+  return 0;
+}
+
+void *utf8valid(const void *str) {
+  const char *s = (const char *)str;
 
   while ('\0' != *s) {
     if (0xf0 == (0xf8 & *s)) {
       // ensure each of the 3 following bytes in this 4-byte
       // utf8 codepoint began with 0b10xxxxxx
-      if ((0x80 != (0xc0 & s[1])) ||
-          (0x80 != (0xc0 & s[2])) ||
+      if ((0x80 != (0xc0 & s[1])) || (0x80 != (0xc0 & s[2])) ||
           (0x80 != (0xc0 & s[3]))) {
-        return (void* )s;
+        return (void *)s;
       }
 
       // ensure that our utf8 codepoint ended after 4 bytes
       if (0x80 == (0xc0 & s[4])) {
-        return (void* )s;
+        return (void *)s;
       }
 
       // ensure that the top 5 bits of this 4-byte utf8
       // codepoint were not 0, as then we could have used
       // one of the smaller encodings
       if ((0 == (0x07 & s[0])) && (0 == (0x30 & s[1]))) {
-        return (void* )s;
+        return (void *)s;
       }
 
       // 4-byte utf8 code point (began with 0b11110xxx)
@@ -692,21 +749,20 @@ void* utf8valid(const void* str) {
     } else if (0xe0 == (0xf0 & *s)) {
       // ensure each of the 2 following bytes in this 3-byte
       // utf8 codepoint began with 0b10xxxxxx
-      if ((0x80 != (0xc0 & s[1])) ||
-          (0x80 != (0xc0 & s[2]))) {
-        return (void* )s;
+      if ((0x80 != (0xc0 & s[1])) || (0x80 != (0xc0 & s[2]))) {
+        return (void *)s;
       }
 
       // ensure that our utf8 codepoint ended after 3 bytes
       if (0x80 == (0xc0 & s[3])) {
-        return (void* )s;
+        return (void *)s;
       }
 
       // ensure that the top 5 bits of this 3-byte utf8
       // codepoint were not 0, as then we could have used
       // one of the smaller encodings
       if ((0 == (0x0f & s[0])) && (0 == (0x20 & s[1]))) {
-        return (void* )s;
+        return (void *)s;
       }
 
       // 3-byte utf8 code point (began with 0b1110xxxx)
@@ -715,19 +771,19 @@ void* utf8valid(const void* str) {
       // ensure the 1 following byte in this 2-byte
       // utf8 codepoint began with 0b10xxxxxx
       if (0x80 != (0xc0 & s[1])) {
-        return (void* )s;
+        return (void *)s;
       }
 
       // ensure that our utf8 codepoint ended after 2 bytes
       if (0x80 == (0xc0 & s[2])) {
-        return (void* )s;
+        return (void *)s;
       }
 
       // ensure that the top 4 bits of this 2-byte utf8
       // codepoint were not 0, as then we could have used
       // one of the smaller encodings
       if (0 == (0x1e & s[0])) {
-        return (void* )s;
+        return (void *)s;
       }
 
       // 2-byte utf8 code point (began with 0b110xxxxx)
@@ -737,20 +793,19 @@ void* utf8valid(const void* str) {
       s += 1;
     } else {
       // we have an invalid 0b1xxxxxxx utf8 code point entry
-      return (void* )s;
+      return (void *)s;
     }
   }
 
   return 0;
 }
 
-
 #ifdef __cplusplus
 } // extern "C"
 #endif
 
-#if defined(__cplusplus) && defined(__clang__)
+#if defined(__clang__)
 #pragma clang diagnostic pop
 #endif
 
-#endif//SHEREDOM_UTF8_H_INCLUDED
+#endif // SHEREDOM_UTF8_H_INCLUDED
