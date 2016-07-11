@@ -132,7 +132,7 @@ UTEST(utf8cat, cat_data_data) {
 
 UTEST(utf8str, cmp) { ASSERT_EQ(data + 21, utf8str(data, cmp)); }
 
-UTEST(utf8str, test) { ASSERT_EQ((void*)0, utf8str(data, "test")); }
+UTEST(utf8str, test) { ASSERT_EQ((void *)0, utf8str(data, "test")); }
 
 UTEST(utf8str, empty) { ASSERT_EQ(data, utf8str(data, "")); }
 
@@ -432,5 +432,16 @@ UTEST(utf8ncasecmp, eq_small) { ASSERT_EQ(0, utf8ncasecmp(data, data, 7)); }
 UTEST(utf8ncasecmp, gt_large) { ASSERT_GT(0, utf8ncasecmp(data, gt, 4000)); }
 
 UTEST(utf8ncasecmp, gt_small) { ASSERT_EQ(0, utf8ncasecmp(data, gt, 7)); }
+
+UTEST(utf8codepoint, data) {
+  long codepoint;
+  void *v;
+  unsigned expected_length = utf8len(data) - 1;
+  for (v = utf8codepoint(data, &codepoint); '\0' != codepoint;
+       v = utf8codepoint(v, &codepoint)) {
+    ASSERT_EQ(expected_length, utf8len(v));
+    expected_length -= 1;
+  }
+}
 
 UTEST_MAIN();
