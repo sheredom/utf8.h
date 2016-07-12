@@ -66,7 +66,7 @@ Anywhere in the string.h or strings.h documentation where it refers to 'bytes' I
 
 - Implement utf8coll (akin to strcoll).
 - Implement utf8fry (akin to strfry).
-- Add NULL pointer support. Should I NULL check the arguments to the API?
+- ~~Add NULL pointer support. Should I NULL check the arguments to the API?~~
 - Add Doxygen (or similar) to mimic the Unix man pages for string.h.
 - Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
 - Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
