@@ -40,9 +40,11 @@ extern "C" {
 #endif
 
 #if defined(__clang__) || defined(__GNUC__)
+#define utf8_nonnull __attribute__((nonnull))
 #define utf8_pure __attribute__((pure))
 #define utf8_weak __attribute__((weak))
 #elif defined(_MSC_VER)
+#define utf8_nonnull
 #define utf8_pure
 #define utf8_weak __inline
 #else
@@ -52,49 +54,49 @@ extern "C" {
 // While ignoring the case of ASCII characters, return less
 // than 0, 0, greater than 0 if src1 < src2, src1 == src2,
 // src1 > src2 respectively.
-utf8_pure utf8_weak int utf8casecmp(const void *src1, const void *src2);
+utf8_nonnull utf8_pure utf8_weak int utf8casecmp(const void *src1, const void *src2);
 
 // Append the utf8 string src onto the utf8 string dst.
-utf8_weak void *utf8cat(void *dst, const void *src);
+utf8_nonnull utf8_weak void *utf8cat(void *dst, const void *src);
 
 // Find the first match of the utf8 codepoint chr in the utf8 string src.
-utf8_pure utf8_weak void *utf8chr(const void *src, long chr);
+utf8_nonnull utf8_pure utf8_weak void *utf8chr(const void *src, long chr);
 
 // Return less than 0, 0, greater than 0 if src1 < src2,
 // src1 == src2, src1 > src2 respectively.
-utf8_pure utf8_weak int utf8cmp(const void *src1, const void *src2);
+utf8_nonnull utf8_pure utf8_weak int utf8cmp(const void *src1, const void *src2);
 
 // Copy the utf8 string src onto the memory allocated in dst.
-utf8_weak void *utf8cpy(void *dst, const void *src);
+utf8_nonnull utf8_weak void *utf8cpy(void *dst, const void *src);
 
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints not from the utf8 string reject.
-utf8_pure utf8_weak size_t utf8cspn(const void *src, const void *reject);
+utf8_nonnull utf8_pure utf8_weak size_t utf8cspn(const void *src, const void *reject);
 
 // Duplicate the utf8 string src by getting its size, malloc'ing a new buffer
 // copying over the data, and returning that. Or 0 if malloc failed.
-utf8_weak void *utf8dup(const void *src);
+utf8_nonnull utf8_weak void *utf8dup(const void *src);
 
 // Number of utf8 codepoints in the utf8 string str,
 // excluding the null terminating byte.
-utf8_pure utf8_weak size_t utf8len(const void *str);
+utf8_nonnull utf8_pure utf8_weak size_t utf8len(const void *str);
 
 // While ignoring the case of ASCII characters, return less
 // than 0, 0, greater than 0 if src1 < src2, src1 == src2,
 // src1 > src2 respectively. Checking at most n
 // bytes of each utf8 string.
-utf8_pure utf8_weak int utf8ncasecmp(const void *src1, const void *src2,
+utf8_nonnull utf8_pure utf8_weak int utf8ncasecmp(const void *src1, const void *src2,
                                      size_t n);
 
 // Append the utf8 string src onto the utf8 string dst,
 // writing at most n+1 bytes. Can produce an invalid utf8
 // string if n falls partway through a utf8 codepoint.
-utf8_weak void *utf8ncat(void *dst, const void *src, size_t n);
+utf8_nonnull utf8_weak void *utf8ncat(void *dst, const void *src, size_t n);
 
 // Return less than 0, 0, greater than 0 if src1 < src2,
 // src1 == src2, src1 > src2 respectively. Checking at most n
 // bytes of each utf8 string.
-utf8_pure utf8_weak int utf8ncmp(const void *src1, const void *src2, size_t n);
+utf8_nonnull utf8_pure utf8_weak int utf8ncmp(const void *src1, const void *src2, size_t n);
 
 // Copy the utf8 string src onto the memory allocated in dst.
 // Copies at most n bytes. If there is no terminating null byte in
@@ -103,40 +105,41 @@ utf8_pure utf8_weak int utf8ncmp(const void *src1, const void *src2, size_t n);
 // extra null terminating bytes are appended to dst such that at
 // total of n bytes are written. Can produce an invalid utf8
 // string if n falls partway through a utf8 codepoint.
-utf8_weak void *utf8ncpy(void *dst, const void *src, size_t n);
+utf8_nonnull utf8_weak void *utf8ncpy(void *dst, const void *src, size_t n);
 
 // Locates the first occurence in the utf8 string str of any byte in the
 // utf8 string accept, or 0 if no match was found.
-utf8_pure utf8_weak void *utf8pbrk(const void *str, const void *accept);
+utf8_nonnull utf8_pure utf8_weak void *utf8pbrk(const void *str, const void *accept);
 
 // Find the last match of the utf8 codepoint chr in the utf8 string src.
-utf8_pure utf8_weak void *utf8rchr(const void *src, int chr);
+utf8_nonnull utf8_pure utf8_weak void *utf8rchr(const void *src, int chr);
 
 // Number of bytes in the utf8 string str,
 // including the null terminating byte.
-utf8_pure utf8_weak size_t utf8size(const void *str);
+utf8_nonnull utf8_pure utf8_weak size_t utf8size(const void *str);
 
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints from the utf8 string accept.
-utf8_pure utf8_weak size_t utf8spn(const void *src, const void *accept);
+utf8_nonnull utf8_pure utf8_weak size_t utf8spn(const void *src, const void *accept);
 
 // The position of the utf8 string needle in the utf8 string haystack.
-utf8_pure utf8_weak void *utf8str(const void *haystack, const void *needle);
+utf8_nonnull utf8_pure utf8_weak void *utf8str(const void *haystack, const void *needle);
 
 // The position of the utf8 string needle in the utf8 string haystack, case
 // instensitive.
-utf8_pure utf8_weak void *utf8casestr(const void *haystack, const void *needle);
+utf8_nonnull utf8_pure utf8_weak void *utf8casestr(const void *haystack, const void *needle);
 
 // Return 0 on success, or the position of the invalid
 // utf8 codepoint on failure.
-utf8_pure utf8_weak void *utf8valid(const void *str);
+utf8_nonnull utf8_pure utf8_weak void *utf8valid(const void *str);
 
 // Sets out_codepoint to the next utf8 codepoint in str, and returns the address
 // of the utf8 codepoint after the current one in str.
-utf8_weak void *utf8codepoint(const void *str, long *out_codepoint);
+utf8_nonnull utf8_weak void *utf8codepoint(const void *str, long *out_codepoint);
 
 #undef utf8_weak
 #undef utf8_pure
+#undef utf8_nonnull
 
 int utf8casecmp(const void *src1, const void *src2) {
   const unsigned char *s1 = (const unsigned char *)src1;
