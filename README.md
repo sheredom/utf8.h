@@ -8,6 +8,8 @@ A simple one header solution to supporting utf8 strings in C and C++.
 
 Functions provided from the C header string.h but with a utf8* prefix instead of the str* prefix:
 
+[API function docs](#api-function-docs)
+
 string.h | utf8.h | complete
 ---------|--------|---------
 strcat | utf8cat | &#10004;
@@ -61,6 +63,132 @@ The utf8.h API matches the string.h API as much as possible by design. There are
 I use void* instead of char* when passing around utf8 strings. My reasoning is that I really don't want people accidentally thinking they can use integer arthimetic on the pointer and always get a valid character like you would with an ASCII string. Having it as a void* forces a user to explicitly cast the utf8 string to char* such that the onus is on them not to break the code anymore!
 
 Anywhere in the string.h or strings.h documentation where it refers to 'bytes' I have changed that to utf8 codepoints. For instance, utf8len will return the number of utf8 codepoints in a utf8 string - which does not necessarily equate to the number of bytes.
+
+## API function docs ##
+
+```c
+int utf8casecmp(const void *src1, const void *src2);
+```
+While ignoring the case of ASCII characters,   
+return less than 0, 0, greater than 0   
+if `src1 < src2`, `src1 == src2`, `src1 > src2` respectively.
+
+```c
+void *utf8cat(void *dst, const void *src);
+```
+Append the utf8 string `src` onto the utf8 string `dst`.
+
+```c
+void *utf8chr(const void *src, long chr);
+```
+Find the first match of the utf8 codepoint `chr` in the utf8 string `src`.
+
+```c
+int utf8cmp(const void *src1, const void *src2);
+```
+Return less than 0, 0, greater than 0 if `src1 < src2`,   
+`src1 == src2`, `src1 > src2` respectively.
+
+```c
+void *utf8cpy(void *dst, const void *src);
+```
+Copy the utf8 string `src` onto the memory allocated in `dst`.
+
+```c
+size_t utf8cspn(const void *src, const void *reject);
+```
+Number of utf8 codepoints in the utf8 string `src` that consists entirely   
+of utf8 codepoints not from the utf8 string `reject`.
+
+```c
+void *utf8dup(const void *src);
+```
+Duplicate the utf8 string `src` by getting its size, `malloc`ing a new buffer   
+copying over the data, and returning that. Or 0 if `malloc` failed.
+
+```c
+size_t utf8len(const void *str);
+```
+Number of utf8 codepoints in the utf8 string `str`,   
+**excluding** the null terminating byte.
+
+```c
+int utf8ncasecmp(const void *src1, const void *src2, size_t n);
+```
+While ignoring the case of ASCII characters, return less   
+than 0, 0, greater than 0 if `src1 < src2`, `src1 == src2`,   
+`src1 > src2` respectively. Checking at most `n`   
+bytes of each utf8 string.
+
+```c
+void *utf8ncat(void *dst, const void *src, size_t n);
+```
+Append the utf8 string `src` onto the utf8 string `dst`,   
+writing at most `n+1` bytes. Can produce an invalid utf8   
+string if `n` falls partway through a utf8 codepoint.
+
+```c
+int utf8ncmp(const void *src1, const void *src2, size_t n);
+```
+Return less than 0, 0, greater than 0 if `src1 < src2`,   
+`src1 == src2`, `src1 > src2` respectively. Checking at most `n`   
+bytes of each utf8 string.
+
+```c
+void *utf8ncpy(void *dst, const void *src, size_t n);
+```
+Copy the utf8 string `src` onto the memory allocated in `dst`.   
+Copies at most `n` bytes. If there is no terminating null byte in   
+the first `n` bytes of `src`, the string placed into `dst` will not be   
+null-terminated. If the size (in bytes) of `src` is less than `n`,   
+extra null terminating bytes are appended to `dst` such that at   
+total of `n` bytes are written. Can produce an invalid utf8   
+string if `n` falls partway through a utf8 codepoint.
+
+```c
+void *utf8pbrk(const void *str, const void *accept);
+```
+Locates the first occurence in the utf8 string `str` of any byte in the   
+utf8 string `accept`, or 0 if no match was found.
+
+```c
+void *utf8rchr(const void *src, int chr);
+```
+Find the last match of the utf8 codepoint `chr` in the utf8 string `src`.
+
+```c
+size_t utf8size(const void *str);
+```
+Number of bytes in the utf8 string `str`,   
+including the null terminating byte.   
+
+```c
+size_t utf8spn(const void *src, const void *accept);
+```
+Number of utf8 codepoints in the utf8 string `src` that consists entirely   
+of utf8 codepoints from the utf8 string `accept`.
+
+```c
+void *utf8str(const void *haystack, const void *needle);
+```
+The position of the utf8 string `needle` in the utf8 string `haystack`.
+
+```c
+void *utf8casestr(const void *haystack, const void *needle);
+```
+The position of the utf8 string `needle` in the utf8 string `haystack`, 
+case instensitive.
+
+```c
+void *utf8valid(const void *str);
+```
+Return 0 on success, or the position of the invalid utf8 codepoint on failure.
+
+```c
+void *utf8codepoint(const void *str, long *out_codepoint);
+```
+Sets out_codepoint to the next utf8 codepoint in `str`,    
+and returns the address of the utf8 codepoint after the current one in `str`.
 
 ## Todo ##
 
