@@ -47,6 +47,8 @@ utf8.h | complete
 utf8codepoint | &#10004;
 utf8size | &#10004;
 utf8valid | &#10004;
+utf8codepointsize | &#10004;
+utf8addcodepoint | &#10004;
 
 ## Usage ##
 
