@@ -150,7 +150,7 @@ utf8_nonnull utf8_pure utf8_weak void *utf8valid(const void *str);
 // Sets out_codepoint to the next utf8 codepoint in str, and returns the address
 // of the utf8 codepoint after the current one in str.
 utf8_nonnull utf8_weak void *utf8codepoint(const void *utf8_restrict str,
-                                           long *utf8_restrict out_codepoint);
+                                           int *utf8_restrict out_codepoint);
 
 // Returns the size of the given codepoint in bytes.
 utf8_weak size_t utf8codepointsize(int chr);
@@ -845,7 +845,7 @@ void *utf8valid(const void *str) {
 }
 
 void *utf8codepoint(const void *utf8_restrict str,
-                    long *utf8_restrict out_codepoint) {
+                    int *utf8_restrict out_codepoint) {
   const char *s = (const char *)str;
 
   if (0xf0 == (0xf8 & s[0])) {
@@ -949,7 +949,7 @@ int utf8isupper(int chr)
 void utf8lwr(void *utf8_restrict str)
 {
   void *p, *pn;
-  long cp;
+  int cp;
 
   p = (char *)str;
   pn = utf8codepoint(p, &cp);
@@ -967,7 +967,7 @@ void utf8lwr(void *utf8_restrict str)
 void utf8upr(void *utf8_restrict str)
 {
   void *p, *pn;
-  long cp;
+  int cp;
 
   p = (char *)str;
   pn = utf8codepoint(p, &cp);
