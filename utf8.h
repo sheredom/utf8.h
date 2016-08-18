@@ -160,10 +160,16 @@ utf8_weak size_t utf8codepointsize(int chr);
 // is not enough space for the codepoint, this function returns null.
 utf8_nonnull utf8_weak void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n);
 
+// Returns 1 if the given character is lowercase, or 0 if it is not.
 utf8_weak int utf8islower(int chr);
+
+// Returns 1 if the given character is uppercase, or 0 if it is not.
 utf8_weak int utf8isupper(int chr);
 
+// Transform the given string into all lowercase codepoints.
 utf8_nonnull utf8_weak void utf8lwr(void *utf8_restrict str);
+
+// Transform the given string into all uppercase codepoints.
 utf8_nonnull utf8_weak void utf8upr(void *utf8_restrict str);
 
 #undef utf8_weak
@@ -925,10 +931,11 @@ void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n) {
 
 int utf8islower(int chr)
 {
-  if (('a' <= chr) && ('z' >= chr)) {
-    return 1;
+  if (('A' <= chr) && ('Z' >= chr)) {
+    return 0;
   }
-  return 0;
+  // Because we're not all-inclusive, assume everything else is lowercase
+  return 1;
 }
 
 int utf8isupper(int chr)
