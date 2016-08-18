@@ -444,4 +444,23 @@ UTEST(utf8codepoint, data) {
   }
 }
 
+UTEST(utf8codepointsize, size_1) { ASSERT_EQ(1, utf8codepointsize('A')); }
+
+UTEST(utf8codepointsize, size_4) { ASSERT_EQ(4, utf8codepointsize(0x20C78)); }
+
+UTEST(utf8catcodepoint, data) {
+  char buffer[129];
+  memset(buffer, 0, 129);
+  char* p = buffer;
+  int i;
+  for (i = 0; i < 128; i++) {
+    long cp = (i % 2 == 0 ? 'A' : 0x20C78);
+    p = utf8catcodepoint(p, cp, 128 - (p - buffer));
+    if (!p) {
+      break;
+    }
+  }
+  ASSERT_EQ(51, utf8len(buffer));
+}
+
 UTEST_MAIN();
