@@ -156,8 +156,9 @@ utf8_nonnull utf8_weak void *utf8codepoint(const void *utf8_restrict str,
 utf8_weak size_t utf8codepointsize(int chr);
 
 // Write a codepoint to the given string, and return the address to the next place
-// after the written codepoint.
-utf8_nonnull utf8_weak void *utf8addcodepoint(void *utf8_restrict str, int chr, size_t n);
+// after the written codepoint. Pass how many bytes left in the buffer to n. If there
+// is not enough space for the codepoint, this function returns null.
+utf8_nonnull utf8_weak void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n);
 
 #undef utf8_weak
 #undef utf8_pure
@@ -870,7 +871,7 @@ size_t utf8codepointsize(int chr) {
   }
 }
 
-void *utf8addcodepoint(void *utf8_restrict str, int chr, size_t n) {
+void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n) {
   char *s = (char *)str;
 
   if (0 == ((int)0xffffff80 & chr)) {
