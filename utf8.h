@@ -160,6 +160,9 @@ utf8_weak size_t utf8codepointsize(int chr);
 // is not enough space for the codepoint, this function returns null.
 utf8_nonnull utf8_weak void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n);
 
+utf8_nonnull utf8_weak void utf8lwr(void *utf8_restrict str);
+utf8_nonnull utf8_weak void utf8upr(void *utf8_restrict str);
+
 #undef utf8_weak
 #undef utf8_pure
 #undef utf8_nonnull
@@ -915,6 +918,42 @@ void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n) {
   }
 
   return s;
+}
+
+void utf8lwr(void *utf8_restrict str)
+{
+  void *p, *pn;
+  long cp;
+
+  p = (char *)str;
+  pn = utf8codepoint(p, &cp);
+
+  while (cp != 0) {
+    if (('A' <= cp) && ('Z' >= cp)) {
+      cp |= 0x20;
+      utf8catcodepoint(p, cp, 1);
+    }
+    p = pn;
+    pn = utf8codepoint(p, &cp);
+  }
+}
+
+void utf8upr(void *utf8_restrict str)
+{
+  void *p, *pn;
+  long cp;
+
+  p = (char *)str;
+  pn = utf8codepoint(p, &cp);
+
+  while (cp != 0) {
+    if (('a' <= cp) && ('z' >= cp)) {
+      cp &= ~0x20;
+      utf8catcodepoint(p, cp, 1);
+    }
+    p = pn;
+    pn = utf8codepoint(p, &cp);
+  }
 }
 
 #undef utf8_restrict

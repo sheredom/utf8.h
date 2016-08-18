@@ -450,7 +450,7 @@ UTEST(utf8codepointsize, size_4) { ASSERT_EQ(4, utf8codepointsize(0x20C78)); }
 
 UTEST(utf8catcodepoint, data) {
   char buffer[129];
-  char* p = buffer;
+  char *p = buffer;
   long cp;
   int i;
   memset(buffer, 0, 129);
@@ -462,6 +462,28 @@ UTEST(utf8catcodepoint, data) {
     }
   }
   ASSERT_EQ(51, utf8len(buffer));
+}
+
+UTEST(utf8lwr, ascii) {
+  size_t sz;
+  char *str;
+  sz = strlen(ascii1);
+  str = (char *)malloc(sz + 1);
+  memcpy(str, ascii1, sz + 1);
+  utf8lwr(str);
+  ASSERT_EQ(0, strcmp(str, "i like goats yarhar."));
+  free(str);
+}
+
+UTEST(utf8upr, ascii) {
+  size_t sz;
+  char *str;
+  sz = strlen(ascii1);
+  str = (char *)malloc(sz + 1);
+  memcpy(str, ascii1, sz + 1);
+  utf8upr(str);
+  ASSERT_EQ(0, strcmp(str, "I LIKE GOATS YARHAR."));
+  free(str);
 }
 
 UTEST_MAIN();

@@ -49,6 +49,8 @@ utf8size | &#10004;
 utf8valid | &#10004;
 utf8codepointsize | &#10004;
 utf8catcodepoint | &#10004;
+utf8lwr | ~~&#10004;~~
+utf8upr | ~~&#10004;~~
 
 ## Usage ##
 
