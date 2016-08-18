@@ -152,6 +152,14 @@ utf8_nonnull utf8_pure utf8_weak void *utf8valid(const void *str);
 utf8_nonnull utf8_weak void *utf8codepoint(const void *utf8_restrict str,
                                            long *utf8_restrict out_codepoint);
 
+// Returns the size of the given codepoint in bytes.
+utf8_weak size_t utf8codepointsize(int chr);
+
+// Write a codepoint to the given string, and return the address to the next place
+// after the written codepoint. Pass how many bytes left in the buffer to n. If there
+// is not enough space for the codepoint, this function returns null.
+utf8_nonnull utf8_weak void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n);
+
 #undef utf8_weak
 #undef utf8_pure
 #undef utf8_nonnull
@@ -849,6 +857,64 @@ void *utf8codepoint(const void *utf8_restrict str,
   }
 
   return (void *)s;
+}
+
+size_t utf8codepointsize(int chr) {
+  if (0 == ((int)0xffffff80 & chr)) {
+    return 1;
+  } else if (0 == ((int)0xfffff800 & chr)) {
+    return 2;
+  } else if (0 == ((int)0xffff0000 & chr)) {
+    return 3;
+  } else { // if (0 == ((int)0xffe00000 & chr)) {
+    return 4;
+  }
+}
+
+void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n) {
+  char *s = (char *)str;
+
+  if (0 == ((int)0xffffff80 & chr)) {
+    // 1-byte/7-bit ascii
+    // (0b0xxxxxxx)
+    if (n < 1) {
+      return 0;
+    }
+    s[0] = (char)chr;
+    s += 1;
+  } else if (0 == ((int)0xfffff800 & chr)) {
+    // 2-byte/11-bit utf8 code point
+    // (0b110xxxxx 0b10xxxxxx)
+    if (n < 2) {
+      return 0;
+    }
+    s[0] = 0xc0 | (char)(chr >> 6);
+    s[1] = 0x80 | (char)(chr & 0x3f);
+    s += 2;
+  } else if (0 == ((int)0xffff0000 & chr)) {
+    // 3-byte/16-bit utf8 code point
+    // (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
+    if (n < 3) {
+      return 0;
+    }
+    s[0] = 0xe0 | (char)(chr >> 12);
+    s[1] = 0x80 | (char)((chr >> 6) & 0x3f);
+    s[2] = 0x80 | (char)(chr & 0x3f);
+    s += 3;
+  } else { // if (0 == ((int)0xffe00000 & chr)) {
+    // 4-byte/21-bit utf8 code point
+    // (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx)
+    if (n < 4) {
+      return 0;
+    }
+    s[0] = 0xf0 | (char)(chr >> 18);
+    s[1] = 0x80 | (char)((chr >> 12) & 0x3f);
+    s[2] = 0x80 | (char)((chr >> 6) & 0x3f);
+    s[3] = 0x80 | (char)(chr & 0x3f);
+    s += 4;
+  }
+
+  return s;
 }
 
 #undef utf8_restrict
