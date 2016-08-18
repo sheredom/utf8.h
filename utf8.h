@@ -160,6 +160,9 @@ utf8_weak size_t utf8codepointsize(int chr);
 // is not enough space for the codepoint, this function returns null.
 utf8_nonnull utf8_weak void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n);
 
+utf8_weak int utf8islower(int chr);
+utf8_weak int utf8isupper(int chr);
+
 utf8_nonnull utf8_weak void utf8lwr(void *utf8_restrict str);
 utf8_nonnull utf8_weak void utf8upr(void *utf8_restrict str);
 
@@ -918,6 +921,22 @@ void *utf8catcodepoint(void *utf8_restrict str, int chr, size_t n) {
   }
 
   return s;
+}
+
+int utf8islower(int chr)
+{
+  if (('a' <= chr) && ('z' >= chr)) {
+    return 1;
+  }
+  return 0;
+}
+
+int utf8isupper(int chr)
+{
+  if (('A' <= chr) && ('Z' >= chr)) {
+    return 1;
+  }
+  return 0;
 }
 
 void utf8lwr(void *utf8_restrict str)

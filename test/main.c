@@ -464,6 +464,11 @@ UTEST(utf8catcodepoint, data) {
   ASSERT_EQ(51, utf8len(buffer));
 }
 
+UTEST(utf8islower, upper) { ASSERT_EQ(0, utf8islower('P')); }
+UTEST(utf8islower, lower) { ASSERT_EQ(1, utf8islower('p')); }
+UTEST(utf8isupper, upper) { ASSERT_EQ(1, utf8isupper('P')); }
+UTEST(utf8isupper, lower) { ASSERT_EQ(0, utf8isupper('p')); }
+
 UTEST(utf8lwr, ascii) {
   size_t sz;
   char *str;
