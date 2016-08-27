@@ -694,7 +694,7 @@ void *utf8str(const void *haystack, const void *needle) {
     const char *maybeMatch = h;
     const char *n = (const char *)needle;
 
-    while (*h == *n) {
+    while (*h == *n && (*h != '\0' && *n != '\0')) {
       n++;
       h++;
     }
