@@ -23,3 +23,8 @@ build_script:
   - if "%PLATFORM%"=="x64" cmake -G "%VSVERSION% Win64" ../test
   - if "%PLATFORM%"=="Win32" cmake -G "%VSVERSION%" ../test
   - msbuild /m /p:Configuration="%CONFIGURATION%" /p:Platform="%PLATFORM%" utf8.sln
+  - copy %CONFIGURATION%\utf8_test.exe utf8_test.exe
+
+test_script:
+  - utf8_test.exe
+

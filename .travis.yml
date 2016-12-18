@@ -13,3 +13,4 @@ script:
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=$CONFIGURATION ../test
   - make
+  - ./utf8_test
