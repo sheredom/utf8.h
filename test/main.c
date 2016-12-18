@@ -434,10 +434,10 @@ UTEST(utf8ncasecmp, gt_large) { ASSERT_GT(0, utf8ncasecmp(data, gt, 4000)); }
 UTEST(utf8ncasecmp, gt_small) { ASSERT_EQ(0, utf8ncasecmp(data, gt, 7)); }
 
 UTEST(utf8codepoint, data) {
-  long codepoint;
+  int32_t codepoint;
   void *v;
   unsigned expected_length = utf8len(data) - 1;
-  for (v = utf8codepoint(data, &codepoint); '\0' != codepoint;
+  for (v = utf8codepoint(data, &codepoint); codepoint;
        v = utf8codepoint(v, &codepoint)) {
     ASSERT_EQ(expected_length, utf8len(v));
     expected_length -= 1;
