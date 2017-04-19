@@ -10,7 +10,6 @@ environment:
     - VSVERSION: Visual Studio 11 2012
     - VSVERSION: Visual Studio 12 2013
     - VSVERSION: Visual Studio 14 2015
-    - VSVERSION: Visual Studio 15 2017
 
 platform:
   - Win32
@@ -21,7 +20,6 @@ configuration:
   - Release
 
 build_script:
-  - cmake --version
   - md build
   - cd build
   - if "%PLATFORM%"=="x64" cmake -G "%VSVERSION% Win64" ../test
