@@ -26,8 +26,19 @@
 #ifndef SHEREDOM_UTF8_H_INCLUDED
 #define SHEREDOM_UTF8_H_INCLUDED
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+
+// disable 'bytes padding added after construct' warning
+#pragma warning(disable : 4820)
+#endif
+
 #include <stddef.h>
 #include <stdlib.h>
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 #if defined(_MSC_VER)
 #define int32_t __int32
