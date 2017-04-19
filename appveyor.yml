@@ -21,6 +21,7 @@ configuration:
   - Release
 
 build_script:
+  - cmake --version
   - md build
   - cd build
   - if "%PLATFORM%"=="x64" cmake -G "%VSVERSION% Win64" ../test
