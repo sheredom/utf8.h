@@ -10,6 +10,8 @@ environment:
     - VSVERSION: Visual Studio 11 2012
     - VSVERSION: Visual Studio 12 2013
     - VSVERSION: Visual Studio 14 2015
+    - VSVERSION: Visual Studio 15 2017
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
 platform:
   - Win32
@@ -29,4 +31,3 @@ build_script:
 
 test_script:
   - utf8_test.exe
-
