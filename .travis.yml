@@ -1,22 +1,23 @@
 language: cpp
 
-os:
-  - linux
-  - osx
-
-compiler:
-  - clang
-  - gcc
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.8']
+      env:
+        - C_COMPILER=gcc-4.8
+        - CXX_COMPILER=g++-4.8
 
 env:
-  - CONFIGURATION=Debug
-  - CONFIGURATION=RelWithDebInfo
-  - CONFIGURATION=MinSizeRel
-  - CONFIGURATION=Release
-
-osx_image:
-  - xcode6.4
-  - xcode8.3
+  matrix:
+    - CONFIGURATION=Debug
+    - CONFIGURATION=RelWithDebInfo
+    - CONFIGURATION=MinSizeRel
+    - CONFIGURATION=Release
 
 script:
   - mkdir build
