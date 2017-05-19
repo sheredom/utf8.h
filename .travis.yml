@@ -1,5 +1,6 @@
 language: cpp
 
+
 matrix:
   include:
     - os: linux
@@ -12,16 +13,147 @@ matrix:
         - C_COMPILER=gcc-4.8
         - CXX_COMPILER=g++-4.8
 
-env:
-  matrix:
-    - CONFIGURATION=Debug
-    - CONFIGURATION=RelWithDebInfo
-    - CONFIGURATION=MinSizeRel
-    - CONFIGURATION=Release
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.9']
+      env:
+        - C_COMPILER=gcc-4.9
+        - CXX_COMPILER=g++-4.9
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-5']
+      env:
+        - C_COMPILER=gcc-5
+        - CXX_COMPILER=g++-5
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-6']
+      env:
+        - C_COMPILER=gcc-6
+        - CXX_COMPILER=g++-6
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5']
+          packages: ['clang-3.5']
+      env:
+        - C_COMPILER=clang-3.5
+        - CXX_COMPILER=clang++-3.5
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
+          packages: ['clang-3.6']
+      env:
+        - C_COMPILER=clang-3.6
+        - CXX_COMPILER=clang++-3.6
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.7']
+          packages: ['clang-3.7']
+      env:
+        - C_COMPILER=clang-3.7
+        - CXX_COMPILER=clang++-3.7
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.8']
+          packages: ['clang-3.8']
+      env:
+        - C_COMPILER=clang-3.8
+        - CXX_COMPILER=clang++-3.8
+
+    - os: linux
+      dist: trusty
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-3.9']
+          packages: ['clang-3.9']
+      env:
+        - C_COMPILER=clang-3.9
+        - CXX_COMPILER=clang++-3.9
+
+    - os: linux
+      dist: trusty
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-4.0']
+          packages: ['clang-4.0']
+      env:
+        - C_COMPILER=clang-4.0
+        - CXX_COMPILER=clang++-4.0
+
+    - os: osx
+      osx_image: xcode6.4
+      compiler: clang
+      env:
+        - C_COMPILER=clang
+        - CXX_COMPILER=clang++
+
+    - os: osx
+      osx_image: xcode7.3
+      compiler: clang
+      env:
+        - C_COMPILER=clang
+        - CXX_COMPILER=clang++
+
+    - os: osx
+      osx_image: xcode8.3
+      compiler: clang
+      env:
+        - C_COMPILER=clang
+        - CXX_COMPILER=clang++
 
 script:
+  - set CC=$C_COMPILER
+  - set CXX=$CXX_COMPILER
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=$CONFIGURATION ../test
+  - cmake -DCMAKE_BUILD_TYPE=Debug ../test
   - make
   - ./utf8_test
+  - cd ..
+  - rm -rf build
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ../test
+  - make
+  - ./utf8_test
+  - cd ..
+  - rm -rf build
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../test
+  - make
+  - ./utf8_test
+  - cd ..
+  - rm -rf build
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=Release ../test
+  - make
+  - ./utf8_test
+  - cd ..
+  - rm -rf build
