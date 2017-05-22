@@ -8,6 +8,16 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.6']
+      env:
+        - C_COMPILER=gcc-4.6
+        - CXX_COMPILER=g++-4.6
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-4.7']
       env:
         - C_COMPILER=gcc-4.7
@@ -137,13 +147,6 @@ matrix:
         - CXX_COMPILER=clang++
 
     - os: osx
-      osx_image: xcode8.1
-      compiler: clang
-      env:
-        - C_COMPILER=clang
-        - CXX_COMPILER=clang++
-
-    - os: osx
       osx_image: xcode8.2
       compiler: clang
       env:
@@ -160,6 +163,8 @@ matrix:
 script:
   - set CC=$C_COMPILER
   - set CXX=$CXX_COMPILER
+  - $CC --version
+  - $CXX --version
   - mkdir build
   - cd build
   - cmake -DCMAKE_BUILD_TYPE=Debug ../test
