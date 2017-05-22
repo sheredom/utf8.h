@@ -161,8 +161,8 @@ matrix:
         - CXX_COMPILER=clang++
 
 script:
-  - set CC=$C_COMPILER
-  - set CXX=$CXX_COMPILER
+  - export CC=$C_COMPILER
+  - export CXX=$CXX_COMPILER
   - $CC --version
   - $CXX --version
   - mkdir build
