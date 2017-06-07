@@ -742,7 +742,7 @@ void *utf8casestr(const void *haystack, const void *needle) {
     const char *maybeMatch = h;
     const char *n = (const char *)needle;
 
-    for (;;) {
+    for (; '\0' != *h && '\0' != *n;) {
       char a = *h;
       char b = *n;
       // not entirely correct, but good enough
