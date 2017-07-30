@@ -434,7 +434,7 @@ UTEST(utf8ncasecmp, gt_large) { ASSERT_GT(0, utf8ncasecmp(data, gt, 4000)); }
 UTEST(utf8ncasecmp, gt_small) { ASSERT_EQ(0, utf8ncasecmp(data, gt, 7)); }
 
 UTEST(utf8codepoint, data) {
-  int32_t codepoint;
+  utf8_int32_t codepoint;
   void *v;
   size_t expected_length = utf8len(data) - 1;
   for (v = utf8codepoint(data, &codepoint); codepoint;
