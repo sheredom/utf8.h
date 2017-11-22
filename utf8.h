@@ -136,6 +136,12 @@ utf8_nonnull utf8_pure utf8_weak int utf8ncmp(const void *src1,
 utf8_nonnull utf8_weak void *utf8ncpy(void *utf8_restrict dst,
                                       const void *utf8_restrict src, size_t n);
 
+// Similar to utf8dup, except that at most n bytes of src are copied. If src is
+// longer than n, only n bytes are copied and a null byte is added.
+//
+// Returns a new string if successful, 0 otherwise
+utf8_nonnull utf8_weak void *utf8ndup(const void *src, size_t n);
+
 // Locates the first occurence in the utf8 string str of any byte in the
 // utf8 string accept, or 0 if no match was found.
 utf8_nonnull utf8_pure utf8_weak void *utf8pbrk(const void *str,
@@ -518,6 +524,38 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
   }
 
   return dst;
+}
+
+void *utf8ndup(const void *src, size_t n) {
+  const char *s = (const char *)src;
+  char *c = 0;
+
+  // figure out how many bytes (including the terminator) we need to copy first
+  size_t bytes = utf8size(src);
+
+  if (n < bytes) {
+    c = (char *)malloc(n + 1);
+  } else {
+    c = (char *)malloc(bytes);
+    n = bytes;
+  }
+
+  if (0 == c) {
+    // out of memory so we bail
+    return 0;
+  }
+
+  bytes = 0;
+
+  // copy src byte-by-byte into our new utf8 string
+  while ('\0' != s[bytes] && bytes < n) {
+    c[bytes] = s[bytes];
+    bytes++;
+  }
+
+  // append null terminating byte
+  c[bytes] = '\0';
+  return c;
 }
 
 void *utf8rchr(const void *src, int chr) {
