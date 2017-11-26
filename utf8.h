@@ -542,8 +542,8 @@ void *utf8ndup(const void *src, size_t n) {
 
   c = (char*)malloc(bytes + 1);
   if (0 == c) {
-      // out of memory so we bail
-      return 0;
+    // out of memory so we bail
+    return 0;
   }
 
   bytes = 0;
