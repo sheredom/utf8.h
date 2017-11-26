@@ -527,22 +527,23 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
 }
 
 void *utf8ndup(const void *src, size_t n) {
-  const char *s = (const char *)src;
-  char *c = 0;
+  const char* s = (const char*)src;
+  char* c       = 0;
+  size_t bytes  = 0;
 
-  // figure out how many bytes (including the terminator) we need to copy first
-  size_t bytes = utf8size(src);
-
-  if (n < bytes) {
-    c = (char *)malloc(n + 1);
-  } else {
-    c = (char *)malloc(bytes);
-    n = bytes;
+  // Find the end of the string or stop when n is reached
+  while ('\0' != s[bytes] && bytes < n) {
+      bytes++;
   }
 
+  // In case bytes is actually less than n, we need to set it
+  // to be used later in the copy byte by byte.
+  n = bytes;
+
+  c = (char*)malloc(bytes + 1);
   if (0 == c) {
-    // out of memory so we bail
-    return 0;
+      // out of memory so we bail
+      return 0;
   }
 
   bytes = 0;
