@@ -199,6 +199,20 @@ UTEST(utf8dup, empty) {
   free(dup);
 }
 
+UTEST(utf8ndup, ascii) {
+  void *const dup = utf8ndup("1234567890", 4);
+  ASSERT_TRUE(dup);
+  ASSERT_EQ(4, utf8len(dup));
+  free(dup);
+}
+
+UTEST(utf8ndup, ascii_larger) {
+  void *const dup = utf8ndup("1234567890", 100);
+  ASSERT_TRUE(dup);
+  ASSERT_EQ(10, utf8len(dup));
+  free(dup);
+}
+
 UTEST(utf8size, data) { ASSERT_EQ(105, utf8size(data)); }
 
 UTEST(utf8size, ascii) { ASSERT_EQ(3, utf8size("ab")); }
