@@ -199,9 +199,149 @@ utf8_nonnull utf8_weak void utf8lwr(void *utf8_restrict str);
 // Transform the given string into all uppercase codepoints.
 utf8_nonnull utf8_weak void utf8upr(void *utf8_restrict str);
 
+#if (__STDC_VERSION__ >= 199901L) && !defined(UTF8_NO_INLINE)
+#define utf8_inline  inline
+#define utf8_c99
+#else // NOT (>= C99 && !defined(UTF8_NO_INLINE))
+#define utf8_inline
+
+// *s = c equivalent
+// Assign the codepoint c at the current str position, and return a pointer to
+// the next position in the str following the codepoint.
+utf8_nonnull void *utf8set(void *utf8_restrict str, utf8_int32_t chr);
+
+// s++ equivalent
+// Increment the str by 1 codepoint, and return a pointer to that position.
+utf8_nonnull void *utf8inc(void *utf8_restrict str);
+
+// s-- equivalent
+// Decrement the str by 1 codepoint, and return a pointer to that position.
+utf8_nonnull void *utf8dec(void *utf8_restrict str);
+
+// Return the byte offset of the character at position pos.
+utf8_nonnull size_t utf8pos(const void *utf8_restrict str, size_t pos);
+
+#endif // >= C99 && !defined(UTF8_NO_INLINE)
+
+// inline OR utf8_imple
+#if defined(UTF8_IMPLEMENTATION) || defined(utf8_c99)
+
+utf8_inline void *utf8set(void *utf8_restrict str, utf8_int32_t chr) {
+  unsigned char *s = (unsigned char *)str;
+
+  if(0 == ((int)0xffffff80 & chr)) {
+    // 1-byte/7-bit ascii
+    // (0b0xxxxxxx)
+    s[0] = (unsigned char)chr;
+    s++;
+  } else if(0 == ((int)0xfffff800 & chr)) {
+    // 2-byte/11-bit utf8 code point
+    // (0b110xxxxx 0b10xxxxxx)
+    s[0] = ((unsigned char)(0xc0 | (unsigned char)(chr >> 6)));
+    s[1] = ((unsigned char)(0x80 | (unsigned char)(chr & 0x3f)));
+    s += 2;
+  } else if(0 == ((int)0xffff0000 & chr)) {
+    // 3-byte/16-bit utf8 code point
+    // (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
+    s[0] = ((unsigned char)(0xe0 | (unsigned char)(chr >> 12)));
+    s[1] = ((unsigned char)(0x80 | (unsigned char)((chr >> 6) & 0x3f)));
+    s[2] = ((unsigned char)(0x80 | (unsigned char)(chr & 0x3f)));
+    s += 3;
+  } else { // if (0 == ((int)0xffe00000 & chr)) {
+    // 4-byte/21-bit utf8 code point
+    // (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx)
+    s[0] = ((unsigned char)(0xf0 | (unsigned char)(chr >> 18)));
+    s[1] = ((unsigned char)(0x80 | (unsigned char)((chr >> 12) & 0x3f)));
+    s[2] = ((unsigned char)(0x80 | (unsigned char)((chr >> 6) & 0x3f)));
+    s[3] = ((unsigned char)(0x80 | (unsigned char)(chr & 0x3f)));
+    s += 4;
+  }
+
+  return s;
+}
+
+// s++ equivalent
+// Increment the str by 1 codepoint, and return a pointer to that position.
+utf8_inline void *utf8inc(void *utf8_restrict str) {
+  unsigned char *s = (unsigned char *)str;
+
+  if(0 == ((unsigned char)0x80 & *s)) {
+    // 1-byte/7-bit ascii
+    // (0b0xxxxxxx)
+    s++;
+  } else if(0 == ((unsigned char)0xe0 & *s)) {
+    // 2-byte/11-bit utf8 code point
+    // (0b110xxxxx 0b10xxxxxx)
+    s += 2;
+  } else if(0 == ((unsigned char)0xf0 & *s)) {
+    // 3-byte/16-bit utf8 code point
+    // (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
+    s += 3;
+  } else { // if(0 == ((unsigned char)0xf8 & *s)) {
+    // 4-byte/21-bit utf8 code point
+    // (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx)
+    s += 4;
+  }
+
+  return s;
+}
+
+// s-- equivalent
+// Decrement the str by 1 codepoint, and return a pointer to that position.
+// This assumes that there is a valid codepoint preceeding the current position.
+utf8_inline void *utf8dec(void *utf8_restrict str) {
+  unsigned char *s = (unsigned char *)str;
+
+  // Walk back through memory to the next utf8 codepoint start
+  // (the first byte that doesn't match 0b10xxxxxx)
+  do {
+    s--;
+  } while(0x80 == ((unsigned char)0xc0 & *s));
+
+  return s;
+}
+
+// Return the byte offset of the character at position pos.
+utf8_inline int utf8pos(const void *utf8_restrict str, size_t pos) {
+  const unsigned char *s = (const unsigned char *)str;
+  int offset = 0;
+
+  while(('\0' != *s) && (pos)) {
+    if (0xf0 == (0xf8 & *s)) {
+      // 4-byte utf8 code point (began with 0b11110xxx)
+      s += 4;
+      offset += 4;
+    } else if (0xe0 == (0xf0 & *s)) {
+      // 3-byte utf8 code point (began with 0b1110xxxx)
+      s += 3;
+      offset += 3;
+    } else if (0xc0 == (0xe0 & *s)) {
+      // 2-byte utf8 code point (began with 0b110xxxxx)
+      s += 2;
+      offset += 2;
+    } else { // if (0x00 == (0x80 & *s)) {
+      // 1-byte ascii (began with 0b0xxxxxxx)
+      s += 1;
+      offset += 1;
+    }
+    pos--;
+  }
+
+  if(pos) {
+    // The requested position is beyond the string length
+    return -1;
+  }
+
+  return offset;
+}
+
+#endif // defined(UTF8_IMPLEMENTATION) || (defined(utf8_c99)
+
 #undef utf8_weak
 #undef utf8_pure
 #undef utf8_nonnull
+
+#ifdef UTF8_IMPLEMENTATION
 
 int utf8casecmp(const void *src1, const void *src2) {
   const unsigned char *s1 = (const unsigned char *)src1;
@@ -1039,6 +1179,8 @@ void utf8upr(void *utf8_restrict str)
     pn = utf8codepoint(p, &cp);
   }
 }
+
+#endif // UTF8_IMPLEMENTATION
 
 #undef utf8_restrict
 
