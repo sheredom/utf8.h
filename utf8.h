@@ -205,6 +205,10 @@ utf8_nonnull utf8_weak void utf8upr(void *utf8_restrict str);
 #else // NOT (>= C99 && !defined(UTF8_NO_INLINE))
 #define utf8_inline
 
+// *s equivalent
+// Return the first codepoint in str.
+utf8_nonnull utf8_int32_t utf8getc(const void *utf8_restrict *str);
+
 // *s = c equivalent
 // Assign the codepoint c at the current str position, and return a pointer to
 // the next position in the str following the codepoint.
@@ -225,6 +229,43 @@ utf8_nonnull size_t utf8pos(const void *utf8_restrict str, size_t pos);
 
 // inline OR utf8_imple
 #if defined(UTF8_IMPLEMENTATION) || defined(utf8_c99)
+
+utf8_inline utf8_int32_t utf8getc(const void *utf8_restrict *str) {
+  unsigned char *s = (unsigned char *)str;
+  utf8_int32_t cp;
+
+  if(0 == (((unsigned char)0x80) & *s)) {
+    // 1-byte/7-bit ascii
+    // (0b0xxxxxxx)
+    cp = *s;
+  } else if(0xc0 == ((unsigned char)0xe0 & *s)) {
+    // 2-byte/11-bit utf8 code point
+    // (0b110xxxxx 0b10xxxxxx)
+    cp = ((unsigned char)~0xe0) & *s;
+    cp <<= 6;
+    cp |= ((unsigned char)~0xc0) & *s;
+  } else if(0xe0 == ((unsigned char)0xf0 & *s)) {
+    // 3-byte/16-bit utf8 code point
+    // (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
+    cp = ((unsigned char)~0xf0) & *s;
+    cp <<= 6;
+    cp |= ((unsigned char)~0xc0) & *s;
+    cp <<= 6;
+    cp |= ((unsigned char)~0xc0) & *s;
+  } else { // if (0xf0 == ((unsigned char)0xf8 & *s)) {
+    // 4-byte/21-bit utf8 code point
+    // (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx)
+    cp = ((unsigned char)~0xf8) & *s;
+    cp <<= 6;
+    cp |= ((unsigned char)~0xc0) & *s;
+    cp <<= 6;
+    cp |= ((unsigned char)~0xc0) & *s;
+    cp <<= 6;
+    cp |= ((unsigned char)~0xc0) & *s;
+  }
+
+  return cp;
+}
 
 utf8_inline void *utf8set(void *utf8_restrict str, utf8_int32_t chr) {
   unsigned char *s = (unsigned char *)str;
