@@ -50,10 +50,12 @@ utf8size | &#10004;
 utf8valid | &#10004;
 utf8codepointsize | &#10004;
 utf8catcodepoint | &#10004;
-utf8isupper | 
-utf8islower | 
-utf8lwr | 
-utf8upr | 
+utf8isupper |  ~~&#10004;~~
+utf8islower | ~~&#10004;~~
+utf8lwr | ~~&#10004;~~
+utf8upr | ~~&#10004;~~
+utf8lwrcodepoint | ~~&#10004;~~
+utf8uprcodepoint | ~~&#10004;~~
 
 ## Usage ##
 
@@ -76,9 +78,8 @@ Anywhere in the string.h or strings.h documentation where it refers to 'bytes' I
 ```c
 int utf8casecmp(const void *src1, const void *src2);
 ```
-While ignoring the case of ASCII characters,   
-return less than 0, 0, greater than 0   
-if `src1 < src2`, `src1 == src2`, `src1 > src2` respectively.
+Return less than 0, 0, greater than 0 if `src1 < src2`, `src1 == src2`,
+`src1 > src2` respectively, case insensitive.
 
 ```c
 void *utf8cat(void *dst, const void *src);
@@ -122,9 +123,8 @@ Number of utf8 codepoints in the utf8 string `str`,
 ```c
 int utf8ncasecmp(const void *src1, const void *src2, size_t n);
 ```
-While ignoring the case of ASCII characters, return less   
-than 0, 0, greater than 0 if `src1 < src2`, `src1 == src2`,   
-`src1 > src2` respectively. Checking at most `n`   
+Return less than 0, 0, greater than 0 if `src1 < src2`, `src1 == src2`,   
+`src1 > src2` respectively, case insensitive. Checking at most `n`   
 bytes of each utf8 string.
 
 ```c
@@ -184,7 +184,7 @@ The position of the utf8 string `needle` in the utf8 string `haystack`.
 void *utf8casestr(const void *haystack, const void *needle);
 ```
 The position of the utf8 string `needle` in the utf8 string `haystack`, 
-case instensitive.
+case insensitive.
 
 ```c
 void *utf8valid(const void *str);
@@ -197,6 +197,63 @@ void *utf8codepoint(const void *str, long *out_codepoint);
 Sets out_codepoint to the next utf8 codepoint in `str`,    
 and returns the address of the utf8 codepoint after the current one in `str`.
 
+```c
+utf8_weak size_t utf8codepointsize(utf8_int32_t chr);
+```
+Returns the size of the given codepoint in bytes.
+
+```c
+utf8_nonnull utf8_weak void *utf8catcodepoint(void *utf8_restrict str,
+                                              utf8_int32_t chr, size_t n);
+```
+Write a codepoint to the given string, and return the address to the next
+place after the written codepoint. Pass how many bytes left in the buffer to
+n. If there is not enough space for the codepoint, this function returns
+null.
+
+```x
+utf8_weak int utf8islower(utf8_int32_t chr);
+```
+Returns 1 if the given character is lowercase, or 0 if it is not.
+
+```c
+utf8_weak int utf8isupper(utf8_int32_t chr);
+```
+Returns 1 if the given character is uppercase, or 0 if it is not.
+
+```c
+utf8_nonnull utf8_weak void utf8lwr(void *utf8_restrict str);
+```
+Transform the given string into all lowercase codepoints.
+
+```c
+utf8_nonnull utf8_weak void utf8upr(void *utf8_restrict str);
+```
+Transform the given string into all uppercase codepoints.
+
+```c
+utf8_weak utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp);
+```
+Make a codepoint lower case if possible.
+
+```c
+utf8_weak utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
+```
+Make a codepoint upper case if possible.
+
+## Codepoint Case
+
+Various functions provided will do case insensitive compares, or transform utf8
+strings from one case to another. Given the vastness of unicode, and the authors
+lack of understanding beyond latin codepoints on whether case means anything,
+the following categories are the only ones that will be checked in case
+insensitive code:
+
+* [ASCII](https://en.wikipedia.org/wiki/Basic_Latin_(Unicode_block))
+* [Latin-1 Supplement](https://en.wikipedia.org/wiki/Latin-1_Supplement_(Unicode_block))
+* [Latin Extended-A](https://en.wikipedia.org/wiki/Latin_Extended-A)
+* [Latin Extended-B](https://en.wikipedia.org/wiki/Latin_Extended-B)
+
 ## Todo ##
 
 - Implement utf8coll (akin to strcoll).
@@ -206,8 +263,6 @@ and returns the address of the utf8 codepoint after the current one in `str`.
 - Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
 - Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
 - Investigate changing to [Creative Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) (as suggested by [@mcclure111](https://twitter.com/mcclure111))
-- ~~Add utf8casecmp and utf8ncasecmp to compare two strings case-insensitively (as insensitively suggested by [@daniel_collin](https://twitter.com/daniel_collin))~~
-- Extend utf8casecmp range to consume non-ASCII case differences too (I don't even rightly know if there are any!)
 
 ## License ##
 

@@ -1,3 +1,6 @@
+// The latest version of this library is available on GitHub;
+// https://github.com/sheredom/utf8.h
+
 // This is free and unencumbered software released into the public domain.
 //
 // Anyone is free to copy, modify, publish, use, compile, sell, or
@@ -71,9 +74,14 @@ extern "C" {
 #error Non clang, non gcc, non MSVC compiler found!
 #endif
 
-// While ignoring the case of ASCII characters, return less
-// than 0, 0, greater than 0 if src1 < src2, src1 == src2,
-// src1 > src2 respectively.
+#ifdef __cplusplus
+#define utf8_null NULL
+#else
+#define utf8_null 0
+#endif
+
+// Return less than 0, 0, greater than 0 if src1 < src2, src1 == src2, src1 >
+// src2 respectively, case insensitive.
 utf8_nonnull utf8_pure utf8_weak int utf8casecmp(const void *src1,
                                                  const void *src2);
 
@@ -107,10 +115,9 @@ utf8_nonnull utf8_weak void *utf8dup(const void *src);
 // excluding the null terminating byte.
 utf8_nonnull utf8_pure utf8_weak size_t utf8len(const void *str);
 
-// While ignoring the case of ASCII characters, return less
-// than 0, 0, greater than 0 if src1 < src2, src1 == src2,
-// src1 > src2 respectively. Checking at most n
-// bytes of each utf8 string.
+// Return less than 0, 0, greater than 0 if src1 < src2, src1 == src2, src1 >
+// src2 respectively, case insensitive. Checking at most n bytes of each utf8
+// string.
 utf8_nonnull utf8_pure utf8_weak int utf8ncasecmp(const void *src1,
                                                   const void *src2, size_t n);
 
@@ -164,7 +171,7 @@ utf8_nonnull utf8_pure utf8_weak void *utf8str(const void *haystack,
                                                const void *needle);
 
 // The position of the utf8 string needle in the utf8 string haystack, case
-// instensitive.
+// insensitive.
 utf8_nonnull utf8_pure utf8_weak void *utf8casestr(const void *haystack,
                                                    const void *needle);
 
@@ -181,9 +188,10 @@ utf8codepoint(const void *utf8_restrict str,
 // Returns the size of the given codepoint in bytes.
 utf8_weak size_t utf8codepointsize(utf8_int32_t chr);
 
-// Write a codepoint to the given string, and return the address to the next place
-// after the written codepoint. Pass how many bytes left in the buffer to n. If there
-// is not enough space for the codepoint, this function returns null.
+// Write a codepoint to the given string, and return the address to the next
+// place after the written codepoint. Pass how many bytes left in the buffer to
+// n. If there is not enough space for the codepoint, this function returns
+// null.
 utf8_nonnull utf8_weak void *utf8catcodepoint(void *utf8_restrict str,
                                               utf8_int32_t chr, size_t n);
 
@@ -199,38 +207,45 @@ utf8_nonnull utf8_weak void utf8lwr(void *utf8_restrict str);
 // Transform the given string into all uppercase codepoints.
 utf8_nonnull utf8_weak void utf8upr(void *utf8_restrict str);
 
+// Make a codepoint lower case if possible.
+utf8_weak utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp);
+
+// Make a codepoint upper case if possible.
+utf8_weak utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
+
 #undef utf8_weak
 #undef utf8_pure
 #undef utf8_nonnull
 
 int utf8casecmp(const void *src1, const void *src2) {
-  const unsigned char *s1 = (const unsigned char *)src1;
-  const unsigned char *s2 = (const unsigned char *)src2;
+  utf8_int32_t src1_cp, src2_cp, src1_orig_cp, src2_orig_cp;
 
-  while (('\0' != *s1) || ('\0' != *s2)) {
-    unsigned char a = *s1;
-    unsigned char b = *s2;
+  for (;;) {
+    src1 = utf8codepoint(src1, &src1_cp);
+    src2 = utf8codepoint(src2, &src2_cp);
 
-    if (('A' <= a) && ('Z' >= a)) {
-      a |= 0x20; // make a lowercase
+    // Take a copy of src1 & src2
+    src1_orig_cp = src1_cp;
+    src2_orig_cp = src2_cp;
+
+    // Lower the srcs if required
+    src1_cp = utf8lwrcodepoint(src1_cp);
+    src2_cp = utf8lwrcodepoint(src2_cp);
+
+    // Check if the lowered codepoints match
+    if ((0 == src1_orig_cp) && (0 == src2_orig_cp)) {
+      return 0;
+    } else if (src1_cp == src2_cp) {
+      continue;
     }
 
-    if (('A' <= b) && ('Z' >= b)) {
-      b |= 0x20; // make b lowercase
-    }
-
-    if (a < b) {
+    // If they don't match, then we return which of the original's are less
+    if (src1_orig_cp < src2_orig_cp) {
       return -1;
-    } else if (a > b) {
+    } else if (src1_orig_cp > src2_orig_cp) {
       return 1;
     }
-
-    s1++;
-    s2++;
   }
-
-  // both utf8 strings matched
-  return 0;
 }
 
 void *utf8cat(void *utf8_restrict dst, const void *utf8_restrict src) {
@@ -381,16 +396,16 @@ size_t utf8size(const void *str);
 
 void *utf8dup(const void *src) {
   const char *s = (const char *)src;
-  char *n = 0;
+  char *n = utf8_null;
 
   // figure out how many bytes (including the terminator) we need to copy first
   size_t bytes = utf8size(src);
 
   n = (char *)malloc(bytes);
 
-  if (0 == n) {
+  if (utf8_null == n) {
     // out of memory so we bail
-    return 0;
+    return utf8_null;
   } else {
     bytes = 0;
 
@@ -436,30 +451,83 @@ size_t utf8len(const void *str) {
 }
 
 int utf8ncasecmp(const void *src1, const void *src2, size_t n) {
-  const unsigned char *s1 = (const unsigned char *)src1;
-  const unsigned char *s2 = (const unsigned char *)src2;
+  utf8_int32_t src1_cp, src2_cp, src1_orig_cp, src2_orig_cp;
 
-  while ((('\0' != *s1) || ('\0' != *s2)) && (0 != n--)) {
-    unsigned char a = *s1;
-    unsigned char b = *s2;
+  do {
+    const unsigned char *const s1 = (const unsigned char *)src1;
+    const unsigned char *const s2 = (const unsigned char *)src2;
 
-    if (('A' <= a) && ('Z' >= a)) {
-      a |= 0x20; // make a lowercase
+    // first check that we have enough bytes left in n to contain an entire
+    // codepoint
+    if (0 == n) {
+      return 0;
     }
 
-    if (('A' <= b) && ('Z' >= b)) {
-      b |= 0x20; // make b lowercase
+    if ((1 == n) && ((0xc0 == (0xe0 & *s1)) || (0xc0 == (0xe0 & *s2)))) {
+      const utf8_int32_t c1 = (0xe0 & *s1);
+      const utf8_int32_t c2 = (0xe0 & *s2);
+
+      if (c1 < c2) {
+        return -1;
+      } else if (c1 > c2) {
+        return 1;
+      } else {
+        return 0;
+      }
     }
 
-    if (a < b) {
+    if ((2 >= n) && ((0xe0 == (0xf0 & *s1)) || (0xe0 == (0xf0 & *s2)))) {
+      const utf8_int32_t c1 = (0xf0 & *s1);
+      const utf8_int32_t c2 = (0xf0 & *s2);
+
+      if (c1 < c2) {
+        return -1;
+      } else if (c1 > c2) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
+    if ((3 >= n) && ((0xf0 == (0xf8 & *s1)) || (0xf0 == (0xf8 & *s2)))) {
+      const utf8_int32_t c1 = (0xf8 & *s1);
+      const utf8_int32_t c2 = (0xf8 & *s2);
+
+      if (c1 < c2) {
+        return -1;
+      } else if (c1 > c2) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+
+    src1 = utf8codepoint(src1, &src1_cp);
+    src2 = utf8codepoint(src2, &src2_cp);
+    n -= utf8codepointsize(src1_cp);
+
+    // Take a copy of src1 & src2
+    src1_orig_cp = src1_cp;
+    src2_orig_cp = src2_cp;
+
+    // Lower srcs if required
+    src1_cp = utf8lwrcodepoint(src1_cp);
+    src2_cp = utf8lwrcodepoint(src2_cp);
+
+    // Check if the lowered codepoints match
+    if ((0 == src1_orig_cp) && (0 == src2_orig_cp)) {
+      return 0;
+    } else if (src1_cp == src2_cp) {
+      continue;
+    }
+
+    // If they don't match, then we return which of the original's are less
+    if (src1_orig_cp < src2_orig_cp) {
       return -1;
-    } else if (a > b) {
+    } else if (src1_orig_cp > src2_orig_cp) {
       return 1;
     }
-
-    s1++;
-    s2++;
-  }
+  } while (0 < n);
 
   // both utf8 strings matched
   return 0;
@@ -527,23 +595,23 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
 }
 
 void *utf8ndup(const void *src, size_t n) {
-  const char* s = (const char*)src;
-  char* c       = 0;
-  size_t bytes  = 0;
+  const char *s = (const char *)src;
+  char *c = utf8_null;
+  size_t bytes = 0;
 
   // Find the end of the string or stop when n is reached
   while ('\0' != s[bytes] && bytes < n) {
-      bytes++;
+    bytes++;
   }
 
   // In case bytes is actually less than n, we need to set it
   // to be used later in the copy byte by byte.
   n = bytes;
 
-  c = (char*)malloc(bytes + 1);
-  if (0 == c) {
+  c = (char *)malloc(bytes + 1);
+  if (utf8_null == c) {
     // out of memory so we bail
-    return 0;
+    return utf8_null;
   }
 
   bytes = 0;
@@ -561,7 +629,7 @@ void *utf8ndup(const void *src, size_t n) {
 
 void *utf8rchr(const void *src, int chr) {
   const char *s = (const char *)src;
-  const char *match = 0;
+  const char *match = utf8_null;
   char c[5] = {'\0', '\0', '\0', '\0', '\0'};
 
   if (0 == chr) {
@@ -673,7 +741,7 @@ void *utf8pbrk(const void *str, const void *accept) {
     } while ((0x80 == (0xc0 & *s)));
   }
 
-  return 0;
+  return utf8_null;
 }
 
 size_t utf8size(const void *str) {
@@ -768,11 +836,11 @@ void *utf8str(const void *haystack, const void *needle) {
   }
 
   // no match
-  return 0;
+  return utf8_null;
 }
 
 void *utf8casestr(const void *haystack, const void *needle) {
-  const char *h = (const char *)haystack;
+  const void *h = haystack;
 
   // if needle has no utf8 codepoints before the null terminating
   // byte then return haystack
@@ -780,48 +848,38 @@ void *utf8casestr(const void *haystack, const void *needle) {
     return (void *)haystack;
   }
 
-  while ('\0' != *h) {
-    const char *maybeMatch = h;
-    const char *n = (const char *)needle;
+  for (;;) {
+    const void *maybeMatch = h;
+    const void *n = needle;
+    utf8_int32_t h_cp, n_cp;
 
-    for (; '\0' != *h && '\0' != *n;) {
-      char a = *h;
-      char b = *n;
-      // not entirely correct, but good enough
-      if (('A' <= a) && ('Z' >= a)) {
-        a |= 0x20; // make a lowercase
-      }
+    h = utf8codepoint(h, &h_cp);
+    n = utf8codepoint(n, &n_cp);
 
-      if (('A' <= b) && ('Z' >= b)) {
-        b |= 0x20; // make b lowercase
-      }
+    while ((0 != h_cp) && (0 != n_cp)) {
+      h_cp = utf8lwrcodepoint(h_cp);
+      n_cp = utf8lwrcodepoint(n_cp);
 
       // if we find a mismatch, bail out!
-      if (a != b) {
+      if (h_cp != n_cp) {
         break;
       }
 
-      n++;
-      h++;
+      h = utf8codepoint(h, &h_cp);
+      n = utf8codepoint(n, &n_cp);
     }
 
-    if ('\0' == *n) {
+    if (0 == n_cp) {
       // we found the whole utf8 string for needle in haystack at
       // maybeMatch, so return it
       return (void *)maybeMatch;
-    } else {
-      // h could be in the middle of an unmatching utf8 codepoint,
-      // so we need to march it on to the next character beginning,
-      if ('\0' != *h) {
-        do {
-          h++;
-        } while (0x80 == (0xc0 & *h));
-      }
+    }
+
+    if (0 == h_cp) {
+      // no match
+      return utf8_null;
     }
   }
-
-  // no match
-  return 0;
 }
 
 void *utf8valid(const void *str) {
@@ -901,7 +959,7 @@ void *utf8valid(const void *str) {
     }
   }
 
-  return 0;
+  return utf8_null;
 }
 
 void *utf8codepoint(const void *utf8_restrict str,
@@ -950,7 +1008,7 @@ void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
     // 1-byte/7-bit ascii
     // (0b0xxxxxxx)
     if (n < 1) {
-      return 0;
+      return utf8_null;
     }
     s[0] = (char)chr;
     s += 1;
@@ -958,7 +1016,7 @@ void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
     // 2-byte/11-bit utf8 code point
     // (0b110xxxxx 0b10xxxxxx)
     if (n < 2) {
-      return 0;
+      return utf8_null;
     }
     s[0] = 0xc0 | (char)(chr >> 6);
     s[1] = 0x80 | (char)(chr & 0x3f);
@@ -967,7 +1025,7 @@ void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
     // 3-byte/16-bit utf8 code point
     // (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
     if (n < 3) {
-      return 0;
+      return utf8_null;
     }
     s[0] = 0xe0 | (char)(chr >> 12);
     s[1] = 0x80 | (char)((chr >> 6) & 0x3f);
@@ -977,7 +1035,7 @@ void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
     // 4-byte/21-bit utf8 code point
     // (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx)
     if (n < 4) {
-      return 0;
+      return utf8_null;
     }
     s[0] = 0xf0 | (char)(chr >> 18);
     s[1] = 0x80 | (char)((chr >> 12) & 0x3f);
@@ -990,24 +1048,221 @@ void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
 }
 
 int utf8islower(utf8_int32_t chr) {
-  if (('A' <= chr) && ('Z' >= chr)) {
-    return 0;
-  }
-  // Because we're not all-inclusive, assume everything else is lowercase
-  return 1;
-}
-
-int utf8isupper(utf8_int32_t chr) {
-  if (('A' <= chr) && ('Z' >= chr)) {
+  // ascii
+  if (('a' <= chr) && ('z' >= chr)) {
     return 1;
   }
+
+  // Latin-1 Supplement
+  if ((0x00e0 <= chr) && (0x00f6 >= chr)) {
+    return 1;
+  }
+
+  if ((0x00f8 <= chr) && (0x00fe >= chr)) {
+    return 1;
+  }
+
+  if (0x00ff == chr) {
+    return 1;
+  }
+
+  // Latin Extended-A
+  if ((0x0100 <= chr) && (0x012f >= chr)) {
+    return (chr & 1); // Odd characters are lower
+  }
+
+  if ((0x0132 <= chr) && (0x0137 >= chr)) {
+    return (chr & 1); // Odd characters are lower
+  }
+
+  if ((0x0139 <= chr) && (0x0148 >= chr)) {
+    return !(chr & 1); // Even characters are lower
+  }
+
+  if ((0x014a <= chr) && (0x0177 >= chr)) {
+    return (chr & 1); // Odd characters are lower
+  }
+
+  if ((0x0179 <= chr) && (0x017e >= chr)) {
+    return !(chr & 1); // Even characters are lower
+  }
+
+  // Latin Extended-B
+  switch (chr) {
+  default: break;
+  case 0x0180: return 1;
+  case 0x01dd: return 1;
+  case 0x019a: return 1;
+  case 0x019e: return 1;
+  case 0x0292: return 1;
+  case 0x01c6: return 1;
+  case 0x01c9: return 1;
+  case 0x01cc: return 1;
+  case 0x01f3: return 1;
+  case 0x01bf: return 1;
+  case 0x0188: return 1;
+  case 0x018c: return 1;
+  case 0x0192: return 1;
+  case 0x0199: return 1;
+  case 0x01a8: return 1;
+  case 0x01ad: return 1;
+  case 0x01b0: return 1;
+  case 0x01b9: return 1;
+  case 0x01bd: return 1;
+  case 0x01f5: return 1;
+  case 0x023c: return 1;
+  case 0x0242: return 1;
+  };
+
+  if ((0x0182 <= chr) && (0x0185 >= chr)) {
+    return (chr & 1); // Odd characters are lower
+  }
+
+  if ((0x01a0 <= chr) && (0x01a5 >= chr)) {
+    return (chr & 1); // Odd characters are lower
+  }
+
+  if ((0x01af <= chr) && (0x01b0 >= chr)) {
+    return !(chr & 1); // Even characters are lower
+  }
+
+  if ((0x01b3 <= chr) && (0x01b6 >= chr)) {
+    return !(chr & 1); // Even characters are lower
+  }
+
+  if ((0x01cd <= chr) && (0x01dc >= chr)) {
+    return !(chr & 1); // Even characters are lower
+  }
+
+  if ((0x01de <= chr) && (0x01ef >= chr)) {
+    return (chr & 1); // Odd characters are lower
+  }
+
+  if ((0x01f8 <= chr) && (0x021f >= chr)) {
+    return (chr & 1); // Odd characters are lower
+  }
+
+  if ((0x0222 <= chr) && (0x0233 >= chr)) {
+    return (chr & 1); // Odd characters are lower
+  }
+
+  if ((0x0246 <= chr) && (0x024f >= chr)) {
+    return (chr & 1); // Odd characters are lower
+  }
+
   return 0;
 }
 
-void utf8lwr(void *utf8_restrict str)
-{
+int utf8isupper(utf8_int32_t chr) {
+  // ascii
+  if (('A' <= chr) && ('Z' >= chr)) {
+    return 1;
+  }
+
+  // Latin-1 Supplement
+  if ((0x00c0 <= chr) && (0x00d6 >= chr)) {
+    return 1;
+  }
+
+  if ((0x00d8 <= chr) && (0x00de >= chr)) {
+    return 1;
+  }
+
+  // Latin Extended-A
+  if ((0x0100 <= chr) && (0x012f >= chr)) {
+    return !(chr & 1); // Even characters are upper
+  }
+
+  if ((0x0132 <= chr) && (0x0137 >= chr)) {
+    return !(chr & 1); // Even characters are upper
+  }
+
+  if ((0x0139 <= chr) && (0x0148 >= chr)) {
+    return (chr & 1); // Odd characters are upper
+  }
+
+  if ((0x014a <= chr) && (0x0177 >= chr)) {
+    return !(chr & 1); // Even characters are upper
+  }
+
+  if (0x0178 == chr) {
+    return 1;
+  }
+
+  if ((0x0179 <= chr) && (0x017e >= chr)) {
+    return (chr & 1); // Odd characters are upper
+  }
+
+  // Latin Extended-B
+  switch (chr) {
+  default: break;
+  case 0x0243: return 1;
+  case 0x018e: return 1;
+  case 0x023d: return 1;
+  case 0x0220: return 1;
+  case 0x01b7: return 1;
+  case 0x01c4: return 1;
+  case 0x01c7: return 1;
+  case 0x01ca: return 1;
+  case 0x01f1: return 1;
+  case 0x01f7: return 1;
+
+  case 0x0187: return 1;
+  case 0x018b: return 1;
+  case 0x0191: return 1;
+  case 0x0198: return 1;
+  case 0x01a7: return 1;
+  case 0x01ac: return 1;
+  case 0x01af: return 1;
+  case 0x01b8: return 1;
+  case 0x01bc: return 1;
+  case 0x01f4: return 1;
+  case 0x023b: return 1;
+  case 0x0241: return 1;
+  };
+
+  if ((0x0182 <= chr) && (0x0185 >= chr)) {
+    return !(chr & 1); // Even characters are upper
+  }
+
+  if ((0x01a0 <= chr) && (0x01a5 >= chr)) {
+    return !(chr & 1); // Even characters are upper
+  }
+
+  if ((0x01af <= chr) && (0x01b0 >= chr)) {
+    return (chr & 1); // Odd characters are upper
+  }
+
+  if ((0x01b3 <= chr) && (0x01b6 >= chr)) {
+    return (chr & 1); // Odd characters are upper
+  }
+
+  if ((0x01cd <= chr) && (0x01dc >= chr)) {
+    return (chr & 1); // Odd characters are upper
+  }
+
+  if ((0x01de <= chr) && (0x01ef >= chr)) {
+    return !(chr & 1); // Even characters are upper
+  }
+
+  if ((0x01f8 <= chr) && (0x021f >= chr)) {
+    return !(chr & 1); // Even characters are upper
+  }
+
+  if ((0x0222 <= chr) && (0x0233 >= chr)) {
+    return !(chr & 1); // Even characters are upper
+  }
+
+  if ((0x0246 <= chr) && (0x024f >= chr)) {
+    return !(chr & 1); // Even characters are upper
+  }
+
+  return 0;
+}
+
+void utf8lwr(void *utf8_restrict str) {
   void *p, *pn;
-  int cp;
+  utf8_int32_t cp;
 
   p = (char *)str;
   pn = utf8codepoint(p, &cp);
@@ -1016,16 +1271,72 @@ void utf8lwr(void *utf8_restrict str)
     if (('A' <= cp) && ('Z' >= cp)) {
       cp |= 0x20;
       utf8catcodepoint(p, cp, 1);
+    } else if (((0x00c0 <= cp) && (0x00d6 >= cp)) ||
+               ((0x00d8 <= cp) && (0x00de >= cp))) {
+      cp += 32;
+      utf8catcodepoint(p, cp, 2);
+    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
+               ((0x0132 <= cp) && (0x0137 >= cp)) ||
+               ((0x014a <= cp) && (0x0177 >= cp)) ||
+               ((0x0182 <= cp) && (0x0185 >= cp)) ||
+               ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
+               ((0x01de <= cp) && (0x01ef >= cp)) ||
+               ((0x01f8 <= cp) && (0x021f >= cp)) ||
+               ((0x0222 <= cp) && (0x0233 >= cp)) ||
+               ((0x0246 <= cp) && (0x024f >= cp))) {
+      cp |= 0x1;
+      utf8catcodepoint(p, cp, 2);
+    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
+               ((0x0179 <= cp) && (0x017e >= cp)) ||
+               ((0x01af <= cp) && (0x01b0 >= cp)) ||
+               ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
+               ((0x01cd <= cp) && (0x01dc >= cp))) {
+      cp += 1;
+      cp &= ~0x1;
+      utf8catcodepoint(p, cp, 2);
+    } else {
+      utf8_int32_t new_cp = 0;
+
+      switch (cp) {
+      default: break;
+      case 0x0178: new_cp = 0x00ff; break;
+      case 0x0243: new_cp = 0x0180; break;
+      case 0x018e: new_cp = 0x01dd; break;
+      case 0x023d: new_cp = 0x019a; break;
+      case 0x0220: new_cp = 0x019e; break;
+      case 0x01b7: new_cp = 0x0292; break;
+      case 0x01c4: new_cp = 0x01c6; break;
+      case 0x01c7: new_cp = 0x01c9; break;
+      case 0x01ca: new_cp = 0x01cc; break;
+      case 0x01f1: new_cp = 0x01f3; break;
+      case 0x01f7: new_cp = 0x01bf; break;
+      case 0x0187: new_cp = 0x0188; break;
+      case 0x018b: new_cp = 0x018c; break;
+      case 0x0191: new_cp = 0x0192; break;
+      case 0x0198: new_cp = 0x0199; break;
+      case 0x01a7: new_cp = 0x01a8; break;
+      case 0x01ac: new_cp = 0x01ad; break;
+      case 0x01af: new_cp = 0x01b0; break;
+      case 0x01b8: new_cp = 0x01b9; break;
+      case 0x01bc: new_cp = 0x01bd; break;
+      case 0x01f4: new_cp = 0x01f5; break;
+      case 0x023b: new_cp = 0x023c; break;
+      case 0x0241: new_cp = 0x0242; break;
+      };
+
+      if (0 != new_cp) {
+        utf8catcodepoint(p, new_cp, 2);
+      }
     }
+
     p = pn;
     pn = utf8codepoint(p, &cp);
   }
 }
 
-void utf8upr(void *utf8_restrict str)
-{
+void utf8upr(void *utf8_restrict str) {
   void *p, *pn;
-  int cp;
+  utf8_int32_t cp;
 
   p = (char *)str;
   pn = utf8codepoint(p, &cp);
@@ -1034,13 +1345,181 @@ void utf8upr(void *utf8_restrict str)
     if (('a' <= cp) && ('z' >= cp)) {
       cp &= ~0x20;
       utf8catcodepoint(p, cp, 1);
+    } else if (((0x00e0 <= cp) && (0x00f6 >= cp)) ||
+               ((0x00f8 <= cp) && (0x00fe >= cp))) {
+      cp -= 32;
+      utf8catcodepoint(p, cp, 2);
+    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
+               ((0x0132 <= cp) && (0x0137 >= cp)) ||
+               ((0x014a <= cp) && (0x0177 >= cp)) ||
+               ((0x0182 <= cp) && (0x0185 >= cp)) ||
+               ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
+               ((0x01de <= cp) && (0x01ef >= cp)) ||
+               ((0x01f8 <= cp) && (0x021f >= cp)) ||
+               ((0x0222 <= cp) && (0x0233 >= cp)) ||
+               ((0x0246 <= cp) && (0x024f >= cp))) {
+      cp &= ~0x1;
+      utf8catcodepoint(p, cp, 2);
+    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
+               ((0x0179 <= cp) && (0x017e >= cp)) ||
+               ((0x01af <= cp) && (0x01b0 >= cp)) ||
+               ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
+               ((0x01cd <= cp) && (0x01dc >= cp))) {
+      cp -= 1;
+      cp |= 0x1;
+      utf8catcodepoint(p, cp, 2);
+    } else {
+      utf8_int32_t new_cp = 0;
+
+      switch (cp) {
+      default: break;
+      case 0x00ff: new_cp = 0x0178; break;
+      case 0x0180: new_cp = 0x0243; break;
+      case 0x01dd: new_cp = 0x018e; break;
+      case 0x019a: new_cp = 0x023d; break;
+      case 0x019e: new_cp = 0x0220; break;
+      case 0x0292: new_cp = 0x01b7; break;
+      case 0x01c6: new_cp = 0x01c4; break;
+      case 0x01c9: new_cp = 0x01c7; break;
+      case 0x01cc: new_cp = 0x01ca; break;
+      case 0x01f3: new_cp = 0x01f1; break;
+      case 0x01bf: new_cp = 0x01f7; break;
+      case 0x0188: new_cp = 0x0187; break;
+      case 0x018c: new_cp = 0x018b; break;
+      case 0x0192: new_cp = 0x0191; break;
+      case 0x0199: new_cp = 0x0198; break;
+      case 0x01a8: new_cp = 0x01a7; break;
+      case 0x01ad: new_cp = 0x01ac; break;
+      case 0x01b0: new_cp = 0x01af; break;
+      case 0x01b9: new_cp = 0x01b8; break;
+      case 0x01bd: new_cp = 0x01bc; break;
+      case 0x01f5: new_cp = 0x01f4; break;
+      case 0x023c: new_cp = 0x023b; break;
+      case 0x0242: new_cp = 0x0241; break;
+      };
+
+      if (0 != new_cp) {
+        utf8catcodepoint(p, new_cp, 2);
+      }
     }
+
     p = pn;
     pn = utf8codepoint(p, &cp);
   }
 }
 
+utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
+  if (('A' <= cp) && ('Z' >= cp)) {
+    cp |= 0x20;
+  } else if (((0x00c0 <= cp) && (0x00d6 >= cp)) ||
+             ((0x00d8 <= cp) && (0x00de >= cp))) {
+    cp += 32;
+  } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
+             ((0x0132 <= cp) && (0x0137 >= cp)) ||
+             ((0x014a <= cp) && (0x0177 >= cp)) ||
+             ((0x0182 <= cp) && (0x0185 >= cp)) ||
+             ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
+             ((0x01de <= cp) && (0x01ef >= cp)) ||
+             ((0x01f8 <= cp) && (0x021f >= cp)) ||
+             ((0x0222 <= cp) && (0x0233 >= cp)) ||
+             ((0x0246 <= cp) && (0x024f >= cp))) {
+    cp |= 0x1;
+  } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
+             ((0x0179 <= cp) && (0x017e >= cp)) ||
+             ((0x01af <= cp) && (0x01b0 >= cp)) ||
+             ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
+             ((0x01cd <= cp) && (0x01dc >= cp))) {
+    cp += 1;
+    cp &= ~0x1;
+  } else {
+    switch (cp) {
+    default: break;
+    case 0x0178: cp = 0x00ff; break;
+    case 0x0243: cp = 0x0180; break;
+    case 0x018e: cp = 0x01dd; break;
+    case 0x023d: cp = 0x019a; break;
+    case 0x0220: cp = 0x019e; break;
+    case 0x01b7: cp = 0x0292; break;
+    case 0x01c4: cp = 0x01c6; break;
+    case 0x01c7: cp = 0x01c9; break;
+    case 0x01ca: cp = 0x01cc; break;
+    case 0x01f1: cp = 0x01f3; break;
+    case 0x01f7: cp = 0x01bf; break;
+    case 0x0187: cp = 0x0188; break;
+    case 0x018b: cp = 0x018c; break;
+    case 0x0191: cp = 0x0192; break;
+    case 0x0198: cp = 0x0199; break;
+    case 0x01a7: cp = 0x01a8; break;
+    case 0x01ac: cp = 0x01ad; break;
+    case 0x01af: cp = 0x01b0; break;
+    case 0x01b8: cp = 0x01b9; break;
+    case 0x01bc: cp = 0x01bd; break;
+    case 0x01f4: cp = 0x01f5; break;
+    case 0x023b: cp = 0x023c; break;
+    case 0x0241: cp = 0x0242; break;
+    };
+  }
+
+  return cp;
+}
+
+utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
+  if (('a' <= cp) && ('z' >= cp)) {
+    cp &= ~0x20;
+  } else if (((0x00e0 <= cp) && (0x00f6 >= cp)) ||
+             ((0x00f8 <= cp) && (0x00fe >= cp))) {
+    cp -= 32;
+  } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
+             ((0x0132 <= cp) && (0x0137 >= cp)) ||
+             ((0x014a <= cp) && (0x0177 >= cp)) ||
+             ((0x0182 <= cp) && (0x0185 >= cp)) ||
+             ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
+             ((0x01de <= cp) && (0x01ef >= cp)) ||
+             ((0x01f8 <= cp) && (0x021f >= cp)) ||
+             ((0x0222 <= cp) && (0x0233 >= cp)) ||
+             ((0x0246 <= cp) && (0x024f >= cp))) {
+    cp &= ~0x1;
+  } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
+             ((0x0179 <= cp) && (0x017e >= cp)) ||
+             ((0x01af <= cp) && (0x01b0 >= cp)) ||
+             ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
+             ((0x01cd <= cp) && (0x01dc >= cp))) {
+    cp -= 1;
+    cp |= 0x1;
+  } else {
+    switch (cp) {
+    default: break;
+    case 0x00ff: cp = 0x0178; break;
+    case 0x0180: cp = 0x0243; break;
+    case 0x01dd: cp = 0x018e; break;
+    case 0x019a: cp = 0x023d; break;
+    case 0x019e: cp = 0x0220; break;
+    case 0x0292: cp = 0x01b7; break;
+    case 0x01c6: cp = 0x01c4; break;
+    case 0x01c9: cp = 0x01c7; break;
+    case 0x01cc: cp = 0x01ca; break;
+    case 0x01f3: cp = 0x01f1; break;
+    case 0x01bf: cp = 0x01f7; break;
+    case 0x0188: cp = 0x0187; break;
+    case 0x018c: cp = 0x018b; break;
+    case 0x0192: cp = 0x0191; break;
+    case 0x0199: cp = 0x0198; break;
+    case 0x01a8: cp = 0x01a7; break;
+    case 0x01ad: cp = 0x01ac; break;
+    case 0x01b0: cp = 0x01af; break;
+    case 0x01b9: cp = 0x01b8; break;
+    case 0x01bd: cp = 0x01bc; break;
+    case 0x01f5: cp = 0x01f4; break;
+    case 0x023c: cp = 0x023b; break;
+    case 0x0242: cp = 0x0241; break;
+    };
+  }
+
+  return cp;
+}
+
 #undef utf8_restrict
+#undef utf8_null
 
 #ifdef __cplusplus
 } // extern "C"
