@@ -203,7 +203,6 @@ const struct LowerUpperPair lowupPairs[] = {
     {0x01cc, 0x01ca},
     {0x01f3, 0x01f1},
     {0x01bf, 0x01f7},
-
     {0x0183, 0x0182},
     {0x0185, 0x0184},
     {0x0188, 0x0187},
@@ -275,6 +274,78 @@ const struct LowerUpperPair lowupPairs[] = {
     {0x024d, 0x024c},
     {0x024f, 0x024e},
 
+    /* Greek and Coptic */
+    {0x037b, 0x03fd},
+    {0x037c, 0x03fe},
+    {0x037d, 0x03ff},
+
+    {0x03f3, 0x037f},
+    {0x03ac, 0x0386},
+
+    {0x03ad, 0x0388},
+    {0x03ae, 0x0389},
+    {0x03af, 0x038a},
+
+    {0x03cc, 0x038c},
+
+    {0x03cd, 0x038e},
+    {0x03ce, 0x038f},
+
+    {0x0371, 0x0370},
+    {0x0373, 0x0372},
+    {0x0377, 0x0376},
+
+    {0x03B1, 0x0391},
+    {0x03B2, 0x0392},
+    {0x03B3, 0x0393},
+    {0x03B4, 0x0394},
+    {0x03B5, 0x0395},
+    {0x03B6, 0x0396},
+    {0x03B7, 0x0397},
+    {0x03B8, 0x0398},
+    {0x03B9, 0x0399},
+    {0x03BA, 0x039A},
+    {0x03BB, 0x039B},
+    {0x03BC, 0x039C},
+    {0x03BD, 0x039D},
+    {0x03BE, 0x039E},
+    {0x03BF, 0x039F},
+    {0x03C0, 0x03A0},
+    {0x03C1, 0x03A1},
+
+    {0x03C3, 0x03A3},
+    {0x03C4, 0x03A4},
+    {0x03C5, 0x03A5},
+    {0x03C6, 0x03A6},
+    {0x03C7, 0x03A7},
+    {0x03C8, 0x03A8},
+    {0x03C9, 0x03A9},
+    {0x03ca, 0x03aa},
+    {0x03cb, 0x03ab},
+
+    {0x03d1, 0x03f4},
+
+    {0x03d7, 0x03cf},
+
+    {0x03d9, 0x03d8},
+    {0x03db, 0x03da},
+    {0x03dd, 0x03dc},
+    {0x03df, 0x03de},
+    {0x03e1, 0x03e0},
+    {0x03e3, 0x03e2},
+    {0x03e5, 0x03e4},
+    {0x03e7, 0x03e6},
+    {0x03e9, 0x03e8},
+    {0x03eb, 0x03ea},
+    {0x03ed, 0x03ec},
+    {0x03ef, 0x03ee},
+
+    {0x03f2, 0x03f9},
+
+    {0x03f8, 0x03f7},
+
+    {0x03fb, 0x03fa},
+
     // End of array marker
     {0, 0}};
 
@@ -320,7 +391,19 @@ const char lowersStr[] = {
     '\xc8', '\xa7', '\xc8', '\xa9', '\xc8', '\xab', '\xc8', '\xad', '\xc8',
     '\xaf', '\xc8', '\xb1', '\xc8', '\xb3', '\xc8', '\xbc', '\xc9', '\x82',
     '\xc9', '\x87', '\xc9', '\x89', '\xc9', '\x8b', '\xc9', '\x8d', '\xc9',
-    '\x8f', '\0'};
+    '\x8f', '\xcd', '\xbb', '\xcd', '\xbc', '\xcd', '\xbd', '\xcf', '\xb3',
+    '\xce', '\xac', '\xce', '\xad', '\xce', '\xae', '\xce', '\xaf', '\xcf',
+    '\x8c', '\xcf', '\x8d', '\xcf', '\x8e', '\xcd', '\xb1', '\xcd', '\xb3',
+    '\xcd', '\xb7', '\xce', '\xb1', '\xce', '\xb2', '\xce', '\xb3', '\xce',
+    '\xb4', '\xce', '\xb5', '\xce', '\xb6', '\xce', '\xb7', '\xce', '\xb8',
+    '\xce', '\xb9', '\xce', '\xba', '\xce', '\xbb', '\xce', '\xbc', '\xce',
+    '\xbd', '\xce', '\xbe', '\xce', '\xbf', '\xcf', '\x80', '\xcf', '\x81',
+    '\xcf', '\x83', '\xcf', '\x84', '\xcf', '\x85', '\xcf', '\x86', '\xcf',
+    '\x87', '\xcf', '\x88', '\xcf', '\x89', '\xcf', '\x8a', '\xcf', '\x8b',
+    '\xcf', '\x91', '\xcf', '\x97', '\xcf', '\x99', '\xcf', '\x9b', '\xcf',
+    '\x9d', '\xcf', '\x9f', '\xcf', '\xa1', '\xcf', '\xa3', '\xcf', '\xa5',
+    '\xcf', '\xa7', '\xcf', '\xa9', '\xcf', '\xab', '\xcf', '\xad', '\xcf',
+    '\xaf', '\xcf', '\xb2', '\xcf', '\xb8', '\xcf', '\xbb', '\0'};
 
 const char uppersStr[] = {
     '\x41', '\x42', '\x43', '\x44', '\x45', '\x46', '\x47', '\x48', '\x49',
@@ -364,7 +447,19 @@ const char uppersStr[] = {
     '\xc8', '\xa6', '\xc8', '\xa8', '\xc8', '\xaa', '\xc8', '\xac', '\xc8',
     '\xae', '\xc8', '\xb0', '\xc8', '\xb2', '\xc8', '\xbb', '\xc9', '\x81',
     '\xc9', '\x86', '\xc9', '\x88', '\xc9', '\x8a', '\xc9', '\x8c', '\xc9',
-    '\x8e', '\0'};
+    '\x8e', '\xcf', '\xbd', '\xcf', '\xbe', '\xcf', '\xbf', '\xcd', '\xbf',
+    '\xce', '\x86', '\xce', '\x88', '\xce', '\x89', '\xce', '\x8a', '\xce',
+    '\x8c', '\xce', '\x8e', '\xce', '\x8f', '\xcd', '\xb0', '\xcd', '\xb2',
+    '\xcd', '\xb6', '\xce', '\x91', '\xce', '\x92', '\xce', '\x93', '\xce',
+    '\x94', '\xce', '\x95', '\xce', '\x96', '\xce', '\x97', '\xce', '\x98',
+    '\xce', '\x99', '\xce', '\x9a', '\xce', '\x9b', '\xce', '\x9c', '\xce',
+    '\x9d', '\xce', '\x9e', '\xce', '\x9f', '\xce', '\xa0', '\xce', '\xa1',
+    '\xce', '\xa3', '\xce', '\xa4', '\xce', '\xa5', '\xce', '\xa6', '\xce',
+    '\xa7', '\xce', '\xa8', '\xce', '\xa9', '\xce', '\xaa', '\xce', '\xab',
+    '\xcf', '\xb4', '\xcf', '\x8f', '\xcf', '\x98', '\xcf', '\x9a', '\xcf',
+    '\x9c', '\xcf', '\x9e', '\xcf', '\xa0', '\xcf', '\xa2', '\xcf', '\xa4',
+    '\xcf', '\xa6', '\xcf', '\xa8', '\xcf', '\xaa', '\xcf', '\xac', '\xcf',
+    '\xae', '\xcf', '\xb9', '\xcf', '\xb7', '\xcf', '\xba', '\0'};
 
 UTEST(utf8len, data) { ASSERT_EQ(53, utf8len(data)); }
 
