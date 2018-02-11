@@ -253,6 +253,7 @@ insensitive code:
 * [Latin-1 Supplement](https://en.wikipedia.org/wiki/Latin-1_Supplement_(Unicode_block))
 * [Latin Extended-A](https://en.wikipedia.org/wiki/Latin_Extended-A)
 * [Latin Extended-B](https://en.wikipedia.org/wiki/Latin_Extended-B)
+* [Greek and Coptic](https://en.wikipedia.org/wiki/Greek_and_Coptic)
 
 ## Todo ##
 

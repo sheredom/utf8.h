@@ -1047,218 +1047,9 @@ void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
   return s;
 }
 
-int utf8islower(utf8_int32_t chr) {
-  // ascii
-  if (('a' <= chr) && ('z' >= chr)) {
-    return 1;
-  }
+int utf8islower(utf8_int32_t chr) { return chr != utf8uprcodepoint(chr); }
 
-  // Latin-1 Supplement
-  if ((0x00e0 <= chr) && (0x00f6 >= chr)) {
-    return 1;
-  }
-
-  if ((0x00f8 <= chr) && (0x00fe >= chr)) {
-    return 1;
-  }
-
-  if (0x00ff == chr) {
-    return 1;
-  }
-
-  // Latin Extended-A
-  if ((0x0100 <= chr) && (0x012f >= chr)) {
-    return (chr & 1); // Odd characters are lower
-  }
-
-  if ((0x0132 <= chr) && (0x0137 >= chr)) {
-    return (chr & 1); // Odd characters are lower
-  }
-
-  if ((0x0139 <= chr) && (0x0148 >= chr)) {
-    return !(chr & 1); // Even characters are lower
-  }
-
-  if ((0x014a <= chr) && (0x0177 >= chr)) {
-    return (chr & 1); // Odd characters are lower
-  }
-
-  if ((0x0179 <= chr) && (0x017e >= chr)) {
-    return !(chr & 1); // Even characters are lower
-  }
-
-  // Latin Extended-B
-  switch (chr) {
-  default: break;
-  case 0x0180: return 1;
-  case 0x01dd: return 1;
-  case 0x019a: return 1;
-  case 0x019e: return 1;
-  case 0x0292: return 1;
-  case 0x01c6: return 1;
-  case 0x01c9: return 1;
-  case 0x01cc: return 1;
-  case 0x01f3: return 1;
-  case 0x01bf: return 1;
-  case 0x0188: return 1;
-  case 0x018c: return 1;
-  case 0x0192: return 1;
-  case 0x0199: return 1;
-  case 0x01a8: return 1;
-  case 0x01ad: return 1;
-  case 0x01b0: return 1;
-  case 0x01b9: return 1;
-  case 0x01bd: return 1;
-  case 0x01f5: return 1;
-  case 0x023c: return 1;
-  case 0x0242: return 1;
-  };
-
-  if ((0x0182 <= chr) && (0x0185 >= chr)) {
-    return (chr & 1); // Odd characters are lower
-  }
-
-  if ((0x01a0 <= chr) && (0x01a5 >= chr)) {
-    return (chr & 1); // Odd characters are lower
-  }
-
-  if ((0x01af <= chr) && (0x01b0 >= chr)) {
-    return !(chr & 1); // Even characters are lower
-  }
-
-  if ((0x01b3 <= chr) && (0x01b6 >= chr)) {
-    return !(chr & 1); // Even characters are lower
-  }
-
-  if ((0x01cd <= chr) && (0x01dc >= chr)) {
-    return !(chr & 1); // Even characters are lower
-  }
-
-  if ((0x01de <= chr) && (0x01ef >= chr)) {
-    return (chr & 1); // Odd characters are lower
-  }
-
-  if ((0x01f8 <= chr) && (0x021f >= chr)) {
-    return (chr & 1); // Odd characters are lower
-  }
-
-  if ((0x0222 <= chr) && (0x0233 >= chr)) {
-    return (chr & 1); // Odd characters are lower
-  }
-
-  if ((0x0246 <= chr) && (0x024f >= chr)) {
-    return (chr & 1); // Odd characters are lower
-  }
-
-  return 0;
-}
-
-int utf8isupper(utf8_int32_t chr) {
-  // ascii
-  if (('A' <= chr) && ('Z' >= chr)) {
-    return 1;
-  }
-
-  // Latin-1 Supplement
-  if ((0x00c0 <= chr) && (0x00d6 >= chr)) {
-    return 1;
-  }
-
-  if ((0x00d8 <= chr) && (0x00de >= chr)) {
-    return 1;
-  }
-
-  // Latin Extended-A
-  if ((0x0100 <= chr) && (0x012f >= chr)) {
-    return !(chr & 1); // Even characters are upper
-  }
-
-  if ((0x0132 <= chr) && (0x0137 >= chr)) {
-    return !(chr & 1); // Even characters are upper
-  }
-
-  if ((0x0139 <= chr) && (0x0148 >= chr)) {
-    return (chr & 1); // Odd characters are upper
-  }
-
-  if ((0x014a <= chr) && (0x0177 >= chr)) {
-    return !(chr & 1); // Even characters are upper
-  }
-
-  if (0x0178 == chr) {
-    return 1;
-  }
-
-  if ((0x0179 <= chr) && (0x017e >= chr)) {
-    return (chr & 1); // Odd characters are upper
-  }
-
-  // Latin Extended-B
-  switch (chr) {
-  default: break;
-  case 0x0243: return 1;
-  case 0x018e: return 1;
-  case 0x023d: return 1;
-  case 0x0220: return 1;
-  case 0x01b7: return 1;
-  case 0x01c4: return 1;
-  case 0x01c7: return 1;
-  case 0x01ca: return 1;
-  case 0x01f1: return 1;
-  case 0x01f7: return 1;
-
-  case 0x0187: return 1;
-  case 0x018b: return 1;
-  case 0x0191: return 1;
-  case 0x0198: return 1;
-  case 0x01a7: return 1;
-  case 0x01ac: return 1;
-  case 0x01af: return 1;
-  case 0x01b8: return 1;
-  case 0x01bc: return 1;
-  case 0x01f4: return 1;
-  case 0x023b: return 1;
-  case 0x0241: return 1;
-  };
-
-  if ((0x0182 <= chr) && (0x0185 >= chr)) {
-    return !(chr & 1); // Even characters are upper
-  }
-
-  if ((0x01a0 <= chr) && (0x01a5 >= chr)) {
-    return !(chr & 1); // Even characters are upper
-  }
-
-  if ((0x01af <= chr) && (0x01b0 >= chr)) {
-    return (chr & 1); // Odd characters are upper
-  }
-
-  if ((0x01b3 <= chr) && (0x01b6 >= chr)) {
-    return (chr & 1); // Odd characters are upper
-  }
-
-  if ((0x01cd <= chr) && (0x01dc >= chr)) {
-    return (chr & 1); // Odd characters are upper
-  }
-
-  if ((0x01de <= chr) && (0x01ef >= chr)) {
-    return !(chr & 1); // Even characters are upper
-  }
-
-  if ((0x01f8 <= chr) && (0x021f >= chr)) {
-    return !(chr & 1); // Even characters are upper
-  }
-
-  if ((0x0222 <= chr) && (0x0233 >= chr)) {
-    return !(chr & 1); // Even characters are upper
-  }
-
-  if ((0x0246 <= chr) && (0x024f >= chr)) {
-    return !(chr & 1); // Even characters are upper
-  }
-
-  return 0;
-}
+int utf8isupper(utf8_int32_t chr) { return chr != utf8lwrcodepoint(chr); }
 
 void utf8lwr(void *utf8_restrict str) {
   void *p, *pn;
@@ -1268,65 +1059,11 @@ void utf8lwr(void *utf8_restrict str) {
   pn = utf8codepoint(p, &cp);
 
   while (cp != 0) {
-    if (('A' <= cp) && ('Z' >= cp)) {
-      cp |= 0x20;
-      utf8catcodepoint(p, cp, 1);
-    } else if (((0x00c0 <= cp) && (0x00d6 >= cp)) ||
-               ((0x00d8 <= cp) && (0x00de >= cp))) {
-      cp += 32;
-      utf8catcodepoint(p, cp, 2);
-    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
-               ((0x0132 <= cp) && (0x0137 >= cp)) ||
-               ((0x014a <= cp) && (0x0177 >= cp)) ||
-               ((0x0182 <= cp) && (0x0185 >= cp)) ||
-               ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
-               ((0x01de <= cp) && (0x01ef >= cp)) ||
-               ((0x01f8 <= cp) && (0x021f >= cp)) ||
-               ((0x0222 <= cp) && (0x0233 >= cp)) ||
-               ((0x0246 <= cp) && (0x024f >= cp))) {
-      cp |= 0x1;
-      utf8catcodepoint(p, cp, 2);
-    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
-               ((0x0179 <= cp) && (0x017e >= cp)) ||
-               ((0x01af <= cp) && (0x01b0 >= cp)) ||
-               ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
-               ((0x01cd <= cp) && (0x01dc >= cp))) {
-      cp += 1;
-      cp &= ~0x1;
-      utf8catcodepoint(p, cp, 2);
-    } else {
-      utf8_int32_t new_cp = 0;
+    const utf8_int32_t lwr_cp = utf8lwrcodepoint(cp);
+    const size_t size = utf8codepointsize(lwr_cp);
 
-      switch (cp) {
-      default: break;
-      case 0x0178: new_cp = 0x00ff; break;
-      case 0x0243: new_cp = 0x0180; break;
-      case 0x018e: new_cp = 0x01dd; break;
-      case 0x023d: new_cp = 0x019a; break;
-      case 0x0220: new_cp = 0x019e; break;
-      case 0x01b7: new_cp = 0x0292; break;
-      case 0x01c4: new_cp = 0x01c6; break;
-      case 0x01c7: new_cp = 0x01c9; break;
-      case 0x01ca: new_cp = 0x01cc; break;
-      case 0x01f1: new_cp = 0x01f3; break;
-      case 0x01f7: new_cp = 0x01bf; break;
-      case 0x0187: new_cp = 0x0188; break;
-      case 0x018b: new_cp = 0x018c; break;
-      case 0x0191: new_cp = 0x0192; break;
-      case 0x0198: new_cp = 0x0199; break;
-      case 0x01a7: new_cp = 0x01a8; break;
-      case 0x01ac: new_cp = 0x01ad; break;
-      case 0x01af: new_cp = 0x01b0; break;
-      case 0x01b8: new_cp = 0x01b9; break;
-      case 0x01bc: new_cp = 0x01bd; break;
-      case 0x01f4: new_cp = 0x01f5; break;
-      case 0x023b: new_cp = 0x023c; break;
-      case 0x0241: new_cp = 0x0242; break;
-      };
-
-      if (0 != new_cp) {
-        utf8catcodepoint(p, new_cp, 2);
-      }
+    if (lwr_cp != cp) {
+      utf8catcodepoint(p, lwr_cp, size);
     }
 
     p = pn;
@@ -1342,65 +1079,11 @@ void utf8upr(void *utf8_restrict str) {
   pn = utf8codepoint(p, &cp);
 
   while (cp != 0) {
-    if (('a' <= cp) && ('z' >= cp)) {
-      cp &= ~0x20;
-      utf8catcodepoint(p, cp, 1);
-    } else if (((0x00e0 <= cp) && (0x00f6 >= cp)) ||
-               ((0x00f8 <= cp) && (0x00fe >= cp))) {
-      cp -= 32;
-      utf8catcodepoint(p, cp, 2);
-    } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
-               ((0x0132 <= cp) && (0x0137 >= cp)) ||
-               ((0x014a <= cp) && (0x0177 >= cp)) ||
-               ((0x0182 <= cp) && (0x0185 >= cp)) ||
-               ((0x01a0 <= cp) && (0x01a5 >= cp)) ||
-               ((0x01de <= cp) && (0x01ef >= cp)) ||
-               ((0x01f8 <= cp) && (0x021f >= cp)) ||
-               ((0x0222 <= cp) && (0x0233 >= cp)) ||
-               ((0x0246 <= cp) && (0x024f >= cp))) {
-      cp &= ~0x1;
-      utf8catcodepoint(p, cp, 2);
-    } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
-               ((0x0179 <= cp) && (0x017e >= cp)) ||
-               ((0x01af <= cp) && (0x01b0 >= cp)) ||
-               ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
-               ((0x01cd <= cp) && (0x01dc >= cp))) {
-      cp -= 1;
-      cp |= 0x1;
-      utf8catcodepoint(p, cp, 2);
-    } else {
-      utf8_int32_t new_cp = 0;
+    const utf8_int32_t lwr_cp = utf8uprcodepoint(cp);
+    const size_t size = utf8codepointsize(lwr_cp);
 
-      switch (cp) {
-      default: break;
-      case 0x00ff: new_cp = 0x0178; break;
-      case 0x0180: new_cp = 0x0243; break;
-      case 0x01dd: new_cp = 0x018e; break;
-      case 0x019a: new_cp = 0x023d; break;
-      case 0x019e: new_cp = 0x0220; break;
-      case 0x0292: new_cp = 0x01b7; break;
-      case 0x01c6: new_cp = 0x01c4; break;
-      case 0x01c9: new_cp = 0x01c7; break;
-      case 0x01cc: new_cp = 0x01ca; break;
-      case 0x01f3: new_cp = 0x01f1; break;
-      case 0x01bf: new_cp = 0x01f7; break;
-      case 0x0188: new_cp = 0x0187; break;
-      case 0x018c: new_cp = 0x018b; break;
-      case 0x0192: new_cp = 0x0191; break;
-      case 0x0199: new_cp = 0x0198; break;
-      case 0x01a8: new_cp = 0x01a7; break;
-      case 0x01ad: new_cp = 0x01ac; break;
-      case 0x01b0: new_cp = 0x01af; break;
-      case 0x01b9: new_cp = 0x01b8; break;
-      case 0x01bd: new_cp = 0x01bc; break;
-      case 0x01f5: new_cp = 0x01f4; break;
-      case 0x023c: new_cp = 0x023b; break;
-      case 0x0242: new_cp = 0x0241; break;
-      };
-
-      if (0 != new_cp) {
-        utf8catcodepoint(p, new_cp, 2);
-      }
+    if (lwr_cp != cp) {
+      utf8catcodepoint(p, lwr_cp, size);
     }
 
     p = pn;
@@ -1412,7 +1095,9 @@ utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
   if (('A' <= cp) && ('Z' >= cp)) {
     cp |= 0x20;
   } else if (((0x00c0 <= cp) && (0x00d6 >= cp)) ||
-             ((0x00d8 <= cp) && (0x00de >= cp))) {
+             ((0x00d8 <= cp) && (0x00de >= cp)) ||
+             ((0x0391 <= cp) && (0x03a1 >= cp)) ||
+             ((0x03a3 <= cp) && (0x03ab >= cp))) {
     cp += 32;
   } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
              ((0x0132 <= cp) && (0x0137 >= cp)) ||
@@ -1422,7 +1107,8 @@ utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
              ((0x01de <= cp) && (0x01ef >= cp)) ||
              ((0x01f8 <= cp) && (0x021f >= cp)) ||
              ((0x0222 <= cp) && (0x0233 >= cp)) ||
-             ((0x0246 <= cp) && (0x024f >= cp))) {
+             ((0x0246 <= cp) && (0x024f >= cp)) ||
+             ((0x03d8 <= cp) && (0x03ef >= cp))) {
     cp |= 0x1;
   } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
              ((0x0179 <= cp) && (0x017e >= cp)) ||
@@ -1457,6 +1143,25 @@ utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
     case 0x01f4: cp = 0x01f5; break;
     case 0x023b: cp = 0x023c; break;
     case 0x0241: cp = 0x0242; break;
+    case 0x03fd: cp = 0x037b; break;
+    case 0x03fe: cp = 0x037c; break;
+    case 0x03ff: cp = 0x037d; break;
+    case 0x037f: cp = 0x03f3; break;
+    case 0x0386: cp = 0x03ac; break;
+    case 0x0388: cp = 0x03ad; break;
+    case 0x0389: cp = 0x03ae; break;
+    case 0x038a: cp = 0x03af; break;
+    case 0x038c: cp = 0x03cc; break;
+    case 0x038e: cp = 0x03cd; break;
+    case 0x038f: cp = 0x03ce; break;
+    case 0x0370: cp = 0x0371; break;
+    case 0x0372: cp = 0x0373; break;
+    case 0x0376: cp = 0x0377; break;
+    case 0x03f4: cp = 0x03d1; break;
+    case 0x03cf: cp = 0x03d7; break;
+    case 0x03f9: cp = 0x03f2; break;
+    case 0x03f7: cp = 0x03f8; break;
+    case 0x03fa: cp = 0x03fb; break;
     };
   }
 
@@ -1467,7 +1172,9 @@ utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
   if (('a' <= cp) && ('z' >= cp)) {
     cp &= ~0x20;
   } else if (((0x00e0 <= cp) && (0x00f6 >= cp)) ||
-             ((0x00f8 <= cp) && (0x00fe >= cp))) {
+             ((0x00f8 <= cp) && (0x00fe >= cp)) ||
+             ((0x03b1 <= cp) && (0x03c1 >= cp)) ||
+             ((0x03c3 <= cp) && (0x03cb >= cp))) {
     cp -= 32;
   } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
              ((0x0132 <= cp) && (0x0137 >= cp)) ||
@@ -1477,7 +1184,8 @@ utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
              ((0x01de <= cp) && (0x01ef >= cp)) ||
              ((0x01f8 <= cp) && (0x021f >= cp)) ||
              ((0x0222 <= cp) && (0x0233 >= cp)) ||
-             ((0x0246 <= cp) && (0x024f >= cp))) {
+             ((0x0246 <= cp) && (0x024f >= cp)) ||
+             ((0x03d8 <= cp) && (0x03ef >= cp))) {
     cp &= ~0x1;
   } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
              ((0x0179 <= cp) && (0x017e >= cp)) ||
@@ -1512,6 +1220,25 @@ utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
     case 0x01f5: cp = 0x01f4; break;
     case 0x023c: cp = 0x023b; break;
     case 0x0242: cp = 0x0241; break;
+    case 0x037b: cp = 0x03fd; break;
+    case 0x037c: cp = 0x03fe; break;
+    case 0x037d: cp = 0x03ff; break;
+    case 0x03f3: cp = 0x037f; break;
+    case 0x03ac: cp = 0x0386; break;
+    case 0x03ad: cp = 0x0388; break;
+    case 0x03ae: cp = 0x0389; break;
+    case 0x03af: cp = 0x038a; break;
+    case 0x03cc: cp = 0x038c; break;
+    case 0x03cd: cp = 0x038e; break;
+    case 0x03ce: cp = 0x038f; break;
+    case 0x0371: cp = 0x0370; break;
+    case 0x0373: cp = 0x0372; break;
+    case 0x0377: cp = 0x0376; break;
+    case 0x03d1: cp = 0x03f4; break;
+    case 0x03d7: cp = 0x03cf; break;
+    case 0x03f2: cp = 0x03f9; break;
+    case 0x03f8: cp = 0x03f7; break;
+    case 0x03fb: cp = 0x03fa; break;
     };
   }
 
