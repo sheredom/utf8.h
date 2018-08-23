@@ -586,9 +586,8 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
   } while (('\0' != *s) && (0 != --n));
 
   // append null terminating byte
-  while (0 != n) {
+  while (0 != --n) {
     *d++ = '\0';
-    n--;
   }
 
   return dst;
