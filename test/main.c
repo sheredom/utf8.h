@@ -828,6 +828,23 @@ UTEST(utf8ncpy, data) {
   ASSERT_EQ(53, utf8len(utf8ncpy(cpy, data, 105)));
 }
 
+UTEST(utf8ncpy, check_no_buffer_overflow) {
+  utf8_int32_t i;
+  char buffer[11] = {0xdd, 0xdd, 0xdd, 0xdd, 0xdd, 0xdd,
+                     0xdd, 0xdd, 0xdd, 0xdd, 0xdd};
+  ASSERT_EQ(buffer, utf8ncpy(buffer, "foo", 10));
+
+  ASSERT_EQ('f', buffer[0]);
+  ASSERT_EQ('o', buffer[1]);
+  ASSERT_EQ('o', buffer[2]);
+
+  for (i = 3; 10 != i; i++) {
+    ASSERT_EQ(0, buffer[i]);
+  }
+
+  ASSERT_EQ((char)0xdd, buffer[10]);
+}
+
 UTEST(utf8pbrk, pbrk) { ASSERT_EQ(data + 8, utf8pbrk(data, pbrk)); }
 
 UTEST(utf8pbrk, data) { ASSERT_EQ(data, utf8pbrk(data, data)); }
@@ -927,7 +944,7 @@ UTEST(utf8isupper, upper) {
 
 UTEST(utf8isupper, lower) {
   utf8_int32_t i;
-  
+
   for (i = 0; 0 != lowupPairs[i].lower; i++) {
     ASSERT_EQ(0, utf8isupper(lowupPairs[i].lower));
   }
