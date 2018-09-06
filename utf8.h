@@ -578,16 +578,20 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
                size_t n) {
   char *d = (char *)dst;
   const char *s = (const char *)src;
+  size_t index;
 
   // overwriting anything previously in dst, write byte-by-byte
   // from src
-  do {
-    *d++ = *s++;
-  } while (('\0' != *s) && (0 != --n));
+  for (index = 0; index < n; index++) {
+    d[index] = s[index];
+    if ('\0' == s[index]) {
+      break;
+    }
+  }
 
   // append null terminating byte
-  while (0 != --n) {
-    *d++ = '\0';
+  for (; index < n; index++) {
+    d[index] = 0;
   }
 
   return dst;

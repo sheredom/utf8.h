@@ -845,6 +845,16 @@ UTEST(utf8ncpy, check_no_buffer_overflow) {
   ASSERT_EQ((char)0xdd, buffer[10]);
 }
 
+UTEST(utf8ncpy, check_no_n_overflow) {
+  char buffer[4] = {1, 2, 3, 4};
+  ASSERT_EQ(buffer, utf8ncpy(buffer, "foo", 2));
+
+  ASSERT_EQ('f', buffer[0]);
+  ASSERT_EQ('o', buffer[1]);
+  ASSERT_EQ(3, buffer[2]);
+  ASSERT_EQ(4, buffer[3]);
+}
+
 UTEST(utf8pbrk, pbrk) { ASSERT_EQ(data + 8, utf8pbrk(data, pbrk)); }
 
 UTEST(utf8pbrk, data) { ASSERT_EQ(data, utf8pbrk(data, data)); }
