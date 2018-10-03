@@ -829,7 +829,9 @@ void *utf8str(const void *haystack, const void *needle) {
       return (void *)maybeMatch;
     } else {
       // h could be in the middle of an unmatching utf8 codepoint,
-      // so we need to march it on to the next character beginning,
+      // so we need to march it on to the next character beginning
+      // starting from the previous character
+      h = maybeMatch;
       if ('\0' != *h) {
         do {
           h++;
