@@ -829,7 +829,9 @@ void *utf8str(const void *haystack, const void *needle) {
       return (void *)maybeMatch;
     } else {
       // h could be in the middle of an unmatching utf8 codepoint,
-      // so we need to march it on to the next character beginning,
+      // so we need to march it on to the next character beginning
+      // starting from the current character
+      h = maybeMatch;
       if ('\0' != *h) {
         do {
           h++;
@@ -856,7 +858,8 @@ void *utf8casestr(const void *haystack, const void *needle) {
     const void *n = needle;
     utf8_int32_t h_cp, n_cp;
 
-    h = utf8codepoint(h, &h_cp);
+    // Get the next code point and track it
+    const void *nextH = h = utf8codepoint(h, &h_cp);
     n = utf8codepoint(n, &n_cp);
 
     while ((0 != h_cp) && (0 != n_cp)) {
@@ -882,6 +885,9 @@ void *utf8casestr(const void *haystack, const void *needle) {
       // no match
       return utf8_null;
     }
+
+    // Roll back to the next code point in the haystack to test
+    h = nextH;
   }
 }
 
