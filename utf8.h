@@ -814,6 +814,7 @@ void *utf8str(const void *haystack, const void *needle) {
     return (void *)haystack;
   }
 
+  utf8_int32_t h_cp;
   while ('\0' != *h) {
     const char *maybeMatch = h;
     const char *n = (const char *)needle;
@@ -831,12 +832,7 @@ void *utf8str(const void *haystack, const void *needle) {
       // h could be in the middle of an unmatching utf8 codepoint,
       // so we need to march it on to the next character beginning
       // starting from the current character
-      h = maybeMatch;
-      if ('\0' != *h) {
-        do {
-          h++;
-        } while (0x80 == (0xc0 & *h));
-      }
+      h = (const char*)utf8codepoint(maybeMatch, &h_cp);
     }
   }
 
