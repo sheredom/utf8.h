@@ -807,6 +807,7 @@ size_t utf8spn(const void *src, const void *accept) {
 
 void *utf8str(const void *haystack, const void *needle) {
   const char *h = (const char *)haystack;
+  utf8_int32_t throwaway_codepoint;
 
   // if needle has no utf8 codepoints before the null terminating
   // byte then return haystack
@@ -831,12 +832,7 @@ void *utf8str(const void *haystack, const void *needle) {
       // h could be in the middle of an unmatching utf8 codepoint,
       // so we need to march it on to the next character beginning
       // starting from the current character
-      h = maybeMatch;
-      if ('\0' != *h) {
-        do {
-          h++;
-        } while (0x80 == (0xc0 & *h));
-      }
+      h = (const char*)utf8codepoint(maybeMatch, &throwaway_codepoint);
     }
   }
 

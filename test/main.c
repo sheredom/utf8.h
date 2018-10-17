@@ -63,6 +63,7 @@ const char allascii1[] = "abcdefghijklmnopqrstuvwyzABCDEFGHIJKLMNOPQRSTUVWYZ";
 const char allascii2[] = "ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwyz";
 const char haystack[] = "foobar";
 const char needle[] = "oba";
+const char endfailneedle[] = "ra";
 
 struct LowerUpperPair {
   int lower;
@@ -539,6 +540,8 @@ UTEST(utf8str, empty) { ASSERT_EQ(data, utf8str(data, "")); }
 
 UTEST(utf8str, partial) { ASSERT_EQ(haystack + 2, utf8str(haystack, needle)); }
 
+UTEST(utf8str, endfail) { ASSERT_EQ((void *)0, utf8str(haystack, endfailneedle)); }
+
 UTEST(utf8casestr, cmp) { ASSERT_EQ(data + 21, utf8casestr(data, cmp)); }
 
 UTEST(utf8casestr, test) { ASSERT_EQ((void *)0, utf8casestr(data, "test")); }
@@ -546,6 +549,8 @@ UTEST(utf8casestr, test) { ASSERT_EQ((void *)0, utf8casestr(data, "test")); }
 UTEST(utf8casestr, empty) { ASSERT_EQ(data, utf8casestr(data, "")); }
 
 UTEST(utf8casestr, partial) { ASSERT_EQ(haystack + 2, utf8casestr(haystack, needle)); }
+
+UTEST(utf8casestr, endfail) { ASSERT_EQ((void *)0, utf8casestr(haystack, endfailneedle)); }
 
 UTEST(utf8casestr, latin) {
   ASSERT_EQ(lowersStr, utf8casestr(lowersStr, uppersStr));
