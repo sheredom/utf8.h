@@ -559,7 +559,7 @@ int utf8ncmp(const void *src1, const void *src2, size_t n) {
   const unsigned char *s1 = (const unsigned char *)src1;
   const unsigned char *s2 = (const unsigned char *)src2;
 
-  while ((('\0' != *s1) || ('\0' != *s2)) && (0 != n--)) {
+  while ((0 != n--) && (('\0' != *s1) || ('\0' != *s2))) {
     if (*s1 < *s2) {
       return -1;
     } else if (*s1 > *s2) {
