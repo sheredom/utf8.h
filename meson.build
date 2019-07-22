@@ -94,5 +94,4 @@ endif
 utf8_h_dir = include_directories('.')
 
 utf8_h_dep = declare_dependency(
-    link_with: utf8_h_lib,
     include_directories: utf8_h_dir)
