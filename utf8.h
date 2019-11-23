@@ -1129,8 +1129,11 @@ utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
       ((0x00c0 <= cp) && (0x00d6 >= cp)) ||
       ((0x00d8 <= cp) && (0x00de >= cp)) ||
       ((0x0391 <= cp) && (0x03a1 >= cp)) ||
-      ((0x03a3 <= cp) && (0x03ab >= cp))) {
+      ((0x03a3 <= cp) && (0x03ab >= cp)) ||
+      ((0x0410 <= cp) && (0x042f >= cp))) {
     cp += 32;
+  } else if ((0x0400 <= cp) && (0x040f >= cp)) {
+    cp += 80;
   } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
              ((0x0132 <= cp) && (0x0137 >= cp)) ||
              ((0x014a <= cp) && (0x0177 >= cp)) ||
@@ -1140,7 +1143,9 @@ utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
              ((0x01f8 <= cp) && (0x021f >= cp)) ||
              ((0x0222 <= cp) && (0x0233 >= cp)) ||
              ((0x0246 <= cp) && (0x024f >= cp)) ||
-             ((0x03d8 <= cp) && (0x03ef >= cp))) {
+             ((0x03d8 <= cp) && (0x03ef >= cp)) ||
+             ((0x0460 <= cp) && (0x0481 >= cp)) ||
+             ((0x048a <= cp) && (0x04ff >= cp))) {
     cp |= 0x1;
   } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
              ((0x0179 <= cp) && (0x017e >= cp)) ||
@@ -1205,8 +1210,11 @@ utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
       ((0x00e0 <= cp) && (0x00f6 >= cp)) ||
       ((0x00f8 <= cp) && (0x00fe >= cp)) ||
       ((0x03b1 <= cp) && (0x03c1 >= cp)) ||
-      ((0x03c3 <= cp) && (0x03cb >= cp))) {
+      ((0x03c3 <= cp) && (0x03cb >= cp)) ||
+      ((0x0430 <= cp) && (0x044f >= cp))) {
     cp -= 32;
+  } else if ((0x0450 <= cp) && (0x045f >= cp)) {
+    cp -= 80;
   } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
              ((0x0132 <= cp) && (0x0137 >= cp)) ||
              ((0x014a <= cp) && (0x0177 >= cp)) ||
@@ -1216,7 +1224,9 @@ utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
              ((0x01f8 <= cp) && (0x021f >= cp)) ||
              ((0x0222 <= cp) && (0x0233 >= cp)) ||
              ((0x0246 <= cp) && (0x024f >= cp)) ||
-             ((0x03d8 <= cp) && (0x03ef >= cp))) {
+             ((0x03d8 <= cp) && (0x03ef >= cp)) ||
+             ((0x0460 <= cp) && (0x0481 >= cp)) ||
+             ((0x048a <= cp) && (0x04ff >= cp))) {
     cp &= ~0x1;
   } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
              ((0x0179 <= cp) && (0x017e >= cp)) ||
