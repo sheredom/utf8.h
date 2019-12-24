@@ -1037,4 +1037,15 @@ UTEST(utf8upr, latin_upper) {
   free(str);
 }
 
+UTEST(utf8casecmp, basic_ascii) {
+  ASSERT_EQ(-15, utf8casecmp(".gdoc", ".GSHeeT"));
+  ASSERT_EQ(-4, utf8casecmp(".gsheet", ".gSLiDe"));
+
+#ifndef _MSC_VER
+  ASSERT_EQ(strcasecmp(".gdoc", ".GSHeeT"), utf8casecmp(".gdoc", ".GSHeeT"));
+  ASSERT_EQ(strcasecmp(".gsheet", ".gSLiDe"),
+            utf8casecmp(".gsheet", ".gSLiDe"));
+#endif
+}
+
 UTEST_MAIN();
