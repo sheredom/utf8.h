@@ -376,6 +376,11 @@ size_t utf8cspn(const void *src, const void *reject) {
       }
     }
 
+    // found a match at the end of *r, so didn't get a chance to test it
+    if (0 < offset) {
+        return chars;
+    } 
+
     // the current utf8 codepoint in src did not match reject, but src
     // could have been partway through a utf8 codepoint, so we need to
     // march it onto the next utf8 codepoint starting byte
