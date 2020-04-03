@@ -64,6 +64,9 @@ const char allascii2[] = "ABCDEFGHIJKLMNOPQRSTUVWYZabcdefghijklmnopqrstuvwyz";
 const char haystack[] = "foobar";
 const char needle[] = "oba";
 const char endfailneedle[] = "ra";
+const char cspnmultisearch[] = "another test; string|one more";
+const char cspnmultidelims[] = "|;";
+
 
 struct LowerUpperPair {
   int lower;
@@ -587,6 +590,8 @@ UTEST(utf8cspn, spn) { ASSERT_EQ(0, utf8cspn(data, spn)); }
 UTEST(utf8cspn, data) { ASSERT_EQ(0, utf8cspn(data, data)); }
 
 UTEST(utf8cspn, ascii) { ASSERT_EQ(53, utf8cspn(data, "ab")); }
+
+UTEST(utf8cspn, cspnmultisearch) { ASSERT_EQ(12, utf8cspn(cspnmultisearch, cspnmultidelims)); }
 
 UTEST(utf8rchr, a) { ASSERT_EQ(data + 21, utf8rchr(data, 0x3bc)); }
 
