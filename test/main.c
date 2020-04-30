@@ -924,6 +924,17 @@ UTEST(utf8codepoint, data) {
   }
 }
 
+UTEST(utf8codepointcalcsize, data) {
+  const char *v;
+  // No -1 here since we start at the beginning
+  size_t expected_length = utf8len(data);
+  for (v = data; *v;
+       v += utf8codepointcalcsize(v)) {
+    ASSERT_EQ(expected_length, utf8len(v));
+    expected_length -= 1;
+  }
+}
+
 UTEST(utf8codepointsize, size_1) { ASSERT_EQ(1, utf8codepointsize('A')); }
 
 UTEST(utf8codepointsize, size_4) { ASSERT_EQ(4, utf8codepointsize(0x20C78)); }
