@@ -778,6 +778,7 @@ size_t utf8spn(const void *src, const void *accept) {
         // codepoints in a match
         chars++;
         s += offset;
+        offset = 0;
         break;
       } else {
         if (*a == s[offset]) {
@@ -794,6 +795,13 @@ size_t utf8spn(const void *src, const void *accept) {
           offset = 0;
         }
       }
+    }
+
+    // found a match at the end of *a, so didn't get a chance to test it
+    if (0 < offset) {
+        chars++;
+        s += offset;
+        continue;
     }
 
     // if a got to its terminating null byte, then we didn't find a match.

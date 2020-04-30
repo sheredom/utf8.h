@@ -66,6 +66,8 @@ const char needle[] = "oba";
 const char endfailneedle[] = "ra";
 const char cspnmultisearch[] = "another test; string|one more";
 const char cspnmultidelims[] = "|;";
+const char spnasciisearch[] = ",,hello,,world";
+const char spnasciidelims[] = ",";
 
 
 struct LowerUpperPair {
@@ -579,11 +581,14 @@ UTEST(utf8cpy, data) {
   ASSERT_EQ(53, utf8len(utf8cpy(cpy, data)));
 }
 
-UTEST(utf8spn, spn) { ASSERT_EQ(7, utf8spn(data, spn)); }
+// Matches \xce\x93 \xce\xb1 \xce\xb6 \xce\xad \xce\xb5 \xcf\x82 \x20 \xce\xba \xce\xb1 
+UTEST(utf8spn, spn) { ASSERT_EQ(9, utf8spn(data, spn)); }
 
-UTEST(utf8spn, data) { ASSERT_EQ(52, utf8spn(data, data)); }
+UTEST(utf8spn, data) { ASSERT_EQ(53, utf8spn(data, data)); }
 
 UTEST(utf8spn, ascii) { ASSERT_EQ(0, utf8spn(data, "ab")); }
+
+UTEST(utf8spn, spnasciisearch) { ASSERT_EQ(2, utf8spn(spnasciisearch, spnasciidelims)); }
 
 UTEST(utf8cspn, spn) { ASSERT_EQ(0, utf8cspn(data, spn)); }
 
