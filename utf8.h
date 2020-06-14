@@ -396,8 +396,6 @@ size_t utf8cspn(const void *src, const void *reject) {
   return chars;
 }
 
-size_t utf8size(const void *str);
-
 void *utf8dup(const void *src) {
   const char *s = (const char *)src;
   char *n = utf8_null;
