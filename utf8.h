@@ -995,10 +995,13 @@ void *utf8codepoint(const void *utf8_restrict str,
     // 2 byte utf8 codepoint
     *out_codepoint = ((0x1f & s[0]) << 6) | (0x3f & s[1]);
     s += 2;
-  } else {
+  } else if (0 != s[0]) {
     // 1 byte utf8 codepoint otherwise
     *out_codepoint = s[0];
     s += 1;
+  } else {
+    // Null terminator.
+    *out_codepoint = 0;
   }
 
   return (void *)s;

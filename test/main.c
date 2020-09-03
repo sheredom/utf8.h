@@ -1063,6 +1063,13 @@ UTEST(utf8ncasecmp, latin_lowvsup) {
   ASSERT_EQ(0, utf8ncasecmp(uppersStr, lowersStr, 120));
 }
 
+UTEST(utf8codepoint, empty) {
+  utf8_int32_t codepoint;
+  const char *str = "";
+  ASSERT_EQ(str, utf8codepoint(str, &codepoint));
+  ASSERT_EQ(0, codepoint);
+}
+
 UTEST(utf8codepoint, data) {
   utf8_int32_t codepoint;
   void *v;
