@@ -470,9 +470,7 @@ int utf8ncasecmp(const void *src1, const void *src2, size_t n) {
       const utf8_int32_t c2 = (0xe0 & *s2);
 
       if (c1 < c2) {
-        return -1;
-      } else if (c1 > c2) {
-        return 1;
+        return c1 - c2;
       } else {
         return 0;
       }
@@ -483,9 +481,7 @@ int utf8ncasecmp(const void *src1, const void *src2, size_t n) {
       const utf8_int32_t c2 = (0xf0 & *s2);
 
       if (c1 < c2) {
-        return -1;
-      } else if (c1 > c2) {
-        return 1;
+        return c1 - c2;
       } else {
         return 0;
       }
@@ -496,9 +492,7 @@ int utf8ncasecmp(const void *src1, const void *src2, size_t n) {
       const utf8_int32_t c2 = (0xf8 & *s2);
 
       if (c1 < c2) {
-        return -1;
-      } else if (c1 > c2) {
-        return 1;
+        return c1 - c2;
       } else {
         return 0;
       }
@@ -523,11 +517,9 @@ int utf8ncasecmp(const void *src1, const void *src2, size_t n) {
       continue;
     }
 
-    // If they don't match, then we return which of the original's are less
-    if (src1_orig_cp < src2_orig_cp) {
-      return -1;
-    } else if (src1_orig_cp > src2_orig_cp) {
-      return 1;
+    // if they don't match, then we return the difference between the characters
+    if (src1_orig_cp != src2_orig_cp) {
+      return src1_cp - src2_cp;
     }
   } while (0 < n);
 
