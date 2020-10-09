@@ -155,7 +155,7 @@ string if `n` falls partway through a utf8 codepoint.
 ```c
 void *utf8pbrk(const void *str, const void *accept);
 ```
-Locates the first occurence in the utf8 string `str` of any byte in the   
+Locates the first occurrence in the utf8 string `str` of any byte in the   
 utf8 string `accept`, or 0 if no match was found.
 
 ```c
