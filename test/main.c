@@ -1063,6 +1063,17 @@ UTEST(utf8ncasecmp, latin_lowvsup) {
   ASSERT_EQ(0, utf8ncasecmp(uppersStr, lowersStr, 120));
 }
 
+UTEST(utf8ncasecmp, basic_ascii) {
+  ASSERT_EQ(-15, utf8ncasecmp(".gdoc", ".GSHeeT", 5));
+  ASSERT_EQ(-4, utf8ncasecmp(".gsheet", ".gSLiDe", 7));
+
+#ifndef _MSC_VER
+  ASSERT_EQ(strcasecmp(".gdoc", ".GSHeeT"), utf8ncasecmp(".gdoc", ".GSHeeT", 5));
+  ASSERT_EQ(strcasecmp(".gsheet", ".gSLiDe"),
+            utf8ncasecmp(".gsheet", ".gSLiDe", 7));
+#endif
+}
+
 UTEST(utf8codepoint, data) {
   utf8_int32_t codepoint;
   void *v;
