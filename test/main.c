@@ -69,7 +69,6 @@ const char cspnmultidelims[] = "|;";
 const char spnasciisearch[] = ",,hello,,world";
 const char spnasciidelims[] = ",";
 
-
 struct LowerUpperPair {
   int lower;
   int upper;
@@ -690,7 +689,9 @@ UTEST(utf8str, empty) { ASSERT_EQ(data, utf8str(data, "")); }
 
 UTEST(utf8str, partial) { ASSERT_EQ(haystack + 2, utf8str(haystack, needle)); }
 
-UTEST(utf8str, endfail) { ASSERT_EQ((void *)0, utf8str(haystack, endfailneedle)); }
+UTEST(utf8str, endfail) {
+  ASSERT_EQ((void *)0, utf8str(haystack, endfailneedle));
+}
 
 UTEST(utf8casestr, cmp) { ASSERT_EQ(data + 21, utf8casestr(data, cmp)); }
 
@@ -698,9 +699,13 @@ UTEST(utf8casestr, test) { ASSERT_EQ((void *)0, utf8casestr(data, "test")); }
 
 UTEST(utf8casestr, empty) { ASSERT_EQ(data, utf8casestr(data, "")); }
 
-UTEST(utf8casestr, partial) { ASSERT_EQ(haystack + 2, utf8casestr(haystack, needle)); }
+UTEST(utf8casestr, partial) {
+  ASSERT_EQ(haystack + 2, utf8casestr(haystack, needle));
+}
 
-UTEST(utf8casestr, endfail) { ASSERT_EQ((void *)0, utf8casestr(haystack, endfailneedle)); }
+UTEST(utf8casestr, endfail) {
+  ASSERT_EQ((void *)0, utf8casestr(haystack, endfailneedle));
+}
 
 UTEST(utf8casestr, latin) {
   ASSERT_EQ(lowersStr, utf8casestr(lowersStr, uppersStr));
@@ -726,14 +731,17 @@ UTEST(utf8cpy, data) {
   ASSERT_EQ(53, utf8len(utf8cpy(cpy, data)));
 }
 
-// Matches \xce\x93 \xce\xb1 \xce\xb6 \xce\xad \xce\xb5 \xcf\x82 \x20 \xce\xba \xce\xb1 
+// Matches \xce\x93 \xce\xb1 \xce\xb6 \xce\xad \xce\xb5 \xcf\x82 \x20 \xce\xba
+// \xce\xb1
 UTEST(utf8spn, spn) { ASSERT_EQ(9, utf8spn(data, spn)); }
 
 UTEST(utf8spn, data) { ASSERT_EQ(53, utf8spn(data, data)); }
 
 UTEST(utf8spn, ascii) { ASSERT_EQ(0, utf8spn(data, "ab")); }
 
-UTEST(utf8spn, spnasciisearch) { ASSERT_EQ(2, utf8spn(spnasciisearch, spnasciidelims)); }
+UTEST(utf8spn, spnasciisearch) {
+  ASSERT_EQ(2, utf8spn(spnasciisearch, spnasciidelims));
+}
 
 UTEST(utf8cspn, spn) { ASSERT_EQ(0, utf8cspn(data, spn)); }
 
@@ -741,7 +749,9 @@ UTEST(utf8cspn, data) { ASSERT_EQ(0, utf8cspn(data, data)); }
 
 UTEST(utf8cspn, ascii) { ASSERT_EQ(53, utf8cspn(data, "ab")); }
 
-UTEST(utf8cspn, cspnmultisearch) { ASSERT_EQ(12, utf8cspn(cspnmultisearch, cspnmultidelims)); }
+UTEST(utf8cspn, cspnmultisearch) {
+  ASSERT_EQ(12, utf8cspn(cspnmultisearch, cspnmultidelims));
+}
 
 UTEST(utf8rchr, a) { ASSERT_EQ(data + 21, utf8rchr(data, 0x3bc)); }
 
@@ -1068,7 +1078,8 @@ UTEST(utf8ncasecmp, basic_ascii) {
   ASSERT_EQ(-4, utf8ncasecmp(".gsheet", ".gSLiDe", 7));
 
 #ifndef _MSC_VER
-  ASSERT_EQ(strcasecmp(".gdoc", ".GSHeeT"), utf8ncasecmp(".gdoc", ".GSHeeT", 5));
+  ASSERT_EQ(strcasecmp(".gdoc", ".GSHeeT"),
+            utf8ncasecmp(".gdoc", ".GSHeeT", 5));
   ASSERT_EQ(strcasecmp(".gsheet", ".gSLiDe"),
             utf8ncasecmp(".gsheet", ".gSLiDe", 7));
 #endif
@@ -1089,8 +1100,7 @@ UTEST(utf8codepointcalcsize, data) {
   const char *v;
   // No -1 here since we start at the beginning
   size_t expected_length = utf8len(data);
-  for (v = data; *v;
-       v += utf8codepointcalcsize(v)) {
+  for (v = data; *v; v += utf8codepointcalcsize(v)) {
     ASSERT_EQ(expected_length, utf8len(v));
     expected_length -= 1;
   }

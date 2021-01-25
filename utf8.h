@@ -32,7 +32,14 @@
 #if defined(_MSC_VER)
 #pragma warning(push)
 
-// disable 'bytes padding added after construct' warning
+/* disable warning: no function prototype given: converting '()' to '(void)' */
+#pragma warning(disable : 4255)
+
+/* disable warning: '__cplusplus' is not defined as a preprocessor macro,
+ * replacing with '0' for '#if/#elif' */
+#pragma warning(disable : 4668)
+
+/* disable warning: bytes padding added after construct */
 #pragma warning(disable : 4820)
 #endif
 
@@ -184,9 +191,10 @@ utf8_nonnull utf8_pure utf8_weak void *utf8valid(const void *str);
 utf8_nonnull utf8_weak void *
 utf8codepoint(const void *utf8_restrict str,
               utf8_int32_t *utf8_restrict out_codepoint);
-			  
+
 // Calculates the size of the next utf8 codepoint in str.
-utf8_nonnull utf8_weak size_t utf8codepointcalcsize( const void* utf8_restrict str );			  
+utf8_nonnull utf8_weak size_t
+utf8codepointcalcsize(const void *utf8_restrict str);
 
 // Returns the size of the given codepoint in bytes.
 utf8_weak size_t utf8codepointsize(utf8_int32_t chr);
@@ -381,8 +389,8 @@ size_t utf8cspn(const void *src, const void *reject) {
 
     // found a match at the end of *r, so didn't get a chance to test it
     if (0 < offset) {
-        return chars;
-    } 
+      return chars;
+    }
 
     // the current utf8 codepoint in src did not match reject, but src
     // could have been partway through a utf8 codepoint, so we need to
@@ -792,9 +800,9 @@ size_t utf8spn(const void *src, const void *accept) {
 
     // found a match at the end of *a, so didn't get a chance to test it
     if (0 < offset) {
-        chars++;
-        s += offset;
-        continue;
+      chars++;
+      s += offset;
+      continue;
     }
 
     // if a got to its terminating null byte, then we didn't find a match.
@@ -834,7 +842,7 @@ void *utf8str(const void *haystack, const void *needle) {
       // h could be in the middle of an unmatching utf8 codepoint,
       // so we need to march it on to the next character beginning
       // starting from the current character
-      h = (const char*)utf8codepoint(maybeMatch, &throwaway_codepoint);
+      h = (const char *)utf8codepoint(maybeMatch, &throwaway_codepoint);
     }
   }
 
@@ -1148,50 +1156,135 @@ utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
     cp &= ~0x1;
   } else {
     switch (cp) {
-    default: break;
-    case 0x0178: cp = 0x00ff; break;
-    case 0x0243: cp = 0x0180; break;
-    case 0x018e: cp = 0x01dd; break;
-    case 0x023d: cp = 0x019a; break;
-    case 0x0220: cp = 0x019e; break;
-    case 0x01b7: cp = 0x0292; break;
-    case 0x01c4: cp = 0x01c6; break;
-    case 0x01c7: cp = 0x01c9; break;
-    case 0x01ca: cp = 0x01cc; break;
-    case 0x01f1: cp = 0x01f3; break;
-    case 0x01f7: cp = 0x01bf; break;
-    case 0x0187: cp = 0x0188; break;
-    case 0x018b: cp = 0x018c; break;
-    case 0x0191: cp = 0x0192; break;
-    case 0x0198: cp = 0x0199; break;
-    case 0x01a7: cp = 0x01a8; break;
-    case 0x01ac: cp = 0x01ad; break;
-    case 0x01af: cp = 0x01b0; break;
-    case 0x01b8: cp = 0x01b9; break;
-    case 0x01bc: cp = 0x01bd; break;
-    case 0x01f4: cp = 0x01f5; break;
-    case 0x023b: cp = 0x023c; break;
-    case 0x0241: cp = 0x0242; break;
-    case 0x03fd: cp = 0x037b; break;
-    case 0x03fe: cp = 0x037c; break;
-    case 0x03ff: cp = 0x037d; break;
-    case 0x037f: cp = 0x03f3; break;
-    case 0x0386: cp = 0x03ac; break;
-    case 0x0388: cp = 0x03ad; break;
-    case 0x0389: cp = 0x03ae; break;
-    case 0x038a: cp = 0x03af; break;
-    case 0x038c: cp = 0x03cc; break;
-    case 0x038e: cp = 0x03cd; break;
-    case 0x038f: cp = 0x03ce; break;
-    case 0x0370: cp = 0x0371; break;
-    case 0x0372: cp = 0x0373; break;
-    case 0x0376: cp = 0x0377; break;
-    case 0x03f4: cp = 0x03d1; break;
-    case 0x03cf: cp = 0x03d7; break;
-    case 0x03f9: cp = 0x03f2; break;
-    case 0x03f7: cp = 0x03f8; break;
-    case 0x03fa: cp = 0x03fb; break;
-    };
+    default:
+      break;
+    case 0x0178:
+      cp = 0x00ff;
+      break;
+    case 0x0243:
+      cp = 0x0180;
+      break;
+    case 0x018e:
+      cp = 0x01dd;
+      break;
+    case 0x023d:
+      cp = 0x019a;
+      break;
+    case 0x0220:
+      cp = 0x019e;
+      break;
+    case 0x01b7:
+      cp = 0x0292;
+      break;
+    case 0x01c4:
+      cp = 0x01c6;
+      break;
+    case 0x01c7:
+      cp = 0x01c9;
+      break;
+    case 0x01ca:
+      cp = 0x01cc;
+      break;
+    case 0x01f1:
+      cp = 0x01f3;
+      break;
+    case 0x01f7:
+      cp = 0x01bf;
+      break;
+    case 0x0187:
+      cp = 0x0188;
+      break;
+    case 0x018b:
+      cp = 0x018c;
+      break;
+    case 0x0191:
+      cp = 0x0192;
+      break;
+    case 0x0198:
+      cp = 0x0199;
+      break;
+    case 0x01a7:
+      cp = 0x01a8;
+      break;
+    case 0x01ac:
+      cp = 0x01ad;
+      break;
+    case 0x01af:
+      cp = 0x01b0;
+      break;
+    case 0x01b8:
+      cp = 0x01b9;
+      break;
+    case 0x01bc:
+      cp = 0x01bd;
+      break;
+    case 0x01f4:
+      cp = 0x01f5;
+      break;
+    case 0x023b:
+      cp = 0x023c;
+      break;
+    case 0x0241:
+      cp = 0x0242;
+      break;
+    case 0x03fd:
+      cp = 0x037b;
+      break;
+    case 0x03fe:
+      cp = 0x037c;
+      break;
+    case 0x03ff:
+      cp = 0x037d;
+      break;
+    case 0x037f:
+      cp = 0x03f3;
+      break;
+    case 0x0386:
+      cp = 0x03ac;
+      break;
+    case 0x0388:
+      cp = 0x03ad;
+      break;
+    case 0x0389:
+      cp = 0x03ae;
+      break;
+    case 0x038a:
+      cp = 0x03af;
+      break;
+    case 0x038c:
+      cp = 0x03cc;
+      break;
+    case 0x038e:
+      cp = 0x03cd;
+      break;
+    case 0x038f:
+      cp = 0x03ce;
+      break;
+    case 0x0370:
+      cp = 0x0371;
+      break;
+    case 0x0372:
+      cp = 0x0373;
+      break;
+    case 0x0376:
+      cp = 0x0377;
+      break;
+    case 0x03f4:
+      cp = 0x03d1;
+      break;
+    case 0x03cf:
+      cp = 0x03d7;
+      break;
+    case 0x03f9:
+      cp = 0x03f2;
+      break;
+    case 0x03f7:
+      cp = 0x03f8;
+      break;
+    case 0x03fa:
+      cp = 0x03fb;
+      break;
+    }
   }
 
   return cp;
@@ -1229,50 +1322,135 @@ utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
     cp |= 0x1;
   } else {
     switch (cp) {
-    default: break;
-    case 0x00ff: cp = 0x0178; break;
-    case 0x0180: cp = 0x0243; break;
-    case 0x01dd: cp = 0x018e; break;
-    case 0x019a: cp = 0x023d; break;
-    case 0x019e: cp = 0x0220; break;
-    case 0x0292: cp = 0x01b7; break;
-    case 0x01c6: cp = 0x01c4; break;
-    case 0x01c9: cp = 0x01c7; break;
-    case 0x01cc: cp = 0x01ca; break;
-    case 0x01f3: cp = 0x01f1; break;
-    case 0x01bf: cp = 0x01f7; break;
-    case 0x0188: cp = 0x0187; break;
-    case 0x018c: cp = 0x018b; break;
-    case 0x0192: cp = 0x0191; break;
-    case 0x0199: cp = 0x0198; break;
-    case 0x01a8: cp = 0x01a7; break;
-    case 0x01ad: cp = 0x01ac; break;
-    case 0x01b0: cp = 0x01af; break;
-    case 0x01b9: cp = 0x01b8; break;
-    case 0x01bd: cp = 0x01bc; break;
-    case 0x01f5: cp = 0x01f4; break;
-    case 0x023c: cp = 0x023b; break;
-    case 0x0242: cp = 0x0241; break;
-    case 0x037b: cp = 0x03fd; break;
-    case 0x037c: cp = 0x03fe; break;
-    case 0x037d: cp = 0x03ff; break;
-    case 0x03f3: cp = 0x037f; break;
-    case 0x03ac: cp = 0x0386; break;
-    case 0x03ad: cp = 0x0388; break;
-    case 0x03ae: cp = 0x0389; break;
-    case 0x03af: cp = 0x038a; break;
-    case 0x03cc: cp = 0x038c; break;
-    case 0x03cd: cp = 0x038e; break;
-    case 0x03ce: cp = 0x038f; break;
-    case 0x0371: cp = 0x0370; break;
-    case 0x0373: cp = 0x0372; break;
-    case 0x0377: cp = 0x0376; break;
-    case 0x03d1: cp = 0x03f4; break;
-    case 0x03d7: cp = 0x03cf; break;
-    case 0x03f2: cp = 0x03f9; break;
-    case 0x03f8: cp = 0x03f7; break;
-    case 0x03fb: cp = 0x03fa; break;
-    };
+    default:
+      break;
+    case 0x00ff:
+      cp = 0x0178;
+      break;
+    case 0x0180:
+      cp = 0x0243;
+      break;
+    case 0x01dd:
+      cp = 0x018e;
+      break;
+    case 0x019a:
+      cp = 0x023d;
+      break;
+    case 0x019e:
+      cp = 0x0220;
+      break;
+    case 0x0292:
+      cp = 0x01b7;
+      break;
+    case 0x01c6:
+      cp = 0x01c4;
+      break;
+    case 0x01c9:
+      cp = 0x01c7;
+      break;
+    case 0x01cc:
+      cp = 0x01ca;
+      break;
+    case 0x01f3:
+      cp = 0x01f1;
+      break;
+    case 0x01bf:
+      cp = 0x01f7;
+      break;
+    case 0x0188:
+      cp = 0x0187;
+      break;
+    case 0x018c:
+      cp = 0x018b;
+      break;
+    case 0x0192:
+      cp = 0x0191;
+      break;
+    case 0x0199:
+      cp = 0x0198;
+      break;
+    case 0x01a8:
+      cp = 0x01a7;
+      break;
+    case 0x01ad:
+      cp = 0x01ac;
+      break;
+    case 0x01b0:
+      cp = 0x01af;
+      break;
+    case 0x01b9:
+      cp = 0x01b8;
+      break;
+    case 0x01bd:
+      cp = 0x01bc;
+      break;
+    case 0x01f5:
+      cp = 0x01f4;
+      break;
+    case 0x023c:
+      cp = 0x023b;
+      break;
+    case 0x0242:
+      cp = 0x0241;
+      break;
+    case 0x037b:
+      cp = 0x03fd;
+      break;
+    case 0x037c:
+      cp = 0x03fe;
+      break;
+    case 0x037d:
+      cp = 0x03ff;
+      break;
+    case 0x03f3:
+      cp = 0x037f;
+      break;
+    case 0x03ac:
+      cp = 0x0386;
+      break;
+    case 0x03ad:
+      cp = 0x0388;
+      break;
+    case 0x03ae:
+      cp = 0x0389;
+      break;
+    case 0x03af:
+      cp = 0x038a;
+      break;
+    case 0x03cc:
+      cp = 0x038c;
+      break;
+    case 0x03cd:
+      cp = 0x038e;
+      break;
+    case 0x03ce:
+      cp = 0x038f;
+      break;
+    case 0x0371:
+      cp = 0x0370;
+      break;
+    case 0x0373:
+      cp = 0x0372;
+      break;
+    case 0x0377:
+      cp = 0x0376;
+      break;
+    case 0x03d1:
+      cp = 0x03f4;
+      break;
+    case 0x03d7:
+      cp = 0x03cf;
+      break;
+    case 0x03f2:
+      cp = 0x03f9;
+      break;
+    case 0x03f8:
+      cp = 0x03f7;
+      break;
+    case 0x03fb:
+      cp = 0x03fa;
+      break;
+    }
   }
 
   return cp;
