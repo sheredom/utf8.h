@@ -580,7 +580,7 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
                size_t n) {
   char *d = (char *)dst;
   const char *s = (const char *)src;
-  size_t index;
+  size_t index, check_index;
 
   // overwriting anything previously in dst, write byte-by-byte
   // from src
@@ -589,6 +589,11 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
     if ('\0' == s[index]) {
       break;
     }
+  }
+
+  for ( check_index = index - 1; check_index > 0 && 0x80 == (0xc0 & d[check_index]); check_index--);
+  if (check_index < index && (index - check_index) < utf8codepointsize(d[check_index])) {
+    index = check_index;
   }
 
   // append null terminating byte

@@ -1031,6 +1031,34 @@ UTEST(utf8ncpy, check_no_n_overflow) {
   ASSERT_EQ(4, buffer[3]);
 }
 
+UTEST(utf8ncpy, truncated_copy_valid) {
+  char cpy1[32] = {'\0'};
+  utf8ncpy(cpy1, data, 32);
+  ASSERT_EQ(0, utf8valid(cpy1));
+
+  char cpy2[3] = {'\0'};
+  utf8ncpy(cpy2, data, 3);
+  ASSERT_EQ(0, utf8valid(cpy2));
+
+  char cpy3[1] = {'\0'};
+  utf8ncpy(cpy3, data, 1);
+  ASSERT_EQ(0, utf8valid(cpy3));
+}
+
+UTEST(utf8ncpy, truncated_copy_null_terminated) {
+  char cpy1[32] = {'\0'};
+  utf8ncpy(cpy1, data, 32);
+  ASSERT_EQ('\0', cpy1[31]);
+
+  char cpy2[2] = {'\0'};
+  utf8ncpy(cpy2, data, 2);
+  ASSERT_EQ('\0', cpy2[0]);
+
+  char cpy3[3] = {'\0'};
+  utf8ncpy(cpy3, data, 3);
+  ASSERT_EQ('\0', cpy3[2]);
+}
+
 UTEST(utf8pbrk, pbrk) { ASSERT_EQ(data + 8, utf8pbrk(data, pbrk)); }
 
 UTEST(utf8pbrk, data) { ASSERT_EQ(data, utf8pbrk(data, data)); }
