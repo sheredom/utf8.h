@@ -1,8 +1,8 @@
 # 📚 utf8.h
 
+[![Actions Status](https://github.com/sheredom/utf8.h/workflows/CMake/badge.svg)](https://github.com/sheredom/utf8.h/actions)
 [![Build status](https://ci.appveyor.com/api/projects/status/phfjjahhs9j4gxvs?svg=true)](https://ci.appveyor.com/project/sheredom/utf8-h)
-
-[![Build status](https://api.travis-ci.org/repositories/sheredom/utf8.h.svg)](https://travis-ci.org/sheredom/utf8.h)
+[![Sponsor](https://img.shields.io/badge/💜-sponsor-blueviolet)](https://github.com/sponsors/sheredom)
 
 A simple one header solution to supporting utf8 strings in C and C++.
 
@@ -260,11 +260,8 @@ insensitive code:
 
 - Implement utf8coll (akin to strcoll).
 - Implement utf8fry (akin to strfry).
-- ~~Add NULL pointer support. Should I NULL check the arguments to the API?~~
-- Add Doxygen (or similar) to mimic the Unix man pages for string.h.
 - Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
 - Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
-- Investigate changing to [Creative Commons Zero License](http://creativecommons.org/publicdomain/zero/1.0/legalcode.txt) (as suggested by [@mcclure111](https://twitter.com/mcclure111))
 
 ## License ##
 
