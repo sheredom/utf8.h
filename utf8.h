@@ -140,13 +140,12 @@ utf8_nonnull utf8_weak void *utf8ncat(void *utf8_restrict dst,
 utf8_nonnull utf8_pure utf8_weak int utf8ncmp(const void *src1,
                                               const void *src2, size_t n);
 
-// Copy the utf8 string src onto the memory allocated in dst.
-// Copies at most n bytes. If there is no terminating null byte in
-// the first n bytes of src, the string placed into dst will not be
-// null-terminated. If the size (in bytes) of src is less than n,
-// extra null terminating bytes are appended to dst such that at
-// total of n bytes are written. Can produce an invalid utf8
-// string if n falls partway through a utf8 codepoint.
+// Copy the utf8 string src onto the memory allocated in dst.   
+// Copies at most n bytes. If n falls partway through a utf8
+// codepoint, or if dst doesn't have enough room for a null
+// terminator, the final string will be cut short to preserve
+// utf8 validity.
+
 utf8_nonnull utf8_weak void *utf8ncpy(void *utf8_restrict dst,
                                       const void *utf8_restrict src, size_t n);
 
@@ -580,7 +579,7 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
                size_t n) {
   char *d = (char *)dst;
   const char *s = (const char *)src;
-  size_t index;
+  size_t index, check_index;
 
   // overwriting anything previously in dst, write byte-by-byte
   // from src
@@ -589,6 +588,14 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
     if ('\0' == s[index]) {
       break;
     }
+  }
+
+  for ( check_index = index - 1; check_index > 0 && 0x80 == (0xc0 & d[check_index]); check_index--) {
+    // just moving the index
+  }
+
+  if (check_index < index && (index - check_index) < utf8codepointsize(d[check_index])) {
+    index = check_index;
   }
 
   // append null terminating byte

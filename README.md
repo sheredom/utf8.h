@@ -145,12 +145,10 @@ bytes of each utf8 string.
 void *utf8ncpy(void *dst, const void *src, size_t n);
 ```
 Copy the utf8 string `src` onto the memory allocated in `dst`.   
-Copies at most `n` bytes. If there is no terminating null byte in   
-the first `n` bytes of `src`, the string placed into `dst` will not be   
-null-terminated. If the size (in bytes) of `src` is less than `n`,   
-extra null terminating bytes are appended to `dst` such that at   
-total of `n` bytes are written. Can produce an invalid utf8   
-string if `n` falls partway through a utf8 codepoint.
+Copies at most `n` bytes. If `n` falls partway through a utf8
+codepoint, or if `dst` doesn't have enough room for a null
+terminator, the final string will be cut short to preserve
+utf8 validity.
 
 ```c
 void *utf8pbrk(const void *str, const void *accept);
