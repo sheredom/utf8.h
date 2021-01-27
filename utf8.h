@@ -590,7 +590,10 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
     }
   }
 
-  for ( check_index = index - 1; check_index > 0 && 0x80 == (0xc0 & d[check_index]); check_index--);
+  for ( check_index = index - 1; check_index > 0 && 0x80 == (0xc0 & d[check_index]); check_index--) {
+    // just moving the index
+  }
+
   if (check_index < index && (index - check_index) < utf8codepointsize(d[check_index])) {
     index = check_index;
   }
