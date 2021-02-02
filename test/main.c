@@ -536,18 +536,17 @@ const char lowersStr[] = {
     '\xbd', '\xce', '\xbe', '\xce', '\xbf', '\xcf', '\x80', '\xcf', '\x81',
     '\xcf', '\x83', '\xcf', '\x84', '\xcf', '\x85', '\xcf', '\x86', '\xcf',
     '\x87', '\xcf', '\x88', '\xcf', '\x89', '\xcf', '\x8a', '\xcf', '\x8b',
-    '\xcf', '\x91', '\xcf', '\x97', '\xcf', '\x99', '\xcf', '\x9b', '\xcf',
-    '\x9d', '\xcf', '\x9f', '\xcf', '\xa1', '\xcf', '\xa3', '\xcf', '\xa5',
-    '\xcf', '\xa7', '\xcf', '\xa9', '\xcf', '\xab', '\xcf', '\xad', '\xcf',
-    '\xaf', '\xcf', '\xb2', '\xcf', '\xb8', '\xcf', '\xbb', '\xd0', '\xb0',
-    '\xd0', '\xb1', '\xd0', '\xb2', '\xd0', '\xb3', '\xd0', '\xb4', '\xd0',
-    '\xb5', '\xd1', '\x91', '\xd0', '\xb6', '\xd0', '\xb7', '\xd0', '\xb8',
-    '\xd0', '\xb9', '\xd0', '\xba', '\xd0', '\xbb', '\xd0', '\xbc', '\xd0',
-    '\xbd', '\xd0', '\xbe', '\xd0', '\xbf', '\xd1', '\x80', '\xd1', '\x81',
-    '\xd1', '\x82', '\xd1', '\x83', '\xd1', '\x84', '\xd1', '\x85', '\xd1',
-    '\x86', '\xd1', '\x87', '\xd1', '\x88', '\xd1', '\x89', '\xd1', '\x8a',
-    '\xd1', '\x8b', '\xd1', '\x8c', '\xd1', '\x8d', '\xd1', '\x8e', '\xd1',
-    '\x8f', '\0'};
+    '\xcf', '\x97', '\xcf', '\x99', '\xcf', '\x9b', '\xcf', '\x9d', '\xcf',
+    '\x9f', '\xcf', '\xa1', '\xcf', '\xa3', '\xcf', '\xa5', '\xcf', '\xa7',
+    '\xcf', '\xa9', '\xcf', '\xab', '\xcf', '\xad', '\xcf', '\xaf', '\xcf',
+    '\xb2', '\xcf', '\xb8', '\xcf', '\xbb', '\xd0', '\xb0', '\xd0', '\xb1',
+    '\xd0', '\xb2', '\xd0', '\xb3', '\xd0', '\xb4', '\xd0', '\xb5', '\xd1',
+    '\x91', '\xd0', '\xb6', '\xd0', '\xb7', '\xd0', '\xb8', '\xd0', '\xb9',
+    '\xd0', '\xba', '\xd0', '\xbb', '\xd0', '\xbc', '\xd0', '\xbd', '\xd0',
+    '\xbe', '\xd0', '\xbf', '\xd1', '\x80', '\xd1', '\x81', '\xd1', '\x82',
+    '\xd1', '\x83', '\xd1', '\x84', '\xd1', '\x85', '\xd1', '\x86', '\xd1',
+    '\x87', '\xd1', '\x88', '\xd1', '\x89', '\xd1', '\x8a', '\xd1', '\x8b',
+    '\xd1', '\x8c', '\xd1', '\x8d', '\xd1', '\x8e', '\xd1', '\x8f', '\0'};
 
 const char uppersStr[] = {
     '\x41', '\x42', '\x43', '\x44', '\x45', '\x46', '\x47', '\x48', '\x49',
@@ -600,18 +599,17 @@ const char uppersStr[] = {
     '\x9d', '\xce', '\x9e', '\xce', '\x9f', '\xce', '\xa0', '\xce', '\xa1',
     '\xce', '\xa3', '\xce', '\xa4', '\xce', '\xa5', '\xce', '\xa6', '\xce',
     '\xa7', '\xce', '\xa8', '\xce', '\xa9', '\xce', '\xaa', '\xce', '\xab',
-    '\xcf', '\xb4', '\xcf', '\x8f', '\xcf', '\x98', '\xcf', '\x9a', '\xcf',
-    '\x9c', '\xcf', '\x9e', '\xcf', '\xa0', '\xcf', '\xa2', '\xcf', '\xa4',
-    '\xcf', '\xa6', '\xcf', '\xa8', '\xcf', '\xaa', '\xcf', '\xac', '\xcf',
-    '\xae', '\xcf', '\xb9', '\xcf', '\xb7', '\xcf', '\xba', '\xd0', '\x90',
-    '\xd0', '\x91', '\xd0', '\x92', '\xd0', '\x93', '\xd0', '\x94', '\xd0',
-    '\x95', '\xd0', '\x81', '\xd0', '\x96', '\xd0', '\x97', '\xd0', '\x98',
-    '\xd0', '\x99', '\xd0', '\x9a', '\xd0', '\x9b', '\xd0', '\x9c', '\xd0',
-    '\x9d', '\xd0', '\x9e', '\xd0', '\x9f', '\xd0', '\xa0', '\xd0', '\xa1',
-    '\xd0', '\xa2', '\xd0', '\xa3', '\xd0', '\xa4', '\xd0', '\xa5', '\xd0',
-    '\xa6', '\xd0', '\xa7', '\xd0', '\xa8', '\xd0', '\xa9', '\xd0', '\xaa',
-    '\xd0', '\xab', '\xd0', '\xac', '\xd0', '\xad', '\xd0', '\xae', '\xd0',
-    '\xaf', '\0'};
+    '\xcf', '\x8f', '\xcf', '\x98', '\xcf', '\x9a', '\xcf', '\x9c', '\xcf',
+    '\x9e', '\xcf', '\xa0', '\xcf', '\xa2', '\xcf', '\xa4', '\xcf', '\xa6',
+    '\xcf', '\xa8', '\xcf', '\xaa', '\xcf', '\xac', '\xcf', '\xae', '\xcf',
+    '\xb9', '\xcf', '\xb7', '\xcf', '\xba', '\xd0', '\x90', '\xd0', '\x91',
+    '\xd0', '\x92', '\xd0', '\x93', '\xd0', '\x94', '\xd0', '\x95', '\xd0',
+    '\x81', '\xd0', '\x96', '\xd0', '\x97', '\xd0', '\x98', '\xd0', '\x99',
+    '\xd0', '\x9a', '\xd0', '\x9b', '\xd0', '\x9c', '\xd0', '\x9d', '\xd0',
+    '\x9e', '\xd0', '\x9f', '\xd0', '\xa0', '\xd0', '\xa1', '\xd0', '\xa2',
+    '\xd0', '\xa3', '\xd0', '\xa4', '\xd0', '\xa5', '\xd0', '\xa6', '\xd0',
+    '\xa7', '\xd0', '\xa8', '\xd0', '\xa9', '\xd0', '\xaa', '\xd0', '\xab',
+    '\xd0', '\xac', '\xd0', '\xad', '\xd0', '\xae', '\xd0', '\xaf', '\0'};
 
 UTEST(utf8len, data) { ASSERT_EQ(53, utf8len(data)); }
 
@@ -1263,6 +1261,46 @@ UTEST(utf8casecmp, basic_ascii) {
   ASSERT_EQ(strcasecmp(".gsheet", ".gSLiDe"),
             utf8casecmp(".gsheet", ".gSLiDe"));
 #endif
+}
+
+UTEST(utf8lwr, greek_capital_theta) {
+  const char ref[] = {'\xce', '\xb8', '\xce', '\xb8', '\xce',
+                      '\xb8', '\xcf', '\x91', '\0'};
+  char str[] = {'\xcf', '\xb4', '\xce', '\xb8', '\xce',
+                '\x98', '\xcf', '\x91', '\0'};
+
+  utf8lwr(str);
+
+  ASSERT_EQ(0, utf8cmp(str, ref));
+}
+
+UTEST(utf8upr, greek_capital_theta) {
+  const char ref[] = {'\xcf', '\xb4', '\xce', '\x98', '\xce',
+                      '\x98', '\xce', '\x98', '\0'};
+  char str[] = {'\xcf', '\xb4', '\xce', '\xb8', '\xce',
+                '\x98', '\xcf', '\x91', '\0'};
+
+  utf8upr(str);
+
+  ASSERT_EQ(0, utf8cmp(str, ref));
+}
+
+UTEST(utf8casecmp, greek_capital_theta) {
+  const char ref[] = {'\xcf', '\xb4', '\xce', '\x98', '\xce',
+                      '\x98', '\xce', '\x98', '\0'};
+  char str[] = {'\xcf', '\xb4', '\xce', '\xb8', '\xce',
+                '\x98', '\xcf', '\x91', '\0'};
+
+  ASSERT_EQ(0, utf8casecmp(ref, str));
+}
+
+UTEST(utf8ncasecmp, greek_capital_theta) {
+  const char ref[] = {'\xcf', '\xb4', '\xce', '\x98', '\xce',
+                      '\x98', '\xce', '\x98', '\0'};
+  char str[] = {'\xcf', '\xb4', '\xce', '\xb8', '\xce',
+                '\x98', '\xcf', '\x91', '\0'};
+
+  ASSERT_EQ(0, utf8ncasecmp(ref, str, 8));
 }
 
 UTEST_MAIN();

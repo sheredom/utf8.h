@@ -50,7 +50,7 @@
 #pragma warning(pop)
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER < 1920)
 typedef __int32 utf8_int32_t;
 #else
 #include <stdint.h>
@@ -67,16 +67,16 @@ typedef int32_t utf8_int32_t;
 extern "C" {
 #endif
 
-#if defined(__clang__) || defined(__GNUC__)
-#define utf8_nonnull __attribute__((nonnull))
-#define utf8_pure __attribute__((pure))
-#define utf8_restrict __restrict__
-#define utf8_weak __attribute__((weak))
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 #define utf8_nonnull
 #define utf8_pure
 #define utf8_restrict __restrict
 #define utf8_weak __inline
+#elif defined(__clang__) || defined(__GNUC__)
+#define utf8_nonnull __attribute__((nonnull))
+#define utf8_pure __attribute__((pure))
+#define utf8_restrict __restrict__
+#define utf8_weak __attribute__((weak))
 #else
 #error Non clang, non gcc, non MSVC compiler found!
 #endif
@@ -228,29 +228,30 @@ utf8_weak utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
 #undef utf8_nonnull
 
 int utf8casecmp(const void *src1, const void *src2) {
-  utf8_int32_t src1_cp, src2_cp, src1_orig_cp, src2_orig_cp;
+  utf8_int32_t src1_lwr_cp, src2_lwr_cp, src1_upr_cp, src2_upr_cp, src1_orig_cp,
+      src2_orig_cp;
 
   for (;;) {
-    src1 = utf8codepoint(src1, &src1_cp);
-    src2 = utf8codepoint(src2, &src2_cp);
-
-    // take a copy of src1 & src2
-    src1_orig_cp = src1_cp;
-    src2_orig_cp = src2_cp;
+    src1 = utf8codepoint(src1, &src1_orig_cp);
+    src2 = utf8codepoint(src2, &src2_orig_cp);
 
     // lower the srcs if required
-    src1_cp = utf8lwrcodepoint(src1_cp);
-    src2_cp = utf8lwrcodepoint(src2_cp);
+    src1_lwr_cp = utf8lwrcodepoint(src1_orig_cp);
+    src2_lwr_cp = utf8lwrcodepoint(src2_orig_cp);
+
+    // lower the srcs if required
+    src1_upr_cp = utf8uprcodepoint(src1_orig_cp);
+    src2_upr_cp = utf8uprcodepoint(src2_orig_cp);
 
     // check if the lowered codepoints match
     if ((0 == src1_orig_cp) && (0 == src2_orig_cp)) {
       return 0;
-    } else if (src1_cp == src2_cp) {
+    } else if ((src1_lwr_cp == src2_lwr_cp) || (src1_upr_cp == src2_upr_cp)) {
       continue;
     }
 
     // if they don't match, then we return the difference between the characters
-    return src1_cp - src2_cp;
+    return src1_lwr_cp - src2_lwr_cp;
   }
 }
 
@@ -460,7 +461,8 @@ size_t utf8len(const void *str) {
 }
 
 int utf8ncasecmp(const void *src1, const void *src2, size_t n) {
-  utf8_int32_t src1_cp, src2_cp, src1_orig_cp, src2_orig_cp;
+  utf8_int32_t src1_lwr_cp, src2_lwr_cp, src1_upr_cp, src2_upr_cp, src1_orig_cp,
+      src2_orig_cp;
 
   do {
     const unsigned char *const s1 = (const unsigned char *)src1;
@@ -505,29 +507,25 @@ int utf8ncasecmp(const void *src1, const void *src2, size_t n) {
       }
     }
 
-    src1 = utf8codepoint(src1, &src1_cp);
-    src2 = utf8codepoint(src2, &src2_cp);
-    n -= utf8codepointsize(src1_cp);
+    src1 = utf8codepoint(src1, &src1_orig_cp);
+    src2 = utf8codepoint(src2, &src2_orig_cp);
+    n -= utf8codepointsize(src1_orig_cp);
 
-    // Take a copy of src1 & src2
-    src1_orig_cp = src1_cp;
-    src2_orig_cp = src2_cp;
+    src1_lwr_cp = utf8lwrcodepoint(src1_orig_cp);
+    src2_lwr_cp = utf8lwrcodepoint(src2_orig_cp);
 
-    // Lower srcs if required
-    src1_cp = utf8lwrcodepoint(src1_cp);
-    src2_cp = utf8lwrcodepoint(src2_cp);
+    src1_upr_cp = utf8uprcodepoint(src1_orig_cp);
+    src2_upr_cp = utf8uprcodepoint(src2_orig_cp);
 
-    // Check if the lowered codepoints match
+    // check if the lowered codepoints match
     if ((0 == src1_orig_cp) && (0 == src2_orig_cp)) {
       return 0;
-    } else if (src1_cp == src2_cp) {
+    } else if ((src1_lwr_cp == src2_lwr_cp) || (src1_upr_cp == src2_upr_cp)) {
       continue;
     }
 
     // if they don't match, then we return the difference between the characters
-    if (src1_orig_cp != src2_orig_cp) {
-      return src1_cp - src2_cp;
-    }
+    return src1_lwr_cp - src2_lwr_cp;
   } while (0 < n);
 
   // both utf8 strings matched
@@ -1277,7 +1275,7 @@ utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
       cp = 0x0377;
       break;
     case 0x03f4:
-      cp = 0x03d1;
+      cp = 0x03b8;
       break;
     case 0x03cf:
       cp = 0x03d7;
@@ -1443,7 +1441,7 @@ utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
       cp = 0x0376;
       break;
     case 0x03d1:
-      cp = 0x03f4;
+      cp = 0x0398;
       break;
     case 0x03d7:
       cp = 0x03cf;
