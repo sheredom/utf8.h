@@ -1303,4 +1303,20 @@ UTEST(utf8ncasecmp, greek_capital_theta) {
   ASSERT_EQ(0, utf8ncasecmp(ref, str, 8));
 }
 
+UTEST(utf8rcodepoint, ascii) {
+  utf8_int32_t codepoint;
+
+  ASSERT_EQ(ascii1, utf8rcodepoint(ascii1 + 1, &codepoint));
+
+  ASSERT_EQ(ascii1[1], codepoint);
+}
+
+UTEST(utf8rcodepoint, latin) {
+  utf8_int32_t codepoint;
+
+  ASSERT_EQ(data, utf8rcodepoint(data + 2, &codepoint));
+
+  ASSERT_EQ(0x3B1, codepoint);
+}
+
 UTEST_MAIN();
