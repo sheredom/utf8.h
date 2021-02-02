@@ -59,11 +59,11 @@ utf8uprcodepoint | ~~&#10004;~~
 
 ## Usage ##
 
-Just include utf8.h in your code!
+Just `#include "utf8.h"` in your code!
 
-The current supported compilers are gcc, clang and msvc.
+The current supported platforms are Linux, macOS and Windows.
 
-The current tested compiler versions are gcc 4.8.2, clang 3.5 and MSVC 18.0.21005.1.
+The current supported compilers are gcc, clang, MSVC's cl.exe, and clang-cl.exe.
 
 ## Design ##
 

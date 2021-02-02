@@ -36,20 +36,17 @@
 #ifdef _MSC_VER
 /*
    Disable warning about not inlining 'inline' functions.
-   TODO: We'll fix this later by not using fprintf within our macros, and
-   instead use snprintf to a realloc'ed buffer.
 */
 #pragma warning(disable : 4710)
 
 /*
    Disable warning about inlining functions that are not marked 'inline'.
-   TODO: add a UTEST_NOINLINE onto the macro generated functions to fix this.
 */
 #pragma warning(disable : 4711)
 #pragma warning(push, 1)
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER < 1920)
 typedef __int64 utest_int64_t;
 typedef unsigned __int64 utest_uint64_t;
 #else
@@ -68,21 +65,29 @@ typedef uint64_t utest_uint64_t;
 #pragma warning(pop)
 #endif
 
+#if defined(__cplusplus)
+#define UTEST_C_FUNC extern "C"
+#else
+#define UTEST_C_FUNC
+#endif
+
 #if defined(_MSC_VER)
 typedef union {
   struct {
     unsigned long LowPart;
-    long  HighPart;
+    long HighPart;
   } DUMMYSTRUCTNAME;
   struct {
     unsigned long LowPart;
-    long  HighPart;
+    long HighPart;
   } u;
   utest_int64_t QuadPart;
 } utest_large_integer;
 
-__declspec(dllimport) int __stdcall QueryPerformanceCounter(utest_large_integer *);
-__declspec(dllimport) int __stdcall QueryPerformanceFrequency(utest_large_integer *);
+UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceCounter(
+    utest_large_integer *);
+UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceFrequency(
+    utest_large_integer *);
 #elif defined(__linux__)
 
 /*
@@ -112,16 +117,18 @@ __declspec(dllimport) int __stdcall QueryPerformanceFrequency(utest_large_intege
 #include <mach/mach_time.h>
 #endif
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER < 1920)
 #define UTEST_PRId64 "I64d"
 #define UTEST_PRIu64 "I64u"
-#define UTEST_INLINE __forceinline
-
-#if defined(__cplusplus)
-#define UTEST_C_FUNC extern "C"
 #else
-#define UTEST_C_FUNC
+#include <inttypes.h>
+
+#define UTEST_PRId64 PRId64
+#define UTEST_PRIu64 PRIu64
 #endif
+
+#if defined(_MSC_VER)
+#define UTEST_INLINE __forceinline
 
 #if defined(_WIN64)
 #define UTEST_SYMBOL_PREFIX
@@ -129,12 +136,25 @@ __declspec(dllimport) int __stdcall QueryPerformanceFrequency(utest_large_intege
 #define UTEST_SYMBOL_PREFIX "_"
 #endif
 
+#if defined(__clang__)
+#define UTEST_INITIALIZER_BEGIN_DISABLE_WARNINGS                               \
+  _Pragma("clang diagnostic push")                                             \
+      _Pragma("clang diagnostic ignored \"-Wmissing-variable-declarations\"")
+
+#define UTEST_INITIALIZER_END_DISABLE_WARNINGS _Pragma("clang diagnostic pop")
+#else
+#define UTEST_INITIALIZER_BEGIN_DISABLE_WARNINGS
+#define UTEST_INITIALIZER_END_DISABLE_WARNINGS
+#endif
+
 #pragma section(".CRT$XCU", read)
 #define UTEST_INITIALIZER(f)                                                   \
   static void __cdecl f(void);                                                 \
-  __pragma(comment(linker, "/include:" UTEST_SYMBOL_PREFIX #f "_"));           \
-  UTEST_C_FUNC __declspec(allocate(".CRT$XCU")) void(__cdecl * f##_)(void) =   \
-      f;                                                                       \
+  UTEST_INITIALIZER_BEGIN_DISABLE_WARNINGS                                     \
+  __pragma(comment(linker, "/include:" UTEST_SYMBOL_PREFIX #f "_"))            \
+      UTEST_C_FUNC __declspec(allocate(".CRT$XCU")) void(__cdecl *             \
+                                                         f##_)(void) = f;      \
+  UTEST_INITIALIZER_END_DISABLE_WARNINGS                                       \
   static void __cdecl f(void)
 #else
 #if defined(__linux__)
@@ -154,10 +174,6 @@ __declspec(dllimport) int __stdcall QueryPerformanceFrequency(utest_large_intege
 #endif
 #endif
 
-#include <inttypes.h>
-
-#define UTEST_PRId64 PRId64
-#define UTEST_PRIu64 PRIu64
 #define UTEST_INLINE inline
 
 #define UTEST_INITIALIZER(f)                                                   \
@@ -264,18 +280,20 @@ UTEST_EXTERN struct utest_state_s utest_state;
 #pragma clang diagnostic pop
 #endif
 
-#ifdef _MSC_VER
-#define UTEST_SNPRINTF(BUFFER, N, ...) _snprintf_s(BUFFER, N, N, __VA_ARGS__)
-#else
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wvariadic-macros"
 #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
 #endif
+
+#ifdef _MSC_VER
+#define UTEST_SNPRINTF(BUFFER, N, ...) _snprintf_s(BUFFER, N, N, __VA_ARGS__)
+#else
 #define UTEST_SNPRINTF(...) snprintf(__VA_ARGS__)
+#endif
+
 #ifdef __clang__
 #pragma clang diagnostic pop
-#endif
 #endif
 
 #if defined(__cplusplus)
@@ -872,36 +890,21 @@ UTEST_WEAK int utest_should_filter_test(const char *filter,
   return 0;
 }
 
-static UTEST_INLINE int utest_strncmp(const char *a, const char *b, size_t n) {
-  /* strncmp breaks on Wall / Werror on gcc/clang, so we avoid using it */
-  unsigned i;
-
-  for (i = 0; i < n; i++) {
-    if (a[i] < b[i]) {
-      return -1;
-    } else if (a[i] > b[i]) {
-      return 1;
-    }
-  }
-
-  return 0;
-}
-
 static UTEST_INLINE FILE *utest_fopen(const char *filename, const char *mode) {
 #ifdef _MSC_VER
   FILE *file;
   if (0 == fopen_s(&file, filename, mode)) {
     return file;
   } else {
-    return 0;
+    return UTEST_NULL;
   }
 #else
   return fopen(filename, mode);
 #endif
 }
 
-UTEST_WEAK int utest_main(int argc, const char *const argv[]);
-UTEST_WEAK int utest_main(int argc, const char *const argv[]) {
+static UTEST_INLINE int utest_main(int argc, const char *const argv[]);
+int utest_main(int argc, const char *const argv[]) {
   utest_uint64_t failed = 0;
   size_t index = 0;
   size_t *failed_testcases = UTEST_NULL;
@@ -927,7 +930,7 @@ UTEST_WEAK int utest_main(int argc, const char *const argv[]) {
     const char filter_str[] = "--filter=";
     const char output_str[] = "--output=";
 
-    if (0 == utest_strncmp(argv[index], help_str, strlen(help_str))) {
+    if (0 == UTEST_STRNCMP(argv[index], help_str, strlen(help_str))) {
       printf("utest.h - the single file unit testing solution for C/C++!\n"
              "Command line Options:\n"
              "  --help            Show this message and exit.\n"
@@ -939,13 +942,13 @@ UTEST_WEAK int utest_main(int argc, const char *const argv[]) {
              "specified in <output>.\n");
       goto cleanup;
     } else if (0 ==
-               utest_strncmp(argv[index], filter_str, strlen(filter_str))) {
+               UTEST_STRNCMP(argv[index], filter_str, strlen(filter_str))) {
       /* user wants to filter what test cases run! */
       filter = argv[index] + strlen(filter_str);
     } else if (0 ==
-               utest_strncmp(argv[index], output_str, strlen(output_str))) {
+               UTEST_STRNCMP(argv[index], output_str, strlen(output_str))) {
       utest_state.output = utest_fopen(argv[index] + strlen(output_str), "w+");
-    } else if (0 == utest_strncmp(argv[index], list_str, strlen(list_str))) {
+    } else if (0 == UTEST_STRNCMP(argv[index], list_str, strlen(list_str))) {
       for (index = 0; index < utest_state.tests_length; index++) {
         UTEST_PRINTF("%s\n", utest_state.tests[index].name);
       }
