@@ -46,6 +46,7 @@ Functions provided that are unique to utf8.h:
 utf8.h | complete
 -------|---------
 utf8codepoint | &#10004;
+utf8rcodepoint | &#10004;
 utf8size | &#10004;
 utf8valid | &#10004;
 utf8codepointsize | &#10004;
@@ -192,8 +193,14 @@ Return 0 on success, or the position of the invalid utf8 codepoint on failure.
 ```c
 void *utf8codepoint(const void *str, long *out_codepoint);
 ```
-Sets out_codepoint to the next utf8 codepoint in `str`,    
-and returns the address of the utf8 codepoint after the current one in `str`.
+Sets out_codepoint to the current utf8 codepoint in `str`, and returns the
+address of the next utf8 codepoint after the current one in `str`.
+
+```c
+void *utf8rcodepoint(const void *str, long *out_codepoint);
+```
+Sets out_codepoint to the current utf8 codepoint in `str`, and returns the
+address of the previous utf8 codepoint before the current one in `str`.
 
 ```c
 utf8_weak size_t utf8codepointsize(utf8_int32_t chr);

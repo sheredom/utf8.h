@@ -185,8 +185,8 @@ utf8_nonnull utf8_pure utf8_weak void *utf8casestr(const void *haystack,
 // utf8 codepoint on failure.
 utf8_nonnull utf8_pure utf8_weak void *utf8valid(const void *str);
 
-// Sets out_codepoint to the next utf8 codepoint in str, and returns the address
-// of the utf8 codepoint after the current one in str.
+// Sets out_codepoint to the current utf8 codepoint in str, and returns the
+// address of the next utf8 codepoint after the current one in str.
 utf8_nonnull utf8_weak void *
 utf8codepoint(const void *utf8_restrict str,
               utf8_int32_t *utf8_restrict out_codepoint);
@@ -222,6 +222,12 @@ utf8_weak utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp);
 
 // Make a codepoint upper case if possible.
 utf8_weak utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
+
+// Sets out_codepoint to the current utf8 codepoint in str, and returns the
+// address of the previous utf8 codepoint before the current one in str.
+utf8_nonnull utf8_weak void *
+utf8rcodepoint(const void *utf8_restrict str,
+               utf8_int32_t *utf8_restrict out_codepoint);
 
 #undef utf8_weak
 #undef utf8_pure
@@ -1459,6 +1465,33 @@ utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
   }
 
   return cp;
+}
+
+void *utf8rcodepoint(const void *utf8_restrict str,
+                     utf8_int32_t *utf8_restrict out_codepoint) {
+  const char *s = (const char *)str;
+
+  if (0xf0 == (0xf8 & s[0])) {
+    // 4 byte utf8 codepoint
+    *out_codepoint = ((0x07 & s[0]) << 18) | ((0x3f & s[1]) << 12) |
+                     ((0x3f & s[2]) << 6) | (0x3f & s[3]);
+  } else if (0xe0 == (0xf0 & s[0])) {
+    // 3 byte utf8 codepoint
+    *out_codepoint =
+        ((0x0f & s[0]) << 12) | ((0x3f & s[1]) << 6) | (0x3f & s[2]);
+  } else if (0xc0 == (0xe0 & s[0])) {
+    // 2 byte utf8 codepoint
+    *out_codepoint = ((0x1f & s[0]) << 6) | (0x3f & s[1]);
+  } else {
+    // 1 byte utf8 codepoint otherwise
+    *out_codepoint = s[0];
+  }
+
+  do {
+    s--;
+  } while ((0 != (0x80 & s[0])) && (0x80 == (0xc0 & s[0])));
+
+  return (void *)s;
 }
 
 #undef utf8_restrict
