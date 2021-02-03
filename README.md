@@ -49,6 +49,7 @@ utf8codepoint | &#10004;
 utf8rcodepoint | &#10004;
 utf8size | &#10004;
 utf8valid | &#10004;
+utf8makevalid | &#10004;
 utf8codepointsize | &#10004;
 utf8catcodepoint | &#10004;
 utf8isupper |  ~~&#10004;~~
@@ -88,7 +89,7 @@ void *utf8cat(void *dst, const void *src);
 Append the utf8 string `src` onto the utf8 string `dst`.
 
 ```c
-void *utf8chr(const void *src, long chr);
+void *utf8chr(const void *src, utf8_int32_t chr);
 ```
 Find the first match of the utf8 codepoint `chr` in the utf8 string `src`.
 
@@ -158,7 +159,7 @@ Locates the first occurrence in the utf8 string `str` of any byte in the
 utf8 string `accept`, or 0 if no match was found.
 
 ```c
-void *utf8rchr(const void *src, int chr);
+void *utf8rchr(const void *src, utf8_int32_t chr);
 ```
 Find the last match of the utf8 codepoint `chr` in the utf8 string `src`.
 
@@ -191,25 +192,30 @@ void *utf8valid(const void *str);
 Return 0 on success, or the position of the invalid utf8 codepoint on failure.
 
 ```c
-void *utf8codepoint(const void *str, long *out_codepoint);
+int utf8makevalid(void *str, utf8_int32_t replacement);
+```
+Return 0 on success. Makes the `str` valid by replacing invalid sequences with
+the 1-byte `replacement` codepoint.
+
+```c
+void *utf8codepoint(const void *str, utf8_int32_t *out_codepoint);
 ```
 Sets out_codepoint to the current utf8 codepoint in `str`, and returns the
 address of the next utf8 codepoint after the current one in `str`.
 
 ```c
-void *utf8rcodepoint(const void *str, long *out_codepoint);
+void *utf8rcodepoint(const void *str, utf8_int32_t *out_codepoint);
 ```
 Sets out_codepoint to the current utf8 codepoint in `str`, and returns the
 address of the previous utf8 codepoint before the current one in `str`.
 
 ```c
-utf8_weak size_t utf8codepointsize(utf8_int32_t chr);
+size_t utf8codepointsize(utf8_int32_t chr);
 ```
 Returns the size of the given codepoint in bytes.
 
 ```c
-utf8_nonnull utf8_weak void *utf8catcodepoint(void *utf8_restrict str,
-                                              utf8_int32_t chr, size_t n);
+void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n);
 ```
 Write a codepoint to the given string, and return the address to the next
 place after the written codepoint. Pass how many bytes left in the buffer to
@@ -217,32 +223,32 @@ n. If there is not enough space for the codepoint, this function returns
 null.
 
 ```x
-utf8_weak int utf8islower(utf8_int32_t chr);
+int utf8islower(utf8_int32_t chr);
 ```
 Returns 1 if the given character is lowercase, or 0 if it is not.
 
 ```c
-utf8_weak int utf8isupper(utf8_int32_t chr);
+int utf8isupper(utf8_int32_t chr);
 ```
 Returns 1 if the given character is uppercase, or 0 if it is not.
 
 ```c
-utf8_nonnull utf8_weak void utf8lwr(void *utf8_restrict str);
+void utf8lwr(void *utf8_restrict str);
 ```
 Transform the given string into all lowercase codepoints.
 
 ```c
-utf8_nonnull utf8_weak void utf8upr(void *utf8_restrict str);
+void utf8upr(void *utf8_restrict str);
 ```
 Transform the given string into all uppercase codepoints.
 
 ```c
-utf8_weak utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp);
+utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp);
 ```
 Make a codepoint lower case if possible.
 
 ```c
-utf8_weak utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
+utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
 ```
 Make a codepoint upper case if possible.
 
@@ -266,7 +272,6 @@ insensitive code:
 - Implement utf8coll (akin to strcoll).
 - Implement utf8fry (akin to strfry).
 - Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
-- Investigate adding a utf8canon which would turn 'bad' utf8 sequences (like ASCII values encoded in 4-byte utf8 codepoints) into their 'good' equivalents (as suggested by [@KmBenzie](https://twitter.com/KmBenzie))
 
 ## License ##
 

@@ -1319,4 +1319,235 @@ UTEST(utf8rcodepoint, latin) {
   ASSERT_EQ(0x3B1, codepoint);
 }
 
+UTEST(utf8makevalid, a) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xf0';
+  invalid[1] = '\x8f';
+  invalid[2] = '\xbf';
+  invalid[3] = '\xbf';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '\xef');
+}
+
+UTEST(utf8makevalid, b) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xf1';
+  invalid[1] = '\x3f';
+  invalid[2] = '\xbf';
+  invalid[3] = '\xbf';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '?');
+  ASSERT_EQ(invalid[1], '?');
+  ASSERT_EQ(invalid[2], '?');
+  ASSERT_EQ(invalid[3], '?');
+  ASSERT_EQ(invalid[4], '\0');
+}
+
+UTEST(utf8makevalid, c) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xf1';
+  invalid[1] = '\xbf';
+  invalid[2] = '\x3f';
+  invalid[3] = '\xbf';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '?');
+  ASSERT_EQ(invalid[1], '?');
+  ASSERT_EQ(invalid[2], '?');
+  ASSERT_EQ(invalid[3], '?');
+  ASSERT_EQ(invalid[4], '\0');
+}
+
+UTEST(utf8makevalid, d) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xf1';
+  invalid[1] = '\xbf';
+  invalid[2] = '\xbf';
+  invalid[3] = '\x3f';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '?');
+  ASSERT_EQ(invalid[1], '?');
+  ASSERT_EQ(invalid[2], '?');
+  ASSERT_EQ(invalid[3], '?');
+  ASSERT_EQ(invalid[4], '\0');
+}
+
+UTEST(utf8makevalid, e) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xe0';
+  invalid[1] = '\x9f';
+  invalid[2] = '\xbf';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '\xdf');
+  ASSERT_EQ(invalid[1], '\xbf');
+  ASSERT_EQ(invalid[2], '\0');
+}
+
+UTEST(utf8makevalid, f) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xef';
+  invalid[1] = '\x3f';
+  invalid[2] = '\xbf';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '?');
+  ASSERT_EQ(invalid[1], '?');
+  ASSERT_EQ(invalid[2], '?');
+  ASSERT_EQ(invalid[3], '\0');
+}
+
+UTEST(utf8makevalid, g) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xef';
+  invalid[1] = '\xbf';
+  invalid[2] = '\x3f';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '?');
+  ASSERT_EQ(invalid[1], '?');
+  ASSERT_EQ(invalid[2], '?');
+  ASSERT_EQ(invalid[3], '\0');
+}
+
+UTEST(utf8makevalid, h) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xc1';
+  invalid[1] = '\xbf';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '\x7f');
+  ASSERT_EQ(invalid[1], '\0');
+}
+
+UTEST(utf8makevalid, i) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xdf';
+  invalid[1] = '\x3f';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '?');
+  ASSERT_EQ(invalid[1], '?');
+  ASSERT_EQ(invalid[2], '\0');
+}
+
+UTEST(utf8makevalid, j) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\x80';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '?');
+  ASSERT_EQ(invalid[1], '\0');
+}
+
+UTEST(utf8makevalid, k) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xf8';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '?');
+  ASSERT_EQ(invalid[1], '\0');
+}
+
+UTEST(utf8makevalid, l) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xf1';
+  invalid[1] = '\xbf';
+  invalid[2] = '\xbf';
+  invalid[3] = '\xbf';
+  invalid[4] = '\xbf';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '\xf1');
+  ASSERT_EQ(invalid[1], '\xbf');
+  ASSERT_EQ(invalid[2], '\xbf');
+  ASSERT_EQ(invalid[3], '\xbf');
+  ASSERT_EQ(invalid[4], '?');
+  ASSERT_EQ(invalid[5], '\0');
+}
+
+UTEST(utf8makevalid, m) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xef';
+  invalid[1] = '\xbf';
+  invalid[2] = '\xbf';
+  invalid[3] = '\xbf';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '\xef');
+  ASSERT_EQ(invalid[1], '\xbf');
+  ASSERT_EQ(invalid[2], '\xbf');
+  ASSERT_EQ(invalid[3], '?');
+  ASSERT_EQ(invalid[4], '\0');
+}
+
+UTEST(utf8makevalid, n) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xdf';
+  invalid[1] = '\xbf';
+  invalid[2] = '\xbf';
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '?'));
+
+  ASSERT_EQ(invalid[0], '\xdf');
+  ASSERT_EQ(invalid[1], '\xbf');
+  ASSERT_EQ(invalid[2], '?');
+  ASSERT_EQ(invalid[3], '\0');
+}
+
+UTEST(utf8makevalid, invalid_replacement) {
+  char invalid[6];
+  memset(invalid, 0, 6);
+
+  invalid[0] = '\xdf';
+  invalid[1] = '\xbf';
+  invalid[2] = '\xbf';
+
+  ASSERT_NE(0, utf8makevalid(invalid, 0x80));
+}
+
 UTEST_MAIN();

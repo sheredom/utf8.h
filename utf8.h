@@ -185,6 +185,11 @@ utf8_nonnull utf8_pure utf8_weak void *utf8casestr(const void *haystack,
 // utf8 codepoint on failure.
 utf8_nonnull utf8_pure utf8_weak void *utf8valid(const void *str);
 
+// Given a null-terminated string, makes the string valid by replacing invalid
+// codepoints with a 1-byte replacement. Returns 0 on success.
+utf8_nonnull utf8_weak int utf8makevalid(void *str,
+                                         const utf8_int32_t replacement);
+
 // Sets out_codepoint to the current utf8 codepoint in str, and returns the
 // address of the next utf8 codepoint after the current one in str.
 utf8_nonnull utf8_weak void *
@@ -192,8 +197,7 @@ utf8codepoint(const void *utf8_restrict str,
               utf8_int32_t *utf8_restrict out_codepoint);
 
 // Calculates the size of the next utf8 codepoint in str.
-utf8_nonnull utf8_weak size_t
-utf8codepointcalcsize(const void *utf8_restrict str);
+utf8_nonnull utf8_weak size_t utf8codepointcalcsize(const void *str);
 
 // Returns the size of the given codepoint in bytes.
 utf8_weak size_t utf8codepointsize(utf8_int32_t chr);
@@ -202,8 +206,8 @@ utf8_weak size_t utf8codepointsize(utf8_int32_t chr);
 // place after the written codepoint. Pass how many bytes left in the buffer to
 // n. If there is not enough space for the codepoint, this function returns
 // null.
-utf8_nonnull utf8_weak void *utf8catcodepoint(void *utf8_restrict str,
-                                              utf8_int32_t chr, size_t n);
+utf8_nonnull utf8_weak void *utf8catcodepoint(void *str, utf8_int32_t chr,
+                                              size_t n);
 
 // Returns 1 if the given character is lowercase, or 0 if it is not.
 utf8_weak int utf8islower(utf8_int32_t chr);
@@ -988,6 +992,71 @@ void *utf8valid(const void *str) {
   return utf8_null;
 }
 
+int utf8makevalid(void *str, const utf8_int32_t replacement) {
+  char *read = (char *)str;
+  char *write = read;
+  const char r = (char)replacement;
+  utf8_int32_t codepoint;
+
+  if (replacement > 0x7f) {
+    return -1;
+  }
+
+  while ('\0' != *read) {
+    if (0xf0 == (0xf8 & *read)) {
+      // ensure each of the 3 following bytes in this 4-byte
+      // utf8 codepoint began with 0b10xxxxxx
+      if ((0x80 != (0xc0 & read[1])) || (0x80 != (0xc0 & read[2])) ||
+          (0x80 != (0xc0 & read[3]))) {
+        *write++ = r;
+        read++;
+        continue;
+      }
+
+      // 4-byte utf8 code point (began with 0b11110xxx)
+      read = (char *)utf8codepoint(read, &codepoint);
+      write = (char *)utf8catcodepoint(write, codepoint, 4);
+    } else if (0xe0 == (0xf0 & *read)) {
+      // ensure each of the 2 following bytes in this 3-byte
+      // utf8 codepoint began with 0b10xxxxxx
+      if ((0x80 != (0xc0 & read[1])) || (0x80 != (0xc0 & read[2]))) {
+        *write++ = r;
+        read++;
+        continue;
+      }
+
+      // 3-byte utf8 code point (began with 0b1110xxxx)
+      read = (char *)utf8codepoint(read, &codepoint);
+      write = (char *)utf8catcodepoint(write, codepoint, 3);
+    } else if (0xc0 == (0xe0 & *read)) {
+      // ensure the 1 following byte in this 2-byte
+      // utf8 codepoint began with 0b10xxxxxx
+      if (0x80 != (0xc0 & read[1])) {
+        *write++ = r;
+        read++;
+        continue;
+      }
+
+      // 2-byte utf8 code point (began with 0b110xxxxx)
+      read = (char *)utf8codepoint(read, &codepoint);
+      write = (char *)utf8catcodepoint(write, codepoint, 2);
+    } else if (0x00 == (0x80 & *read)) {
+      // 1-byte ascii (began with 0b0xxxxxxx)
+      read = (char *)utf8codepoint(read, &codepoint);
+      write = (char *)utf8catcodepoint(write, codepoint, 1);
+    } else {
+      // if we got here then we've got a dangling continuation (0b10xxxxxx)
+      *write++ = r;
+      read++;
+      continue;
+    }
+  }
+
+  *write = '\0';
+
+  return 0;
+}
+
 void *utf8codepoint(const void *utf8_restrict str,
                     utf8_int32_t *utf8_restrict out_codepoint) {
   const char *s = (const char *)str;
@@ -1015,7 +1084,7 @@ void *utf8codepoint(const void *utf8_restrict str,
   return (void *)s;
 }
 
-size_t utf8codepointcalcsize(const void *utf8_restrict str) {
+size_t utf8codepointcalcsize(const void *str) {
   const char *s = (const char *)str;
 
   if (0xf0 == (0xf8 & s[0])) {
@@ -1045,7 +1114,7 @@ size_t utf8codepointsize(utf8_int32_t chr) {
   }
 }
 
-void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
+void *utf8catcodepoint(void *str, utf8_int32_t chr, size_t n) {
   char *s = (char *)str;
 
   if (0 == ((utf8_int32_t)0xffffff80 & chr)) {
@@ -1062,7 +1131,7 @@ void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
     if (n < 2) {
       return utf8_null;
     }
-    s[0] = 0xc0 | (char)(chr >> 6);
+    s[0] = 0xc0 | (char)((chr >> 6) & 0x1f);
     s[1] = 0x80 | (char)(chr & 0x3f);
     s += 2;
   } else if (0 == ((utf8_int32_t)0xffff0000 & chr)) {
@@ -1071,7 +1140,7 @@ void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
     if (n < 3) {
       return utf8_null;
     }
-    s[0] = 0xe0 | (char)(chr >> 12);
+    s[0] = 0xe0 | (char)((chr >> 12) & 0x0f);
     s[1] = 0x80 | (char)((chr >> 6) & 0x3f);
     s[2] = 0x80 | (char)(chr & 0x3f);
     s += 3;
@@ -1081,7 +1150,7 @@ void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n) {
     if (n < 4) {
       return utf8_null;
     }
-    s[0] = 0xf0 | (char)(chr >> 18);
+    s[0] = 0xf0 | (char)((chr >> 18) & 0x07);
     s[1] = 0x80 | (char)((chr >> 12) & 0x3f);
     s[2] = 0x80 | (char)((chr >> 6) & 0x3f);
     s[3] = 0x80 | (char)(chr & 0x3f);
