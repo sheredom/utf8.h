@@ -116,7 +116,7 @@ utf8_nonnull utf8_pure utf8_weak size_t utf8cspn(const void *src,
 
 // Duplicate the utf8 string src by getting its size, malloc'ing a new buffer
 // copying over the data, and returning that. Or 0 if malloc failed.
-utf8_nonnull utf8_weak void *utf8dup(const void *src);
+utf8_weak void *utf8dup(const void *src);
 
 // Number of utf8 codepoints in the utf8 string str,
 // excluding the null terminating byte.
@@ -153,7 +153,7 @@ utf8_nonnull utf8_weak void *utf8ncpy(void *utf8_restrict dst,
 // longer than n, only n bytes are copied and a null byte is added.
 //
 // Returns a new string if successful, 0 otherwise
-utf8_nonnull utf8_weak void *utf8ndup(const void *src, size_t n);
+utf8_weak void *utf8ndup(const void *src, size_t n);
 
 // Locates the first occurrence in the utf8 string str of any byte in the
 // utf8 string accept, or 0 if no match was found.
@@ -232,6 +232,21 @@ utf8_weak utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
 utf8_nonnull utf8_weak void *
 utf8rcodepoint(const void *utf8_restrict str,
                utf8_int32_t *utf8_restrict out_codepoint);
+
+// Duplicate the utf8 string src by getting its size, calling alloc_func_ptr to
+// copy over data to a new buffer, and returning that. Or 0 if alloc_func_ptr
+// returned null.
+utf8_weak void *utf8dup_ex(const void *src,
+                           void *(*alloc_func_ptr)(void *, size_t),
+                           void *user_data);
+
+// Similar to utf8dup, except that at most n bytes of src are copied. If src is
+// longer than n, only n bytes are copied and a null byte is added.
+//
+// Returns a new string if successful, 0 otherwise.
+utf8_weak void *utf8ndup_ex(const void *src, size_t n,
+                            void *(*alloc_func_ptr)(void *, size_t),
+                            void *user_data);
 
 #undef utf8_weak
 #undef utf8_pure
@@ -414,14 +429,21 @@ size_t utf8cspn(const void *src, const void *reject) {
   return chars;
 }
 
-void *utf8dup(const void *src) {
+void *utf8dup(const void *src) { return utf8dup_ex(src, utf8_null, utf8_null); }
+
+void *utf8dup_ex(const void *src, void *(*alloc_func_ptr)(void *, size_t),
+                 void *user_data) {
   const char *s = (const char *)src;
   char *n = utf8_null;
 
   // figure out how many bytes (including the terminator) we need to copy first
   size_t bytes = utf8size(src);
 
-  n = (char *)malloc(bytes);
+  if (alloc_func_ptr) {
+    n = (char *)alloc_func_ptr(user_data, bytes);
+  } else {
+    n = (char *)malloc(bytes);
+  }
 
   if (utf8_null == n) {
     // out of memory so we bail
@@ -615,6 +637,11 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
 }
 
 void *utf8ndup(const void *src, size_t n) {
+  return utf8ndup_ex(src, n, utf8_null, utf8_null);
+}
+
+void *utf8ndup_ex(const void *src, size_t n,
+                  void *(*alloc_func_ptr)(void *, size_t), void *user_data) {
   const char *s = (const char *)src;
   char *c = utf8_null;
   size_t bytes = 0;
@@ -628,7 +655,12 @@ void *utf8ndup(const void *src, size_t n) {
   // to be used later in the copy byte by byte.
   n = bytes;
 
-  c = (char *)malloc(bytes + 1);
+  if (alloc_func_ptr) {
+    c = (char *)alloc_func_ptr(user_data, bytes + 1);
+  } else {
+    c = (char *)malloc(bytes + 1);
+  }
+
   if (utf8_null == c) {
     // out of memory so we bail
     return utf8_null;

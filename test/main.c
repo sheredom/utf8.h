@@ -796,6 +796,25 @@ UTEST(utf8ndup, ascii_larger) {
   free(dup);
 }
 
+void *allocate_from_buffer(void *user_data, size_t n) { return user_data; }
+
+UTEST(utf8dup_ex, ascii) {
+  char user_data[1024];
+  void *const dup = utf8dup_ex("1234567890", allocate_from_buffer, user_data);
+  ASSERT_TRUE(dup);
+  ASSERT_EQ(dup, user_data);
+  ASSERT_EQ(10, utf8len(dup));
+}
+
+UTEST(utf8ndup_ex, ascii) {
+  char user_data[1024];
+  void *const dup =
+      utf8ndup_ex("1234567890", 4, allocate_from_buffer, user_data);
+  ASSERT_TRUE(dup);
+  ASSERT_EQ(dup, user_data);
+  ASSERT_EQ(4, utf8len(dup));
+}
+
 UTEST(utf8size, data) { ASSERT_EQ(105, utf8size(data)); }
 
 UTEST(utf8size, ascii) { ASSERT_EQ(3, utf8size("ab")); }
