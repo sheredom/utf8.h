@@ -222,7 +222,7 @@ place after the written codepoint. Pass how many bytes left in the buffer to
 n. If there is not enough space for the codepoint, this function returns
 null.
 
-```x
+```c
 int utf8islower(utf8_int32_t chr);
 ```
 Returns 1 if the given character is lowercase, or 0 if it is not.
