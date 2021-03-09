@@ -21,6 +21,7 @@ strcspn | utf8cspn | &#10004;
 strdup | utf8dup | &#10004;
 strfry | utf8fry |
 strlen | utf8len | &#10004;
+strnlen | utf8nlen | &#10004;
 strncat | utf8ncat | &#10004;
 strncmp | utf8ncmp | &#10004;
 strncpy | utf8ncpy | &#10004;
@@ -48,7 +49,10 @@ utf8.h | complete
 utf8codepoint | &#10004;
 utf8rcodepoint | &#10004;
 utf8size | &#10004;
+utf8size\_lazy | &#10004;
+utf8nsize\_lazy | &#10004;
 utf8valid | &#10004;
+utf8nvalid | &#10004;
 utf8makevalid | &#10004;
 utf8codepointsize | &#10004;
 utf8catcodepoint | &#10004;
@@ -123,6 +127,11 @@ Number of utf8 codepoints in the utf8 string `str`,
 **excluding** the null terminating byte.
 
 ```c
+size_t utf8nlen(const void *str, size_t n);
+```
+Similar to `utf8len`, except that only at most `n` bytes of `src` are looked.
+
+```c
 int utf8ncasecmp(const void *src1, const void *src2, size_t n);
 ```
 Return less than 0, 0, greater than 0 if `src1 < src2`, `src1 == src2`,   
@@ -167,7 +176,18 @@ Find the last match of the utf8 codepoint `chr` in the utf8 string `src`.
 size_t utf8size(const void *str);
 ```
 Number of bytes in the utf8 string `str`,   
-including the null terminating byte.   
+including the null terminating byte.
+
+```c
+size_t utf8size_lazy(const void *str);
+```
+Similar to `utf8size`, except that the null terminating byte is **excluded**.
+
+```c
+size_t utf8nsize_lazy(const void *str, size_t n);
+```
+Similar to `utf8size`, except that only at most `n` bytes of `src` are looked and
+the null terminating byte is **excluded**.
 
 ```c
 size_t utf8spn(const void *src, const void *accept);
@@ -190,6 +210,11 @@ case insensitive.
 void *utf8valid(const void *str);
 ```
 Return 0 on success, or the position of the invalid utf8 codepoint on failure.
+
+```c
+void *utf8nvalid(const void *str, size_t n);
+```
+Similar to `utf8valid`, except that only at most `n` bytes of `src` are looked.
 
 ```c
 int utf8makevalid(void *str, utf8_int32_t replacement);

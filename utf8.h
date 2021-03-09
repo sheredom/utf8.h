@@ -122,6 +122,9 @@ utf8_weak void *utf8dup(const void *src);
 // excluding the null terminating byte.
 utf8_nonnull utf8_pure utf8_weak size_t utf8len(const void *str);
 
+// Similar to utf8len, except that only at most n bytes of src are looked.
+utf8_nonnull utf8_pure utf8_weak size_t utf8nlen(const void *str, size_t n);
+
 // Return less than 0, 0, greater than 0 if src1 < src2, src1 == src2, src1 >
 // src2 respectively, case insensitive. Checking at most n bytes of each utf8
 // string.
@@ -167,6 +170,13 @@ utf8_nonnull utf8_pure utf8_weak void *utf8rchr(const void *src, int chr);
 // including the null terminating byte.
 utf8_nonnull utf8_pure utf8_weak size_t utf8size(const void *str);
 
+// Similar to utf8size, except that the null terminating byte is excluded.
+utf8_nonnull utf8_pure utf8_weak size_t utf8size_lazy(const void *str);
+
+// Similar to utf8size, except that only at most n bytes of src are looked and
+// the null terminating byte is excluded.
+utf8_nonnull utf8_pure utf8_weak size_t utf8nsize_lazy(const void *str, size_t n);
+
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints from the utf8 string accept.
 utf8_nonnull utf8_pure utf8_weak size_t utf8spn(const void *src,
@@ -184,6 +194,9 @@ utf8_nonnull utf8_pure utf8_weak void *utf8casestr(const void *haystack,
 // Return 0 on success, or the position of the invalid
 // utf8 codepoint on failure.
 utf8_nonnull utf8_pure utf8_weak void *utf8valid(const void *str);
+
+// Similar to utf8valid, except that only at most n bytes of src are looked.
+utf8_nonnull utf8_pure utf8_weak void *utf8nvalid(const void *str, size_t n);
 
 // Given a null-terminated string, makes the string valid by replacing invalid
 // codepoints with a 1-byte replacement. Returns 0 on success.
@@ -466,10 +479,15 @@ void *utf8dup_ex(const void *src, void *(*alloc_func_ptr)(void *, size_t),
 void *utf8fry(const void *str);
 
 size_t utf8len(const void *str) {
+  return utf8nlen(str, SIZE_MAX);
+}
+
+size_t utf8nlen(const void *str, size_t n) {
   const unsigned char *s = (const unsigned char *)str;
+  const unsigned char *t = s;
   size_t length = 0;
 
-  while ('\0' != *s) {
+  while ((size_t) (s-t) < n && '\0' != *s) {
     if (0xf0 == (0xf8 & *s)) {
       // 4-byte utf8 code point (began with 0b11110xxx)
       s += 4;
@@ -489,6 +507,9 @@ size_t utf8len(const void *str) {
     length++;
   }
 
+  if ((size_t) (s-t) > n) {
+    length--;
+  }
   return length;
 }
 
@@ -797,14 +818,19 @@ void *utf8pbrk(const void *str, const void *accept) {
 }
 
 size_t utf8size(const void *str) {
+  return utf8size_lazy(str) + 1;
+}
+
+size_t utf8size_lazy(const void *str) {
+  return utf8nsize_lazy(str, SIZE_MAX);
+}
+
+size_t utf8nsize_lazy(const void *str, size_t n) {
   const char *s = (const char *)str;
   size_t size = 0;
-  while ('\0' != s[size]) {
+  while (size < n && '\0' != s[size]) {
     size++;
   }
-
-  // we are including the null terminating byte in the size calculation
-  size++;
   return size;
 }
 
@@ -945,10 +971,23 @@ void *utf8casestr(const void *haystack, const void *needle) {
 }
 
 void *utf8valid(const void *str) {
-  const char *s = (const char *)str;
+  return utf8nvalid(str, SIZE_MAX);
+}
 
-  while ('\0' != *s) {
+void *utf8nvalid(const void *str, size_t n) {
+  const char *s = (const char *)str;
+  const char *t = s;
+  size_t consumed, remained;
+
+  while ((void) (consumed = (size_t) (s-t)), consumed < n && '\0' != *s) {
+    remained = n - consumed;
+
     if (0xf0 == (0xf8 & *s)) {
+      // ensure that there's 4 bytes or more remained
+      if (remained < 4) {
+        return (void *)s;
+      }
+
       // ensure each of the 3 following bytes in this 4-byte
       // utf8 codepoint began with 0b10xxxxxx
       if ((0x80 != (0xc0 & s[1])) || (0x80 != (0xc0 & s[2])) ||
@@ -971,6 +1010,11 @@ void *utf8valid(const void *str) {
       // 4-byte utf8 code point (began with 0b11110xxx)
       s += 4;
     } else if (0xe0 == (0xf0 & *s)) {
+      // ensure that there's 3 bytes or more remained
+      if (remained < 3) {
+        return (void *)s;
+      }
+
       // ensure each of the 2 following bytes in this 3-byte
       // utf8 codepoint began with 0b10xxxxxx
       if ((0x80 != (0xc0 & s[1])) || (0x80 != (0xc0 & s[2]))) {
@@ -992,6 +1036,11 @@ void *utf8valid(const void *str) {
       // 3-byte utf8 code point (began with 0b1110xxxx)
       s += 3;
     } else if (0xc0 == (0xe0 & *s)) {
+      // ensure that there's 2 bytes or more remained
+      if (remained < 2) {
+        return (void *)s;
+      }
+
       // ensure the 1 following byte in this 2-byte
       // utf8 codepoint began with 0b10xxxxxx
       if (0x80 != (0xc0 & s[1])) {

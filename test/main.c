@@ -613,6 +613,8 @@ const char uppersStr[] = {
 
 UTEST(utf8len, data) { ASSERT_EQ(53, utf8len(data)); }
 
+UTEST(utf8nlen, data) { ASSERT_EQ(52, utf8nlen(data, 103)); }
+
 UTEST(utf8cat, empty_cat_data) {
   char cat[512] = {'\0'};
 
@@ -821,6 +823,18 @@ UTEST(utf8size, ascii) { ASSERT_EQ(3, utf8size("ab")); }
 
 UTEST(utf8size, empty) { ASSERT_EQ(1, utf8size("")); }
 
+UTEST(utf8size_lazy, data) { ASSERT_EQ(104, utf8size_lazy(data)); }
+
+UTEST(utf8size_lazy, ascii) { ASSERT_EQ(2, utf8size_lazy("ab")); }
+
+UTEST(utf8size_lazy, empty) { ASSERT_EQ(0, utf8size_lazy("")); }
+
+UTEST(utf8nsize_lazy, data) { ASSERT_EQ(50, utf8nsize_lazy(data, 50)); }
+
+UTEST(utf8nsize_lazy, ascii) { ASSERT_EQ(2, utf8nsize_lazy("ab", 50)); }
+
+UTEST(utf8nsize_lazy, empty) { ASSERT_EQ(0, utf8nsize_lazy("", 50)); }
+
 UTEST(utf8valid, a) {
   char invalid[6];
 
@@ -981,6 +995,53 @@ UTEST(utf8valid, data) { ASSERT_EQ(0, utf8valid(data)); }
 UTEST(utf8valid, ascii) { ASSERT_EQ(0, utf8valid("ab")); }
 
 UTEST(utf8valid, empty) { ASSERT_EQ(0, utf8valid("")); }
+
+UTEST(utf8nvalid, a) {
+  char valid[3];
+
+  const char*  invalid      = valid;
+  const size_t invalid_size = 1;
+
+  valid[0] = '\xc2';
+  valid[1] = '\x80';
+  valid[2] = '\0';
+
+  ASSERT_EQ(invalid, utf8nvalid(valid, invalid_size));
+}
+
+UTEST(utf8nvalid, b) {
+  char valid[4];
+
+  const char*  invalid      = valid;
+  const size_t invalid_size = 2;
+
+  valid[0] = '\xe0';
+  valid[1] = '\x80';
+  valid[2] = '\x80';
+  valid[3] = '\0';
+
+  ASSERT_EQ(invalid, utf8nvalid(valid, invalid_size));
+}
+
+UTEST(utf8nvalid, c) {
+  char valid[5];
+
+  const char*  invalid      = valid;
+  const size_t invalid_size = 3;
+
+  valid[0] = '\xf0';
+  valid[1] = '\x80';
+  valid[2] = '\x80';
+  valid[3] = '\x80';
+  valid[4] = '\0';
+  ASSERT_EQ(invalid, utf8nvalid(valid, invalid_size));
+}
+
+UTEST(utf8nvalid, data) { ASSERT_EQ(0, utf8nvalid(data, 105)); }
+
+UTEST(utf8nvalid, ascii) { ASSERT_EQ(0, utf8nvalid("ab", 3)); }
+
+UTEST(utf8nvalid, empty) { ASSERT_EQ(0, utf8nvalid("", 1)); }
 
 UTEST(utf8ncat, ascii_cat_data) {
   char cat[512] = {'\0'};
