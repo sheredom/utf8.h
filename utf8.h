@@ -632,6 +632,10 @@ void *utf8ncpy(void *utf8_restrict dst, const void *utf8_restrict src,
   const char *s = (const char *)src;
   size_t index, check_index;
 
+  if (n == 0) {
+    return dst;
+  }
+
   // overwriting anything previously in dst, write byte-by-byte
   // from src
   for (index = 0; index < n; index++) {
