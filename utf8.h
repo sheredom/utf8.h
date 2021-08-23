@@ -331,21 +331,21 @@ void *utf8chr(const void *src, utf8_int32_t chr) {
   } else if (0 == ((utf8_int32_t)0xfffff800 & chr)) {
     // 2-byte/11-bit utf8 code point
     // (0b110xxxxx 0b10xxxxxx)
-    c[0] = 0xc0 | (char)(chr >> 6);
-    c[1] = 0x80 | (char)(chr & 0x3f);
+    c[0] = (char) (0xc0 | (char)(chr >> 6));
+    c[1] = (char) (0x80 | (char)(chr & 0x3f));
   } else if (0 == ((utf8_int32_t)0xffff0000 & chr)) {
     // 3-byte/16-bit utf8 code point
     // (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
-    c[0] = 0xe0 | (char)(chr >> 12);
-    c[1] = 0x80 | (char)((chr >> 6) & 0x3f);
-    c[2] = 0x80 | (char)(chr & 0x3f);
+    c[0] = (char) (0xe0 | (char)(chr >> 12));
+    c[1] = (char) (0x80 | (char)((chr >> 6) & 0x3f));
+    c[2] = (char) (0x80 | (char)(chr & 0x3f));
   } else { // if (0 == ((int)0xffe00000 & chr)) {
     // 4-byte/21-bit utf8 code point
     // (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx)
-    c[0] = 0xf0 | (char)(chr >> 18);
-    c[1] = 0x80 | (char)((chr >> 12) & 0x3f);
-    c[2] = 0x80 | (char)((chr >> 6) & 0x3f);
-    c[3] = 0x80 | (char)(chr & 0x3f);
+    c[0] = (char) (0xf0 | (char)(chr >> 18));
+    c[1] = (char) (0x80 | (char)((chr >> 12) & 0x3f));
+    c[2] = (char) (0x80 | (char)((chr >> 6) & 0x3f));
+    c[3] = (char) (0x80 | (char)(chr & 0x3f));
   }
 
   // we've made c into a 2 utf8 codepoint string, one for the chr we are
@@ -723,21 +723,21 @@ void *utf8rchr(const void *src, int chr) {
   } else if (0 == ((int)0xfffff800 & chr)) {
     // 2-byte/11-bit utf8 code point
     // (0b110xxxxx 0b10xxxxxx)
-    c[0] = 0xc0 | (char)(chr >> 6);
-    c[1] = 0x80 | (char)(chr & 0x3f);
+    c[0] = (char) (0xc0 | (char)(chr >> 6));
+    c[1] = (char) (0x80 | (char)(chr & 0x3f));
   } else if (0 == ((int)0xffff0000 & chr)) {
     // 3-byte/16-bit utf8 code point
     // (0b1110xxxx 0b10xxxxxx 0b10xxxxxx)
-    c[0] = 0xe0 | (char)(chr >> 12);
-    c[1] = 0x80 | (char)((chr >> 6) & 0x3f);
-    c[2] = 0x80 | (char)(chr & 0x3f);
+    c[0] = (char) (0xe0 | (char)(chr >> 12));
+    c[1] = (char) (0x80 | (char)((chr >> 6) & 0x3f));
+    c[2] = (char) (0x80 | (char)(chr & 0x3f));
   } else { // if (0 == ((int)0xffe00000 & chr)) {
     // 4-byte/21-bit utf8 code point
     // (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx)
-    c[0] = 0xf0 | (char)(chr >> 18);
-    c[1] = 0x80 | (char)((chr >> 12) & 0x3f);
-    c[2] = 0x80 | (char)((chr >> 6) & 0x3f);
-    c[3] = 0x80 | (char)(chr & 0x3f);
+    c[0] = (char) (0xf0 | (char)(chr >> 18));
+    c[1] = (char) (0x80 | (char)((chr >> 12) & 0x3f));
+    c[2] = (char) (0x80 | (char)((chr >> 6) & 0x3f));
+    c[3] = (char) (0x80 | (char)(chr & 0x3f));
   }
 
   // we've created a 2 utf8 codepoint string in c that is
@@ -1216,8 +1216,8 @@ void *utf8catcodepoint(void *str, utf8_int32_t chr, size_t n) {
     if (n < 2) {
       return utf8_null;
     }
-    s[0] = 0xc0 | (char)((chr >> 6) & 0x1f);
-    s[1] = 0x80 | (char)(chr & 0x3f);
+    s[0] = (char) (0xc0 | (char)((chr >> 6) & 0x1f));
+    s[1] = (char) (0x80 | (char)(chr & 0x3f));
     s += 2;
   } else if (0 == ((utf8_int32_t)0xffff0000 & chr)) {
     // 3-byte/16-bit utf8 code point
@@ -1225,9 +1225,9 @@ void *utf8catcodepoint(void *str, utf8_int32_t chr, size_t n) {
     if (n < 3) {
       return utf8_null;
     }
-    s[0] = 0xe0 | (char)((chr >> 12) & 0x0f);
-    s[1] = 0x80 | (char)((chr >> 6) & 0x3f);
-    s[2] = 0x80 | (char)(chr & 0x3f);
+    s[0] = (char) (0xe0 | (char)((chr >> 12) & 0x0f));
+    s[1] = (char) (0x80 | (char)((chr >> 6) & 0x3f));
+    s[2] = (char) (0x80 | (char)(chr & 0x3f));
     s += 3;
   } else { // if (0 == ((int)0xffe00000 & chr)) {
     // 4-byte/21-bit utf8 code point
@@ -1235,10 +1235,10 @@ void *utf8catcodepoint(void *str, utf8_int32_t chr, size_t n) {
     if (n < 4) {
       return utf8_null;
     }
-    s[0] = 0xf0 | (char)((chr >> 18) & 0x07);
-    s[1] = 0x80 | (char)((chr >> 12) & 0x3f);
-    s[2] = 0x80 | (char)((chr >> 6) & 0x3f);
-    s[3] = 0x80 | (char)(chr & 0x3f);
+    s[0] = (char) (0xf0 | (char)((chr >> 18) & 0x07));
+    s[1] = (char) (0x80 | (char)((chr >> 12) & 0x3f));
+    s[2] = (char) (0x80 | (char)((chr >> 6) & 0x3f));
+    s[3] = (char) (0x80 | (char)(chr & 0x3f));
     s += 4;
   }
 
