@@ -31,8 +31,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 add_executable(utf8_test
   main.c
   test.c
-  test.cpp
 )
+
+add_executable(utf8_test_cpp
+    test.cpp
+)
+target_compile_features(utf8_test_cpp PRIVATE cxx_std_14)
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(test.c test.cpp PROPERTIES
@@ -40,7 +44,7 @@ if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   )
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
   set_source_files_properties(test.c test.cpp PROPERTIES
-    COMPILE_FLAGS "-Wall -Wextra -Weverything -Werror"
+    COMPILE_FLAGS "-Wall -Wextra -Weverything -Werror -Wno-c++98-compat"
   )
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
   set_source_files_properties(test.c test.cpp PROPERTIES
