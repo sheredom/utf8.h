@@ -48,7 +48,7 @@ elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
   )
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
   set_source_files_properties(test.c test.cpp PROPERTIES
-    COMPILE_FLAGS "/Wall /WX /wd4514"
+    COMPILE_FLAGS "/Wall /WX /wd4514 /Zc:__cplusplus"
   )
 else()
   message(WARNING "Unknown compiler '${CMAKE_C_COMPILER_ID}'!")
