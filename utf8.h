@@ -370,8 +370,8 @@ utf8_constexpr14 utf8_t *utf8chr(const utf8_t *src, utf8_int32_t chr) {
 }
 
 utf8_constexpr14 int utf8cmp(const utf8_t *src1, const utf8_t *src2) {
-  const unsigned char *s1 = (const unsigned char *)src1;
-  const unsigned char *s2 = (const unsigned char *)src2;
+  const char *s1 = (const char *)src1;
+  const char *s2 = (const char *)src2;
 
   while (('\0' != *s1) || ('\0' != *s2)) {
     if (*s1 < *s2) {
@@ -498,8 +498,8 @@ utf8_constexpr14 size_t utf8len(const utf8_t *str) {
 }
 
 utf8_constexpr14 size_t utf8nlen(const utf8_t *str, size_t n) {
-  const unsigned char *s = (const unsigned char *)str;
-  const unsigned char *t = s;
+  const char *s = (const char *)str;
+  const char *t = s;
   size_t length = 0;
 
   while ((size_t) (s-t) < n && '\0' != *s) {
@@ -533,8 +533,8 @@ utf8_constexpr14 int utf8ncasecmp(const utf8_t *src1, const utf8_t *src2, size_t
         src1_orig_cp = 0, src2_orig_cp = 0;
 
   do {
-    const unsigned char *const s1 = (const unsigned char *)src1;
-    const unsigned char *const s2 = (const unsigned char *)src2;
+    const char *const s1 = (const char *)src1;
+    const char *const s2 = (const char *)src2;
 
     // first check that we have enough bytes left in n to contain an entire
     // codepoint
@@ -623,8 +623,8 @@ utf8_t *utf8ncat(utf8_t *utf8_restrict dst, const utf8_t *utf8_restrict src,
 }
 
 utf8_constexpr14 int utf8ncmp(const utf8_t *src1, const utf8_t *src2, size_t n) {
-  const unsigned char *s1 = (const unsigned char *)src1;
-  const unsigned char *s2 = (const unsigned char *)src2;
+  const char *s1 = (const char *)src1;
+  const char *s2 = (const char *)src2;
 
   while ((0 != n--) && (('\0' != *s1) || ('\0' != *s2))) {
     if (*s1 < *s2) {
