@@ -33,10 +33,14 @@ add_executable(utf8_test
   test.c
 )
 
-add_executable(utf8_test_cpp
+add_executable(utf8_test_cpp14
     test.cpp
 )
-target_compile_features(utf8_test_cpp PRIVATE cxx_std_14)
+target_compile_features(utf8_test_cpp14 PRIVATE cxx_std_14)
+add_executable(utf8_test_cpp20
+    test.cpp
+    )
+target_compile_features(utf8_test_cpp20 PRIVATE cxx_std_20)
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(test.c test.cpp PROPERTIES
