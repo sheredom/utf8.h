@@ -10,58 +10,58 @@ Functions provided from the C header string.h but with a utf8* prefix instead of
 
 [API function docs](#api-function-docs)
 
-string.h | utf8.h | complete
----------|--------|---------
-strcat | utf8cat | &#10004;
-strchr | utf8chr | &#10004;
-strcmp | utf8cmp | &#10004;
-strcoll | utf8coll |
-strcpy | utf8cpy | &#10004;
-strcspn | utf8cspn | &#10004;
-strdup | utf8dup | &#10004;
-strfry | utf8fry |
-strlen | utf8len | &#10004;
-strnlen | utf8nlen | &#10004;
-strncat | utf8ncat | &#10004;
-strncmp | utf8ncmp | &#10004;
-strncpy | utf8ncpy | &#10004;
-strndup | utf8ndup | &#10004;
-strpbrk | utf8pbrk | &#10004;
-strrchr | utf8rchr | &#10004;
-strsep | utf8sep |
-strspn | utf8spn | &#10004;
-strstr | utf8str | &#10004;
-strtok | utf8tok |
-strxfrm | utf8xfrm |
+string.h | utf8.h | complete | C++14 constexpr
+---------|--------|---------|---------
+strcat | utf8cat | &#10004; |
+strchr | utf8chr | &#10004; | &#10004;
+strcmp | utf8cmp | &#10004; | &#10004;
+strcoll | utf8coll | |
+strcpy | utf8cpy | &#10004; |
+strcspn | utf8cspn | &#10004; | &#10004;
+strdup | utf8dup | &#10004; |
+strfry | utf8fry | |
+strlen | utf8len | &#10004; | &#10004;
+strnlen | utf8nlen | &#10004; | &#10004;
+strncat | utf8ncat | &#10004; |
+strncmp | utf8ncmp | &#10004; | &#10004;
+strncpy | utf8ncpy | &#10004; |
+strndup | utf8ndup | &#10004; |
+strpbrk | utf8pbrk | &#10004; | &#10004;
+strrchr | utf8rchr | &#10004; | &#10004;
+strsep | utf8sep | |
+strspn | utf8spn | &#10004; | &#10004;
+strstr | utf8str | &#10004; | &#10004;
+strtok | utf8tok | |
+strxfrm | utf8xfrm | |
 
 Functions provided from the C header strings.h but with a utf8* prefix instead of the str* prefix:
 
-strings.h | utf8.h | complete
-----------|--------|---------
-strcasecmp | utf8casecmp | ~~&#10004;~~
-strncasecmp | utf8ncasecmp | ~~&#10004;~~
-strcasestr | utf8casestr | ~~&#10004;~~
+strings.h | utf8.h | complete | C++14 constexpr
+----------|--------|---------|---------
+strcasecmp | utf8casecmp | ~~&#10004;~~ | &#10004;
+strncasecmp | utf8ncasecmp | ~~&#10004;~~ | &#10004;
+strcasestr | utf8casestr | ~~&#10004;~~ | &#10004;
 
 Functions provided that are unique to utf8.h:
 
-utf8.h | complete
--------|---------
-utf8codepoint | &#10004;
-utf8rcodepoint | &#10004;
-utf8size | &#10004;
-utf8size\_lazy | &#10004;
-utf8nsize\_lazy | &#10004;
-utf8valid | &#10004;
-utf8nvalid | &#10004;
-utf8makevalid | &#10004;
-utf8codepointsize | &#10004;
-utf8catcodepoint | &#10004;
-utf8isupper |  ~~&#10004;~~
-utf8islower | ~~&#10004;~~
-utf8lwr | ~~&#10004;~~
-utf8upr | ~~&#10004;~~
-utf8lwrcodepoint | ~~&#10004;~~
-utf8uprcodepoint | ~~&#10004;~~
+utf8.h | complete | C++14 constexpr
+-------|---------|---------
+utf8codepoint | &#10004; | &#10004;
+utf8rcodepoint | &#10004; | &#10004;
+utf8size | &#10004; | &#10004;
+utf8size\_lazy | &#10004; | &#10004;
+utf8nsize\_lazy | &#10004; | &#10004;
+utf8valid | &#10004; | &#10004;
+utf8nvalid | &#10004; | &#10004;
+utf8makevalid | &#10004; |
+utf8codepointsize | &#10004; | &#10004;
+utf8catcodepoint | &#10004; |
+utf8isupper |  ~~&#10004;~~ | &#10004;
+utf8islower | ~~&#10004;~~ | &#10004;
+utf8lwr | ~~&#10004;~~ |
+utf8upr | ~~&#10004;~~ |
+utf8lwrcodepoint | ~~&#10004;~~ | &#10004;
+utf8uprcodepoint | ~~&#10004;~~ | &#10004;
 
 ## Usage ##
 
@@ -75,7 +75,7 @@ The current supported compilers are gcc, clang, MSVC's cl.exe, and clang-cl.exe.
 
 The utf8.h API matches the string.h API as much as possible by design. There are a few major differences though.
 
-I use void* instead of char* when passing around utf8 strings. My reasoning is that I really don't want people accidentally thinking they can use integer arthimetic on the pointer and always get a valid character like you would with an ASCII string. Having it as a void* forces a user to explicitly cast the utf8 string to char* such that the onus is on them not to break the code anymore!
+utf8.h uses char8_t* in C++ 20 instead of char*
 
 Anywhere in the string.h or strings.h documentation where it refers to 'bytes' I have changed that to utf8 codepoints. For instance, utf8len will return the number of utf8 codepoints in a utf8 string - which does not necessarily equate to the number of bytes.
 
