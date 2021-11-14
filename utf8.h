@@ -87,7 +87,7 @@ extern "C" {
 #define utf8_null 0
 #endif
 
-#if defined(__cplusplus) && __cplusplus >= 201402L
+#if (defined(__cplusplus) && __cplusplus >= 201402L)
 #define utf8_constexpr14 constexpr
 #define utf8_constexpr14_impl constexpr
 #else

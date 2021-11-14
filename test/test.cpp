@@ -27,6 +27,7 @@
 
 // We don't care about the results. We only want to check compilation
 
+#if defined (__cplusplus) && __cplusplus >= 201402L
 constexpr void test()
 {
     constexpr utf8_int8_t in_str[20]{};
@@ -59,6 +60,9 @@ constexpr void test()
     static_assert(utf8lwrcodepoint(in_chr) == in_chr, "utf8 constexpr fail");
     static_assert(utf8uprcodepoint(in_chr) == in_chr, "utf8 constexpr fail");
 }
+#else
+void test(){};
+#endif
 
 int main() {
     test();
