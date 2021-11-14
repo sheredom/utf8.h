@@ -798,7 +798,7 @@ UTEST(utf8ndup, ascii_larger) {
   free(dup);
 }
 
-void *allocate_from_buffer(void *user_data, size_t n) { return user_data; }
+utf8_int8_t *allocate_from_buffer(utf8_int8_t *user_data, size_t n) { return user_data; }
 
 UTEST(utf8dup_ex, ascii) {
   char user_data[1024];

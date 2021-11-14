@@ -25,18 +25,11 @@
 
 #include "utf8.h"
 
-#if __cplusplus >= 202002L
-using char_type = char8_t;
-#else
-using char_type = char;
-#endif
-
-
 // We don't care about the results. We only want to check compilation
 
 constexpr void test()
 {
-    constexpr char_type in_str[20]{};
+    constexpr utf8_int8_t in_str[20]{};
     constexpr utf8_int32_t in_chr{};
     utf8_int32_t out_chr{};
 
