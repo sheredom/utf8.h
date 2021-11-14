@@ -35,12 +35,14 @@ add_executable(utf8_test
 
 add_executable(utf8_test_cpp14
     test.cpp
-)
-target_compile_features(utf8_test_cpp14 PRIVATE cxx_std_14)
+    )
+set_target_properties(utf8_test_cpp14 PROPERTIES CXX_STANDARD 14)
+
 add_executable(utf8_test_cpp20
     test.cpp
     )
-target_compile_features(utf8_test_cpp20 PRIVATE cxx_std_20)
+set_target_properties(utf8_test_cpp20 PROPERTIES CXX_STANDARD 20)
+
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(test.c test.cpp PROPERTIES
@@ -52,8 +54,13 @@ elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
   )
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
   set_source_files_properties(test.c test.cpp PROPERTIES
-    COMPILE_FLAGS "/Wall /WX /wd4514 /Zc:__cplusplus"
+    COMPILE_FLAGS "/Wall /WX /wd4514"
   )
+  if(${MSVC_VERSION} VERSION_GREATER "15.7")
+    set_source_files_properties(test.c test.cpp PROPERTIES
+        COMPILE_FLAGS "/Zc:__cplusplus"
+        )
+  endif()
 else()
   message(WARNING "Unknown compiler '${CMAKE_C_COMPILER_ID}'!")
 endif()
