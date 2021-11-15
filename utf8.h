@@ -89,8 +89,11 @@ extern "C" {
 
 #if defined(__cplusplus) && __cplusplus >= 201402L
 #define utf8_constexpr14 constexpr
+#define utf8_constexpr14_impl constexpr
 #else
-#define utf8_constexpr14
+// constexpr and weak are incompatible. so only enable one of them
+#define utf8_constexpr14 utf8_weak
+#define utf8_constexpr14_impl
 #endif
 
 #if defined(__cplusplus) && __cplusplus >= 202002L
@@ -101,20 +104,20 @@ typedef char utf8_int8_t;
 
 // Return less than 0, 0, greater than 0 if src1 < src2, src1 == src2, src1 >
 // src2 respectively, case insensitive.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak int utf8casecmp(const utf8_int8_t *src1,
-                                                                  const utf8_int8_t *src2);
+utf8_constexpr14 utf8_nonnull utf8_pure int utf8casecmp(const utf8_int8_t *src1,
+                                                        const utf8_int8_t *src2);
 
 // Append the utf8 string src onto the utf8 string dst.
 utf8_nonnull utf8_weak utf8_int8_t *utf8cat(utf8_int8_t *utf8_restrict dst,
                                        const utf8_int8_t *utf8_restrict src);
 
 // Find the first match of the utf8 codepoint chr in the utf8 string src.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak utf8_int8_t *utf8chr(const utf8_int8_t *src,
+utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *utf8chr(const utf8_int8_t *src,
                                                                   utf8_int32_t chr);
 
 // Return less than 0, 0, greater than 0 if src1 < src2,
 // src1 == src2, src1 > src2 respectively.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak int utf8cmp(const utf8_int8_t *src1,
+utf8_constexpr14 utf8_nonnull utf8_pure int utf8cmp(const utf8_int8_t *src1,
                                                               const utf8_int8_t *src2);
 
 // Copy the utf8 string src onto the memory allocated in dst.
@@ -123,7 +126,7 @@ utf8_nonnull utf8_weak utf8_int8_t *utf8cpy(utf8_int8_t *utf8_restrict dst,
 
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints not from the utf8 string reject.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak size_t utf8cspn(const utf8_int8_t *src,
+utf8_constexpr14 utf8_nonnull utf8_pure size_t utf8cspn(const utf8_int8_t *src,
                                                                   const utf8_int8_t *reject);
 
 // Duplicate the utf8 string src by getting its size, malloc'ing a new buffer
@@ -132,15 +135,15 @@ utf8_weak utf8_int8_t *utf8dup(const utf8_int8_t *src);
 
 // Number of utf8 codepoints in the utf8 string str,
 // excluding the null terminating byte.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak size_t utf8len(const utf8_int8_t *str);
+utf8_constexpr14 utf8_nonnull utf8_pure size_t utf8len(const utf8_int8_t *str);
 
 // Similar to utf8len, except that only at most n bytes of src are looked.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak size_t utf8nlen(const utf8_int8_t *str, size_t n);
+utf8_constexpr14 utf8_nonnull utf8_pure size_t utf8nlen(const utf8_int8_t *str, size_t n);
 
 // Return less than 0, 0, greater than 0 if src1 < src2, src1 == src2, src1 >
 // src2 respectively, case insensitive. Checking at most n bytes of each utf8
 // string.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak int utf8ncasecmp(const utf8_int8_t *src1,
+utf8_constexpr14 utf8_nonnull utf8_pure int utf8ncasecmp(const utf8_int8_t *src1,
                                                                    const utf8_int8_t *src2, size_t n);
 
 // Append the utf8 string src onto the utf8 string dst,
@@ -152,7 +155,7 @@ utf8_nonnull utf8_weak utf8_int8_t *utf8ncat(utf8_int8_t *utf8_restrict dst,
 // Return less than 0, 0, greater than 0 if src1 < src2,
 // src1 == src2, src1 > src2 respectively. Checking at most n
 // bytes of each utf8 string.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak int utf8ncmp(const utf8_int8_t *src1,
+utf8_constexpr14 utf8_nonnull utf8_pure int utf8ncmp(const utf8_int8_t *src1,
                                                                const utf8_int8_t *src2, size_t n);
 
 // Copy the utf8 string src onto the memory allocated in dst.
@@ -172,43 +175,43 @@ utf8_weak utf8_int8_t *utf8ndup(const utf8_int8_t *src, size_t n);
 
 // Locates the first occurrence in the utf8 string str of any byte in the
 // utf8 string accept, or 0 if no match was found.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak utf8_int8_t *utf8pbrk(const utf8_int8_t *str,
+utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *utf8pbrk(const utf8_int8_t *str,
                                                                    const utf8_int8_t *accept);
 
 // Find the last match of the utf8 codepoint chr in the utf8 string src.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr);
+utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr);
 
 // Number of bytes in the utf8 string str,
 // including the null terminating byte.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak size_t utf8size(const utf8_int8_t *str);
+utf8_constexpr14 utf8_nonnull utf8_pure size_t utf8size(const utf8_int8_t *str);
 
 // Similar to utf8size, except that the null terminating byte is excluded.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak size_t utf8size_lazy(const utf8_int8_t *str);
+utf8_constexpr14 utf8_nonnull utf8_pure size_t utf8size_lazy(const utf8_int8_t *str);
 
 // Similar to utf8size, except that only at most n bytes of src are looked and
 // the null terminating byte is excluded.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak size_t utf8nsize_lazy(const utf8_int8_t *str, size_t n);
+utf8_constexpr14 utf8_nonnull utf8_pure size_t utf8nsize_lazy(const utf8_int8_t *str, size_t n);
 
 // Number of utf8 codepoints in the utf8 string src that consists entirely
 // of utf8 codepoints from the utf8 string accept.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak size_t utf8spn(const utf8_int8_t *src,
+utf8_constexpr14 utf8_nonnull utf8_pure size_t utf8spn(const utf8_int8_t *src,
                                                                  const utf8_int8_t *accept);
 
 // The position of the utf8 string needle in the utf8 string haystack.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak utf8_int8_t *utf8str(const utf8_int8_t *haystack,
+utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *utf8str(const utf8_int8_t *haystack,
                                                                   const utf8_int8_t *needle);
 
 // The position of the utf8 string needle in the utf8 string haystack, case
 // insensitive.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak utf8_int8_t *utf8casestr(const utf8_int8_t *haystack,
+utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *utf8casestr(const utf8_int8_t *haystack,
                                                                       const utf8_int8_t *needle);
 
 // Return 0 on success, or the position of the invalid
 // utf8 codepoint on failure.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak utf8_int8_t *utf8valid(const utf8_int8_t *str);
+utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *utf8valid(const utf8_int8_t *str);
 
 // Similar to utf8valid, except that only at most n bytes of src are looked.
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_weak utf8_int8_t *utf8nvalid(const utf8_int8_t *str, size_t n);
+utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *utf8nvalid(const utf8_int8_t *str, size_t n);
 
 // Given a null-terminated string, makes the string valid by replacing invalid
 // codepoints with a 1-byte replacement. Returns 0 on success.
@@ -217,15 +220,15 @@ utf8_nonnull utf8_weak int utf8makevalid(utf8_int8_t *str,
 
 // Sets out_codepoint to the current utf8 codepoint in str, and returns the
 // address of the next utf8 codepoint after the current one in str.
-utf8_constexpr14 utf8_nonnull utf8_weak utf8_int8_t *
+utf8_constexpr14 utf8_nonnull utf8_int8_t *
 utf8codepoint(const utf8_int8_t *utf8_restrict str,
               utf8_int32_t *utf8_restrict out_codepoint);
 
 // Calculates the size of the next utf8 codepoint in str.
-utf8_constexpr14 utf8_nonnull utf8_weak size_t utf8codepointcalcsize(const utf8_int8_t *str);
+utf8_constexpr14 utf8_nonnull size_t utf8codepointcalcsize(const utf8_int8_t *str);
 
 // Returns the size of the given codepoint in bytes.
-utf8_constexpr14 utf8_weak size_t utf8codepointsize(utf8_int32_t chr);
+utf8_constexpr14 size_t utf8codepointsize(utf8_int32_t chr);
 
 // Write a codepoint to the given string, and return the address to the next
 // place after the written codepoint. Pass how many bytes left in the buffer to
@@ -235,10 +238,10 @@ utf8_nonnull utf8_weak utf8_int8_t *utf8catcodepoint(utf8_int8_t *str, utf8_int3
                                                 size_t n);
 
 // Returns 1 if the given character is lowercase, or 0 if it is not.
-utf8_constexpr14 utf8_weak int utf8islower(utf8_int32_t chr);
+utf8_constexpr14 int utf8islower(utf8_int32_t chr);
 
 // Returns 1 if the given character is uppercase, or 0 if it is not.
-utf8_constexpr14 utf8_weak int utf8isupper(utf8_int32_t chr);
+utf8_constexpr14 int utf8isupper(utf8_int32_t chr);
 
 // Transform the given string into all lowercase codepoints.
 utf8_nonnull utf8_weak void utf8lwr(utf8_int8_t *utf8_restrict str);
@@ -247,14 +250,14 @@ utf8_nonnull utf8_weak void utf8lwr(utf8_int8_t *utf8_restrict str);
 utf8_nonnull utf8_weak void utf8upr(utf8_int8_t *utf8_restrict str);
 
 // Make a codepoint lower case if possible.
-utf8_constexpr14 utf8_weak utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp);
+utf8_constexpr14 utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp);
 
 // Make a codepoint upper case if possible.
-utf8_constexpr14 utf8_weak utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
+utf8_constexpr14 utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
 
 // Sets out_codepoint to the current utf8 codepoint in str, and returns the
 // address of the previous utf8 codepoint before the current one in str.
-utf8_constexpr14 utf8_nonnull utf8_weak utf8_int8_t *
+utf8_constexpr14 utf8_nonnull utf8_int8_t *
 utf8rcodepoint(const utf8_int8_t *utf8_restrict str,
                utf8_int32_t *utf8_restrict out_codepoint);
 
@@ -277,7 +280,7 @@ utf8_weak utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
 #undef utf8_pure
 #undef utf8_nonnull
 
-utf8_constexpr14 int utf8casecmp(const utf8_int8_t *src1, const utf8_int8_t *src2) {
+utf8_constexpr14_impl int utf8casecmp(const utf8_int8_t *src1, const utf8_int8_t *src2) {
   utf8_int32_t src1_lwr_cp = 0, src2_lwr_cp = 0, src1_upr_cp = 0,
         src2_upr_cp = 0, src1_orig_cp = 0, src2_orig_cp = 0;
 
@@ -323,7 +326,7 @@ utf8_int8_t *utf8cat(utf8_int8_t *utf8_restrict dst, const utf8_int8_t *utf8_res
   return dst;
 }
 
-utf8_constexpr14 utf8_int8_t *utf8chr(const utf8_int8_t *src, utf8_int32_t chr) {
+utf8_constexpr14_impl utf8_int8_t *utf8chr(const utf8_int8_t *src, utf8_int32_t chr) {
   utf8_int8_t c[5] = {'\0', '\0', '\0', '\0', '\0'};
 
   if (0 == chr) {
@@ -363,7 +366,7 @@ utf8_constexpr14 utf8_int8_t *utf8chr(const utf8_int8_t *src, utf8_int32_t chr) 
   return utf8str(src, c);
 }
 
-utf8_constexpr14 int utf8cmp(const utf8_int8_t *src1, const utf8_int8_t *src2) {
+utf8_constexpr14_impl int utf8cmp(const utf8_int8_t *src1, const utf8_int8_t *src2) {
   while (('\0' != *src1) || ('\0' != *src2)) {
     if (*src1 < *src2) {
       return -1;
@@ -379,7 +382,7 @@ utf8_constexpr14 int utf8cmp(const utf8_int8_t *src1, const utf8_int8_t *src2) {
   return 0;
 }
 
-utf8_constexpr14 int utf8coll(const utf8_int8_t *src1, const utf8_int8_t *src2);
+utf8_constexpr14_impl int utf8coll(const utf8_int8_t *src1, const utf8_int8_t *src2);
 
 utf8_int8_t *utf8cpy(utf8_int8_t *utf8_restrict dst, const utf8_int8_t *utf8_restrict src) {
   utf8_int8_t *d = dst;
@@ -396,7 +399,7 @@ utf8_int8_t *utf8cpy(utf8_int8_t *utf8_restrict dst, const utf8_int8_t *utf8_res
   return dst;
 }
 
-utf8_constexpr14 size_t utf8cspn(const utf8_int8_t *src, const utf8_int8_t *reject) {
+utf8_constexpr14_impl size_t utf8cspn(const utf8_int8_t *src, const utf8_int8_t *reject) {
   size_t chars = 0;
 
   while ('\0' != *src) {
@@ -479,13 +482,13 @@ utf8_int8_t *utf8dup_ex(const utf8_int8_t *src, utf8_int8_t *(*alloc_func_ptr)(u
   }
 }
 
-utf8_constexpr14 utf8_int8_t *utf8fry(const utf8_int8_t *str);
+utf8_constexpr14_impl utf8_int8_t *utf8fry(const utf8_int8_t *str);
 
-utf8_constexpr14 size_t utf8len(const utf8_int8_t *str) {
+utf8_constexpr14_impl size_t utf8len(const utf8_int8_t *str) {
   return utf8nlen(str, SIZE_MAX);
 }
 
-utf8_constexpr14 size_t utf8nlen(const utf8_int8_t *str, size_t n) {
+utf8_constexpr14_impl size_t utf8nlen(const utf8_int8_t *str, size_t n) {
   const utf8_int8_t *t = str;
   size_t length = 0;
 
@@ -515,7 +518,7 @@ utf8_constexpr14 size_t utf8nlen(const utf8_int8_t *str, size_t n) {
   return length;
 }
 
-utf8_constexpr14 int utf8ncasecmp(const utf8_int8_t *src1, const utf8_int8_t *src2, size_t n) {
+utf8_constexpr14_impl int utf8ncasecmp(const utf8_int8_t *src1, const utf8_int8_t *src2, size_t n) {
   utf8_int32_t src1_lwr_cp = 0, src2_lwr_cp = 0, src1_upr_cp = 0, src2_upr_cp = 0,
         src1_orig_cp = 0, src2_orig_cp = 0;
 
@@ -608,7 +611,7 @@ utf8_int8_t *utf8ncat(utf8_int8_t *utf8_restrict dst, const utf8_int8_t *utf8_re
   return dst;
 }
 
-utf8_constexpr14 int utf8ncmp(const utf8_int8_t *src1, const utf8_int8_t *src2, size_t n) {
+utf8_constexpr14_impl int utf8ncmp(const utf8_int8_t *src1, const utf8_int8_t *src2, size_t n) {
   while ((0 != n--) && (('\0' != *src1) || ('\0' != *src2))) {
     if (*src1 < *src2) {
       return -1;
@@ -700,7 +703,7 @@ utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
   return c;
 }
 
-utf8_constexpr14 utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
+utf8_constexpr14_impl utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
 
   const utf8_int8_t *match = utf8_null;
   utf8_int8_t c[5] = {'\0', '\0', '\0', '\0', '\0'};
@@ -768,7 +771,7 @@ utf8_constexpr14 utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
   return (utf8_int8_t *)match;
 }
 
-utf8_constexpr14 utf8_int8_t *utf8pbrk(const utf8_int8_t *str, const utf8_int8_t *accept) {
+utf8_constexpr14_impl utf8_int8_t *utf8pbrk(const utf8_int8_t *str, const utf8_int8_t *accept) {
   while ('\0' != *str) {
     const utf8_int8_t *a = accept;
     size_t offset = 0;
@@ -815,15 +818,15 @@ utf8_constexpr14 utf8_int8_t *utf8pbrk(const utf8_int8_t *str, const utf8_int8_t
   return utf8_null;
 }
 
-utf8_constexpr14 size_t utf8size(const utf8_int8_t *str) {
+utf8_constexpr14_impl size_t utf8size(const utf8_int8_t *str) {
   return utf8size_lazy(str) + 1;
 }
 
-utf8_constexpr14 size_t utf8size_lazy(const utf8_int8_t *str) {
+utf8_constexpr14_impl size_t utf8size_lazy(const utf8_int8_t *str) {
   return utf8nsize_lazy(str, SIZE_MAX);
 }
 
-utf8_constexpr14 size_t utf8nsize_lazy(const utf8_int8_t *str, size_t n) {
+utf8_constexpr14_impl size_t utf8nsize_lazy(const utf8_int8_t *str, size_t n) {
   size_t size = 0;
   while (size < n && '\0' != str[size]) {
     size++;
@@ -831,7 +834,7 @@ utf8_constexpr14 size_t utf8nsize_lazy(const utf8_int8_t *str, size_t n) {
   return size;
 }
 
-utf8_constexpr14 size_t utf8spn(const utf8_int8_t *src, const utf8_int8_t *accept) {
+utf8_constexpr14_impl size_t utf8spn(const utf8_int8_t *src, const utf8_int8_t *accept) {
   size_t chars = 0;
 
   while ('\0' != *src) {
@@ -884,7 +887,7 @@ utf8_constexpr14 size_t utf8spn(const utf8_int8_t *src, const utf8_int8_t *accep
   return chars;
 }
 
-utf8_constexpr14 utf8_int8_t *utf8str(const utf8_int8_t *haystack, const utf8_int8_t *needle) {
+utf8_constexpr14_impl utf8_int8_t *utf8str(const utf8_int8_t *haystack, const utf8_int8_t *needle) {
   utf8_int32_t throwaway_codepoint = 0;
 
   // if needle has no utf8 codepoints before the null terminating
@@ -918,7 +921,7 @@ utf8_constexpr14 utf8_int8_t *utf8str(const utf8_int8_t *haystack, const utf8_in
   return utf8_null;
 }
 
-utf8_constexpr14 utf8_int8_t *utf8casestr(const utf8_int8_t *haystack, const utf8_int8_t *needle) {
+utf8_constexpr14_impl utf8_int8_t *utf8casestr(const utf8_int8_t *haystack, const utf8_int8_t *needle) {
   // if needle has no utf8 codepoints before the null terminating
   // byte then return haystack
   if ('\0' == *needle) {
@@ -963,11 +966,11 @@ utf8_constexpr14 utf8_int8_t *utf8casestr(const utf8_int8_t *haystack, const utf
   }
 }
 
-utf8_constexpr14 utf8_int8_t *utf8valid(const utf8_int8_t *str) {
+utf8_constexpr14_impl utf8_int8_t *utf8valid(const utf8_int8_t *str) {
   return utf8nvalid(str, SIZE_MAX);
 }
 
-utf8_constexpr14 utf8_int8_t *utf8nvalid(const utf8_int8_t *str, size_t n) {
+utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str, size_t n) {
   const utf8_int8_t *t = str;
   size_t consumed = 0, remained = 0;
 
@@ -1130,7 +1133,7 @@ int utf8makevalid(utf8_int8_t *str, const utf8_int32_t replacement) {
   return 0;
 }
 
-utf8_constexpr14 utf8_int8_t *utf8codepoint(const utf8_int8_t *utf8_restrict str,
+utf8_constexpr14_impl utf8_int8_t *utf8codepoint(const utf8_int8_t *utf8_restrict str,
                                      utf8_int32_t *utf8_restrict out_codepoint) {
   if (0xf0 == (0xf8 & str[0])) {
     // 4 byte utf8 codepoint
@@ -1155,7 +1158,7 @@ utf8_constexpr14 utf8_int8_t *utf8codepoint(const utf8_int8_t *utf8_restrict str
   return (utf8_int8_t *)str;
 }
 
-utf8_constexpr14 size_t utf8codepointcalcsize(const utf8_int8_t *str) {
+utf8_constexpr14_impl size_t utf8codepointcalcsize(const utf8_int8_t *str) {
   if (0xf0 == (0xf8 & str[0])) {
     // 4 byte utf8 codepoint
     return 4;
@@ -1171,7 +1174,7 @@ utf8_constexpr14 size_t utf8codepointcalcsize(const utf8_int8_t *str) {
   return 1;
 }
 
-utf8_constexpr14 size_t utf8codepointsize(utf8_int32_t chr) {
+utf8_constexpr14_impl size_t utf8codepointsize(utf8_int32_t chr) {
   if (0 == ((utf8_int32_t)0xffffff80 & chr)) {
     return 1;
   } else if (0 == ((utf8_int32_t)0xfffff800 & chr)) {
@@ -1227,9 +1230,9 @@ utf8_int8_t *utf8catcodepoint(utf8_int8_t *str, utf8_int32_t chr, size_t n) {
   return str;
 }
 
-utf8_constexpr14 int utf8islower(utf8_int32_t chr) { return chr != utf8uprcodepoint(chr); }
+utf8_constexpr14_impl int utf8islower(utf8_int32_t chr) { return chr != utf8uprcodepoint(chr); }
 
-utf8_constexpr14 int utf8isupper(utf8_int32_t chr) { return chr != utf8lwrcodepoint(chr); }
+utf8_constexpr14_impl int utf8isupper(utf8_int32_t chr) { return chr != utf8lwrcodepoint(chr); }
 
 void utf8lwr(utf8_int8_t *utf8_restrict str) {
   utf8_int32_t cp = 0;
@@ -1265,7 +1268,7 @@ void utf8upr(utf8_int8_t *utf8_restrict str) {
   }
 }
 
-utf8_constexpr14 utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
+utf8_constexpr14_impl utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
   if (((0x0041 <= cp) && (0x005a >= cp)) ||
       ((0x00c0 <= cp) && (0x00d6 >= cp)) ||
       ((0x00d8 <= cp) && (0x00de >= cp)) ||
@@ -1431,7 +1434,7 @@ utf8_constexpr14 utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
   return cp;
 }
 
-utf8_constexpr14 utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
+utf8_constexpr14_impl utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
   if (((0x0061 <= cp) && (0x007a >= cp)) ||
       ((0x00e0 <= cp) && (0x00f6 >= cp)) ||
       ((0x00f8 <= cp) && (0x00fe >= cp)) ||
@@ -1597,7 +1600,7 @@ utf8_constexpr14 utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
   return cp;
 }
 
-utf8_constexpr14 utf8_int8_t *utf8rcodepoint(const utf8_int8_t *utf8_restrict str,
+utf8_constexpr14_impl utf8_int8_t *utf8rcodepoint(const utf8_int8_t *utf8_restrict str,
                      utf8_int32_t *utf8_restrict out_codepoint) {
   const utf8_int8_t *s = (const utf8_int8_t *)str;
 
