@@ -705,7 +705,7 @@ utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
 
 utf8_constexpr14_impl utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
 
-  const utf8_int8_t *match = utf8_null;
+  utf8_int8_t *match = utf8_null;
   utf8_int8_t c[5] = {'\0', '\0', '\0', '\0', '\0'};
 
   if (0 == chr) {
@@ -752,7 +752,7 @@ utf8_constexpr14_impl utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
 
     if ('\0' == c[offset]) {
       // we found a matching utf8 code point
-      match = src;
+      match = (utf8_int8_t *)src;
       src += offset;
     } else {
       src += offset;
@@ -768,7 +768,7 @@ utf8_constexpr14_impl utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
   }
 
   // return the last match we found (or 0 if no match was found)
-  return (utf8_int8_t *)match;
+  return match;
 }
 
 utf8_constexpr14_impl utf8_int8_t *utf8pbrk(const utf8_int8_t *str, const utf8_int8_t *accept) {
