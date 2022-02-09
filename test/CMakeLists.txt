@@ -24,25 +24,55 @@
 # For more information, please refer to <http://unlicense.org/>
 
 project(utf8)
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 2.8.12)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 add_executable(utf8_test
   main.c
-  test.c
 )
 
-add_executable(utf8_test_cpp14
-    test.cpp
-    )
+add_executable(utf8_test_c90 test.c)
+if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(utf8_test_c90 PUBLIC "-std=c90")
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+  if("${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
+  else()
+    target_compile_options(utf8_test_c90 PUBLIC "-std=c90")
+  endif()
+endif()
+
+add_executable(utf8_test_c99 test.c)
+if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(utf8_test_c99 PUBLIC "-std=c99")
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+  if("${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
+  else()
+    target_compile_options(utf8_test_c99 PUBLIC "-std=c99")
+  endif()
+endif()
+
+add_executable(utf8_test_c11 test.c)
+if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(utf8_test_c11 PUBLIC "-std=c11")
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+  if("${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
+  else()
+    target_compile_options(utf8_test_c11 PUBLIC "-std=c11")
+  endif()
+endif()
+
+add_executable(utf8_test_cpp11 test.cpp)
+set_target_properties(utf8_test_cpp11 PROPERTIES CXX_STANDARD 11)
+
+add_executable(utf8_test_cpp14 test.cpp)
 set_target_properties(utf8_test_cpp14 PROPERTIES CXX_STANDARD 14)
 
-add_executable(utf8_test_cpp20
-    test.cpp
-    )
-set_target_properties(utf8_test_cpp20 PROPERTIES CXX_STANDARD 20)
+add_executable(utf8_test_cpp17 test.cpp)
+set_target_properties(utf8_test_cpp17 PROPERTIES CXX_STANDARD 17)
 
+add_executable(utf8_test_cpp20 test.cpp)
+set_target_properties(utf8_test_cpp20 PROPERTIES CXX_STANDARD 20)
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(test.c test.cpp PROPERTIES
