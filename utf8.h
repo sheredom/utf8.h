@@ -315,7 +315,8 @@ utf8_constexpr14_impl int utf8casecmp(const utf8_int8_t *src1,
       continue;
     }
 
-    /* if they don't match, then we return the difference between the characters */
+    /* if they don't match, then we return the difference between the characters
+     */
     return src1_lwr_cp - src2_lwr_cp;
   }
 }
@@ -476,7 +477,8 @@ utf8_int8_t *utf8dup_ex(const utf8_int8_t *src,
                         utf8_int8_t *user_data) {
   utf8_int8_t *n = utf8_null;
 
-  /* figure out how many bytes (including the terminator) we need to copy first */
+  /* figure out how many bytes (including the terminator) we need to copy first
+   */
   size_t bytes = utf8size(src);
 
   if (alloc_func_ptr) {
@@ -604,7 +606,8 @@ utf8_constexpr14_impl int utf8ncasecmp(const utf8_int8_t *src1,
       continue;
     }
 
-    /* if they don't match, then we return the difference between the characters */
+    /* if they don't match, then we return the difference between the characters
+     */
     return src1_lwr_cp - src2_lwr_cp;
   } while (0 < n);
 

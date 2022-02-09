@@ -798,7 +798,9 @@ UTEST(utf8ndup, ascii_larger) {
   free(dup);
 }
 
-utf8_int8_t *allocate_from_buffer(utf8_int8_t *user_data, size_t n) { return user_data; }
+utf8_int8_t *allocate_from_buffer(utf8_int8_t *user_data, size_t n) {
+  return user_data;
+}
 
 UTEST(utf8dup_ex, ascii) {
   char user_data[1024];
@@ -999,7 +1001,7 @@ UTEST(utf8valid, empty) { ASSERT_EQ(0, utf8valid("")); }
 UTEST(utf8nvalid, a) {
   char valid[3];
 
-  const char*  invalid      = valid;
+  const char *invalid = valid;
   const size_t invalid_size = 1;
 
   valid[0] = '\xc2';
@@ -1012,7 +1014,7 @@ UTEST(utf8nvalid, a) {
 UTEST(utf8nvalid, b) {
   char valid[4];
 
-  const char*  invalid      = valid;
+  const char *invalid = valid;
   const size_t invalid_size = 2;
 
   valid[0] = '\xe0';
@@ -1026,7 +1028,7 @@ UTEST(utf8nvalid, b) {
 UTEST(utf8nvalid, c) {
   char valid[5];
 
-  const char*  invalid      = valid;
+  const char *invalid = valid;
   const size_t invalid_size = 3;
 
   valid[0] = '\xf0';

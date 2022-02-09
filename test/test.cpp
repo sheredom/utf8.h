@@ -27,43 +27,40 @@
 
 // We don't care about the results. We only want to check compilation
 
-#if defined (__cplusplus) && __cplusplus >= 201402L
-constexpr void test()
-{
-    constexpr utf8_int8_t in_str[20]{};
-    constexpr utf8_int32_t in_chr{};
-    utf8_int32_t out_chr{};
+#if defined(__cplusplus) && __cplusplus >= 201402L
+constexpr void test() {
+  constexpr utf8_int8_t in_str[20]{};
+  constexpr utf8_int32_t in_chr{};
+  utf8_int32_t out_chr{};
 
-    utf8codepoint(in_str, &out_chr);
-    utf8rcodepoint(in_str, &out_chr);
-    static_assert(utf8chr(in_str, utf8_int32_t{}), "utf8 constexpr fail");
-    static_assert(utf8cmp(in_str, in_str) == 0, "utf8 constexpr fail");
-    static_assert(utf8cspn(in_str, in_str) == 0, "utf8 constexpr fail");
-    static_assert(utf8len(in_str) == 0, "utf8 constexpr fail");
-    static_assert(utf8nlen(in_str, 1) == 0, "utf8 constexpr fail");
-    static_assert(utf8ncmp(in_str, in_str, 1) == 0, "utf8 constexpr fail");
-    static_assert(utf8pbrk(in_str, in_str) == nullptr, "utf8 constexpr fail");
-    static_assert(utf8rchr(in_str, 1) == nullptr, "utf8 constexpr fail");
-    static_assert(utf8spn(in_str, in_str) == 0, "utf8 constexpr fail");
-    static_assert(utf8str(in_str, in_str), "utf8 constexpr fail");
-    static_assert(utf8casecmp(in_str, in_str) == 0, "utf8 constexpr fail");
-    static_assert(utf8ncasecmp(in_str, in_str, 1) == 0, "utf8 constexpr fail");
-    static_assert(utf8casestr(in_str, in_str), "utf8 constexpr fail");
-    static_assert(utf8size(in_str), "utf8 constexpr fail");
-    static_assert(utf8size_lazy(in_str) == 0, "utf8 constexpr faillazy;");
-    static_assert(utf8nsize_lazy(in_str, 1) == 0, "utf8 constexpr faillazy;");
-    static_assert(utf8valid(in_str) == nullptr, "utf8 constexpr fail");
-    static_assert(utf8nvalid(in_str, 1) == nullptr, "utf8 constexpr fail");
-    static_assert(utf8codepointsize(in_chr), "utf8 constexpr fail");
-    static_assert(utf8isupper(in_chr) == false, "utf8 constexpr fail");
-    static_assert(utf8islower(in_chr) == false, "utf8 constexpr fail");
-    static_assert(utf8lwrcodepoint(in_chr) == in_chr, "utf8 constexpr fail");
-    static_assert(utf8uprcodepoint(in_chr) == in_chr, "utf8 constexpr fail");
+  utf8codepoint(in_str, &out_chr);
+  utf8rcodepoint(in_str, &out_chr);
+  static_assert(utf8chr(in_str, utf8_int32_t{}), "utf8 constexpr fail");
+  static_assert(utf8cmp(in_str, in_str) == 0, "utf8 constexpr fail");
+  static_assert(utf8cspn(in_str, in_str) == 0, "utf8 constexpr fail");
+  static_assert(utf8len(in_str) == 0, "utf8 constexpr fail");
+  static_assert(utf8nlen(in_str, 1) == 0, "utf8 constexpr fail");
+  static_assert(utf8ncmp(in_str, in_str, 1) == 0, "utf8 constexpr fail");
+  static_assert(utf8pbrk(in_str, in_str) == nullptr, "utf8 constexpr fail");
+  static_assert(utf8rchr(in_str, 1) == nullptr, "utf8 constexpr fail");
+  static_assert(utf8spn(in_str, in_str) == 0, "utf8 constexpr fail");
+  static_assert(utf8str(in_str, in_str), "utf8 constexpr fail");
+  static_assert(utf8casecmp(in_str, in_str) == 0, "utf8 constexpr fail");
+  static_assert(utf8ncasecmp(in_str, in_str, 1) == 0, "utf8 constexpr fail");
+  static_assert(utf8casestr(in_str, in_str), "utf8 constexpr fail");
+  static_assert(utf8size(in_str), "utf8 constexpr fail");
+  static_assert(utf8size_lazy(in_str) == 0, "utf8 constexpr faillazy;");
+  static_assert(utf8nsize_lazy(in_str, 1) == 0, "utf8 constexpr faillazy;");
+  static_assert(utf8valid(in_str) == nullptr, "utf8 constexpr fail");
+  static_assert(utf8nvalid(in_str, 1) == nullptr, "utf8 constexpr fail");
+  static_assert(utf8codepointsize(in_chr), "utf8 constexpr fail");
+  static_assert(utf8isupper(in_chr) == false, "utf8 constexpr fail");
+  static_assert(utf8islower(in_chr) == false, "utf8 constexpr fail");
+  static_assert(utf8lwrcodepoint(in_chr) == in_chr, "utf8 constexpr fail");
+  static_assert(utf8uprcodepoint(in_chr) == in_chr, "utf8 constexpr fail");
 }
 #else
-void test(){};
+static void test() {}
 #endif
 
-int main() {
-    test();
-}
+int main() { test(); }
