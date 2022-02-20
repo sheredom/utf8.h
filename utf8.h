@@ -626,9 +626,9 @@ utf8_int8_t *utf8ncat(utf8_int8_t *utf8_restrict dst,
 
   /* overwriting the null terminating byte in dst, append src byte-by-byte
    * stopping if we run out of space */
-  do {
+  while (('\0' != *src) && (0 != n--)) {
     *d++ = *src++;
-  } while (('\0' != *src) && (0 != --n));
+  }
 
   /* write out a new null terminating byte into dst */
   *d = '\0';
