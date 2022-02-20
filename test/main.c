@@ -1062,6 +1062,11 @@ UTEST(utf8ncat, bad_cat) {
   ASSERT_EQ(cat, utf8valid(utf8ncat(cat, data, 1)));
 }
 
+UTEST(utf8ncat, zero_n) {
+  char cat[512] = {'\0'};
+  ASSERT_EQ(0, utf8valid(utf8ncat(cat, data, 0)));
+}
+
 UTEST(utf8ncmp, lt_large) { ASSERT_LT(0, utf8ncmp(data, lt, 4000)); }
 
 UTEST(utf8ncmp, lt_small) { ASSERT_EQ(0, utf8ncmp(data, lt, 7)); }
