@@ -484,7 +484,11 @@ utf8_int8_t *utf8dup_ex(const utf8_int8_t *src,
   if (alloc_func_ptr) {
     n = alloc_func_ptr(user_data, bytes);
   } else {
+#if !defined(UTF8_NO_STD_MALLOC)
     n = (utf8_int8_t *)malloc(bytes);
+#else
+    return utf8_null;
+#endif
   }
 
   if (utf8_null == n) {
@@ -711,7 +715,11 @@ utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
   if (alloc_func_ptr) {
     c = alloc_func_ptr(user_data, bytes + 1);
   } else {
+#if !defined(UTF8_NO_STD_MALLOC)
     c = (utf8_int8_t *)malloc(bytes + 1);
+#else
+    c = utf8_null;
+#endif
   }
 
   if (utf8_null == c) {
