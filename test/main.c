@@ -1637,4 +1637,19 @@ UTEST(utf8makevalid, invalid_replacement) {
   ASSERT_NE(0, utf8makevalid(invalid, 0x80));
 }
 
+UTEST(utf8nvalid, exactly_2_bytes) {
+    const char terminated[] = "\xc2\xa3";
+    ASSERT_EQ(utf8nvalid(terminated, 2), NULL);
+}
+
+UTEST(utf8nvalid, exactly_3_bytes) {
+    const char terminated[] = "\xe1\xbd\xb6";
+    ASSERT_EQ(utf8nvalid(terminated, 3), NULL);
+}
+
+UTEST(utf8nvalid, exactly_4_bytes) {
+    const char terminated[] = "\xf0\x90\x8d\x88";
+    ASSERT_EQ(utf8nvalid(terminated, 4), NULL);
+}
+
 UTEST_MAIN();

@@ -1006,14 +1006,14 @@ utf8_constexpr14_impl utf8_int8_t *utf8valid(const utf8_int8_t *str) {
 utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
                                               size_t n) {
   const utf8_int8_t *t = str;
-  size_t consumed = 0, remained = 0;
+  size_t consumed = 0;
 
   while ((void)(consumed = (size_t)(str - t)), consumed < n && '\0' != *str) {
-    remained = n - consumed;
+    const size_t remaining = n - consumed;
 
     if (0xf0 == (0xf8 & *str)) {
-      /* ensure that there's 4 bytes or more remained */
-      if (remained < 4) {
+      /* ensure that there's 4 bytes or more remaining */
+      if (remaining < 4) {
         return (utf8_int8_t *)str;
       }
 
@@ -1025,7 +1025,7 @@ utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
       }
 
       /* ensure that our utf8 codepoint ended after 4 bytes */
-      if (0x80 == (0xc0 & str[4])) {
+      if ((remaining != 4) && (0x80 == (0xc0 & str[4]))) {
         return (utf8_int8_t *)str;
       }
 
@@ -1039,8 +1039,8 @@ utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
       /* 4-byte utf8 code point (began with 0b11110xxx) */
       str += 4;
     } else if (0xe0 == (0xf0 & *str)) {
-      /* ensure that there's 3 bytes or more remained */
-      if (remained < 3) {
+      /* ensure that there's 3 bytes or more remaining */
+      if (remaining < 3) {
         return (utf8_int8_t *)str;
       }
 
@@ -1051,7 +1051,7 @@ utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
       }
 
       /* ensure that our utf8 codepoint ended after 3 bytes */
-      if (0x80 == (0xc0 & str[3])) {
+      if ((remaining != 3) && (0x80 == (0xc0 & str[3]))) {
         return (utf8_int8_t *)str;
       }
 
@@ -1065,8 +1065,8 @@ utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
       /* 3-byte utf8 code point (began with 0b1110xxxx) */
       str += 3;
     } else if (0xc0 == (0xe0 & *str)) {
-      /* ensure that there's 2 bytes or more remained */
-      if (remained < 2) {
+      /* ensure that there's 2 bytes or more remaining */
+      if (remaining < 2) {
         return (utf8_int8_t *)str;
       }
 
@@ -1077,7 +1077,7 @@ utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
       }
 
       /* ensure that our utf8 codepoint ended after 2 bytes */
-      if (0x80 == (0xc0 & str[2])) {
+      if ((remaining != 2) && (0x80 == (0xc0 & str[2]))) {
         return (utf8_int8_t *)str;
       }
 
