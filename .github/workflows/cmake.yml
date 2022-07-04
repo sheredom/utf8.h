@@ -64,3 +64,8 @@ jobs:
       working-directory: ${{github.workspace}}/build
       shell: bash
       run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test
+
+    - name: Test No Malloc
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_no_malloc_test

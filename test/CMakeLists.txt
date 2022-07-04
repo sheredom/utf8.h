@@ -32,6 +32,10 @@ add_executable(utf8_test
   main.c
 )
 
+add_executable(utf8_no_malloc_test
+  no_malloc.c
+)
+
 add_executable(utf8_test_c90 test.c)
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   target_compile_options(utf8_test_c90 PUBLIC "-std=c90")
