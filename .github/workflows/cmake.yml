@@ -29,7 +29,7 @@ jobs:
 
     - name: Setup dependencies
       if: startsWith(matrix.os, 'ubuntu')
-      run: sudo apt-get install -y gcc-10 g++-10 clang-10
+      run: sudo apt-get install -y gcc-10 g++-10 clang
 
     - name: Configure CMake
       shell: bash
@@ -47,7 +47,7 @@ jobs:
       shell: bash
       if: (matrix.compiler == 'clang') && startsWith(matrix.os, 'ubuntu')
       working-directory: ${{github.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE/test -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10
+      run: cmake $GITHUB_WORKSPACE/test -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
 
     - name: Configure CMake with Clang (Windows)
       shell: bash

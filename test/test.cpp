@@ -34,7 +34,7 @@ constexpr void test() {
   utf8_int32_t out_chr{};
 
   utf8codepoint(in_str, &out_chr);
-  utf8rcodepoint(in_str, &out_chr);
+  utf8rcodepoint(in_str + 1, &out_chr);
   static_assert(utf8chr(in_str, utf8_int32_t{}), "utf8 constexpr fail");
   static_assert(utf8cmp(in_str, in_str) == 0, "utf8 constexpr fail");
   static_assert(utf8cspn(in_str, in_str) == 0, "utf8 constexpr fail");
