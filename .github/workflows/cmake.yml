@@ -69,3 +69,38 @@ jobs:
       working-directory: ${{github.workspace}}/build
       shell: bash
       run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_no_malloc_test
+
+    - name: Test c90
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test_c90
+
+    - name: Test c99
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test_c99
+
+    - name: Test c11
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test_c11
+
+    - name: Test c++11
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test_cpp11
+
+    - name: Test c++14
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test_cpp14
+
+    - name: Test c++17
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test_cpp17
+
+    - name: Test c++20
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test_cpp20

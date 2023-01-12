@@ -66,6 +66,13 @@
 #pragma warning(disable : 5039)
 #endif
 
+#if _MSC_VER > 1930
+/*
+  Disable warning about 'const' variable is not used.
+*/
+#pragma warning(disable : 5264)
+#endif
+
 #pragma warning(push, 1)
 #endif
 
@@ -112,15 +119,6 @@ typedef uint32_t utest_uint32_t;
 #pragma GCC diagnostic ignored "-Wunknown-pragmas"
 #endif
 
-// define UTEST_USE_OLD_QPC before #include "utest.h" to use old
-// QueryPerformanceCounter
-#ifndef UTEST_USE_OLD_QPC
-#pragma warning(push, 0)
-#include <Windows.h>
-#pragma warning(pop)
-
-typedef LARGE_INTEGER utest_large_integer;
-#else
 // use old QueryPerformanceCounter definitions (not sure is this needed in some
 // edge cases or not) on Win7 with VS2015 these extern declaration cause "second
 // C linkage of overloaded function not allowed" error
@@ -143,7 +141,6 @@ UTEST_C_FUNC __declspec(dllimport) int __stdcall QueryPerformanceFrequency(
 
 #if defined(__MINGW64__) || defined(__MINGW32__)
 #pragma GCC diagnostic pop
-#endif
 #endif
 
 #elif defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) ||    \
@@ -358,8 +355,12 @@ UTEST_EXTERN struct utest_state_s utest_state;
 
 #if defined(_MSC_VER)
 #define UTEST_WEAK __forceinline
-#else
+#elif defined(__MINGW32__) || defined(__MINGW64__)
+#define UTEST_WEAK static __attribute__((used))
+#elif defined(__clang__) || defined(__GNUC__)
 #define UTEST_WEAK __attribute__((weak))
+#else
+#error Non clang, non gcc, non MSVC compiler found!
 #endif
 
 #if defined(_MSC_VER)
@@ -419,7 +420,12 @@ UTEST_WEAK UTEST_OVERLOADABLE void utest_type_printer(double d) {
 
 UTEST_WEAK UTEST_OVERLOADABLE void utest_type_printer(long double d);
 UTEST_WEAK UTEST_OVERLOADABLE void utest_type_printer(long double d) {
+#if defined(__MINGW32__) || defined(__MINGW64__)
+  /* MINGW is weird - doesn't like LF at all?! */
+  UTEST_PRINTF("%f", (double)d);
+#else
   UTEST_PRINTF("%Lf", d);
+#endif
 }
 
 UTEST_WEAK UTEST_OVERLOADABLE void utest_type_printer(int i);
@@ -451,7 +457,8 @@ UTEST_WEAK UTEST_OVERLOADABLE void utest_type_printer(const void *p) {
    long long is a c++11 extension
 */
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) ||              \
-    defined(__cplusplus) && (__cplusplus >= 201103L)
+    defined(__cplusplus) && (__cplusplus >= 201103L) ||                        \
+    (defined(__MINGW32__) || defined(__MINGW64__))
 
 #ifdef __clang__
 #pragma clang diagnostic push
@@ -474,7 +481,8 @@ utest_type_printer(long long unsigned int i) {
 #endif
 
 #endif
-#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) &&            \
+    !(defined(__MINGW32__) || defined(__MINGW64__))
 #define utest_type_printer(val)                                                \
   UTEST_PRINTF(_Generic((val), signed char                                     \
                         : "%d", unsigned char                                  \
@@ -505,7 +513,7 @@ utest_type_printer(long long unsigned int i) {
 #ifdef _MSC_VER
 #define UTEST_SURPRESS_WARNING_BEGIN                                           \
   __pragma(warning(push)) __pragma(warning(disable : 4127))                    \
-      __pragma(warning(disable : 4571))
+      __pragma(warning(disable : 4571)) __pragma(warning(disable : 4130))
 #define UTEST_SURPRESS_WARNING_END __pragma(warning(pop))
 #else
 #define UTEST_SURPRESS_WARNING_BEGIN
@@ -639,7 +647,7 @@ utest_type_printer(long long unsigned int i) {
 
 #define EXPECT_STREQ(x, y)                                                     \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (0 != strcmp(x, y)) {                                                   \
+    if (UTEST_NULL == x || UTEST_NULL == y || 0 != strcmp(x, y)) {             \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : \"%s\"\n", x);                                \
       UTEST_PRINTF("    Actual : \"%s\"\n", y);                                \
@@ -651,7 +659,7 @@ utest_type_printer(long long unsigned int i) {
 
 #define EXPECT_STRNE(x, y)                                                     \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (0 == strcmp(x, y)) {                                                   \
+    if (UTEST_NULL == x || UTEST_NULL == y || 0 == strcmp(x, y)) {             \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : \"%s\"\n", x);                                \
       UTEST_PRINTF("    Actual : \"%s\"\n", y);                                \
@@ -663,7 +671,7 @@ utest_type_printer(long long unsigned int i) {
 
 #define EXPECT_STRNEQ(x, y, n)                                                 \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (0 != UTEST_STRNCMP(x, y, n)) {                                         \
+    if (UTEST_NULL == x || UTEST_NULL == y || 0 != UTEST_STRNCMP(x, y, n)) {   \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : \"%.*s\"\n", UTEST_CAST(int, n), x);          \
       UTEST_PRINTF("    Actual : \"%.*s\"\n", UTEST_CAST(int, n), y);          \
@@ -675,7 +683,7 @@ utest_type_printer(long long unsigned int i) {
 
 #define EXPECT_STRNNE(x, y, n)                                                 \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (0 == UTEST_STRNCMP(x, y, n)) {                                         \
+    if (UTEST_NULL == x || UTEST_NULL == y || 0 == UTEST_STRNCMP(x, y, n)) {   \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : \"%.*s\"\n", UTEST_CAST(int, n), x);          \
       UTEST_PRINTF("    Actual : \"%.*s\"\n", UTEST_CAST(int, n), y);          \
@@ -687,8 +695,9 @@ utest_type_printer(long long unsigned int i) {
 
 #define EXPECT_NEAR(x, y, epsilon)                                             \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (utest_fabs(UTEST_CAST(double, x) - UTEST_CAST(double, y)) >            \
-        UTEST_CAST(double, epsilon)) {                                         \
+    const double diff =                                                        \
+        utest_fabs(UTEST_CAST(double, x) - UTEST_CAST(double, y));             \
+    if (diff > UTEST_CAST(double, epsilon) || utest_isnan(diff)) {             \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : %f\n", UTEST_CAST(double, x));                \
       UTEST_PRINTF("    Actual : %f\n", UTEST_CAST(double, y));                \
@@ -818,7 +827,7 @@ utest_type_printer(long long unsigned int i) {
 
 #define ASSERT_STREQ(x, y)                                                     \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (0 != strcmp(x, y)) {                                                   \
+    if (UTEST_NULL == x || UTEST_NULL == y || 0 != strcmp(x, y)) {             \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : \"%s\"\n", x);                                \
       UTEST_PRINTF("    Actual : \"%s\"\n", y);                                \
@@ -831,7 +840,7 @@ utest_type_printer(long long unsigned int i) {
 
 #define ASSERT_STRNE(x, y)                                                     \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (0 == strcmp(x, y)) {                                                   \
+    if (UTEST_NULL == x || UTEST_NULL == y || 0 == strcmp(x, y)) {             \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : \"%s\"\n", x);                                \
       UTEST_PRINTF("    Actual : \"%s\"\n", y);                                \
@@ -844,7 +853,7 @@ utest_type_printer(long long unsigned int i) {
 
 #define ASSERT_STRNEQ(x, y, n)                                                 \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (0 != UTEST_STRNCMP(x, y, n)) {                                         \
+    if (UTEST_NULL == x || UTEST_NULL == y || 0 != UTEST_STRNCMP(x, y, n)) {   \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : \"%.*s\"\n", UTEST_CAST(int, n), x);          \
       UTEST_PRINTF("    Actual : \"%.*s\"\n", UTEST_CAST(int, n), y);          \
@@ -857,7 +866,7 @@ utest_type_printer(long long unsigned int i) {
 
 #define ASSERT_STRNNE(x, y, n)                                                 \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (0 == UTEST_STRNCMP(x, y, n)) {                                         \
+    if (UTEST_NULL == x || UTEST_NULL == y || 0 == UTEST_STRNCMP(x, y, n)) {   \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : \"%.*s\"\n", UTEST_CAST(int, n), x);          \
       UTEST_PRINTF("    Actual : \"%.*s\"\n", UTEST_CAST(int, n), y);          \
@@ -870,8 +879,9 @@ utest_type_printer(long long unsigned int i) {
 
 #define ASSERT_NEAR(x, y, epsilon)                                             \
   UTEST_SURPRESS_WARNING_BEGIN do {                                            \
-    if (utest_fabs(UTEST_CAST(double, x) - UTEST_CAST(double, y)) >            \
-        UTEST_CAST(double, epsilon)) {                                         \
+    const double diff =                                                        \
+        utest_fabs(UTEST_CAST(double, x) - UTEST_CAST(double, y));             \
+    if (diff > UTEST_CAST(double, epsilon) || utest_isnan(diff)) {             \
       UTEST_PRINTF("%s:%u: Failure\n", __FILE__, __LINE__);                    \
       UTEST_PRINTF("  Expected : %f\n", UTEST_CAST(double, x));                \
       UTEST_PRINTF("    Actual : %f\n", UTEST_CAST(double, y));                \
@@ -1043,6 +1053,19 @@ double utest_fabs(double d) {
   both.d = d;
   both.u &= 0x7fffffffffffffffu;
   return both.d;
+}
+
+UTEST_WEAK
+int utest_isnan(double d);
+UTEST_WEAK
+int utest_isnan(double d) {
+  union {
+    double d;
+    utest_uint64_t u;
+  } both;
+  both.d = d;
+  both.u &= 0x7fffffffffffffffu;
+  return both.u > 0x7ff0000000000000u;
 }
 
 UTEST_WEAK

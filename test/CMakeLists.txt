@@ -26,17 +26,26 @@
 project(utf8)
 cmake_minimum_required(VERSION 2.8.12)
 
+set(UTF8_USE_SANITIZER "" CACHE STRING "Set which Clang Sanitizer to use")
+
+macro(add_sanitizer target)
+  if(NOT "${UTF8_USE_SANITIZER}" STREQUAL "")
+    target_compile_options(${target} PUBLIC -fno-omit-frame-pointer -fsanitize=${UTF8_USE_SANITIZER})
+    target_link_options(${target} PUBLIC -fno-omit-frame-pointer -fsanitize=${UTF8_USE_SANITIZER})
+  endif()
+endmacro()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-add_executable(utf8_test
-  main.c
-)
+add_executable(utf8_test main.c)
+add_sanitizer(utf8_test)
 
-add_executable(utf8_no_malloc_test
-  no_malloc.c
-)
+add_executable(utf8_no_malloc_test no_malloc.c)
+add_sanitizer(utf8_no_malloc_test)
 
 add_executable(utf8_test_c90 test.c)
+add_sanitizer(utf8_test_c90)
+
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   target_compile_options(utf8_test_c90 PUBLIC "-std=c90")
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
@@ -47,6 +56,8 @@ elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 add_executable(utf8_test_c99 test.c)
+add_sanitizer(utf8_test_c99)
+
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   target_compile_options(utf8_test_c99 PUBLIC "-std=c99")
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
@@ -57,6 +68,8 @@ elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 add_executable(utf8_test_c11 test.c)
+add_sanitizer(utf8_test_c11)
+
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   target_compile_options(utf8_test_c11 PUBLIC "-std=c11")
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
@@ -67,15 +80,19 @@ elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
 endif()
 
 add_executable(utf8_test_cpp11 test.cpp)
+add_sanitizer(utf8_test_cpp11)
 set_target_properties(utf8_test_cpp11 PROPERTIES CXX_STANDARD 11)
 
 add_executable(utf8_test_cpp14 test.cpp)
+add_sanitizer(utf8_test_cpp14)
 set_target_properties(utf8_test_cpp14 PROPERTIES CXX_STANDARD 14)
 
 add_executable(utf8_test_cpp17 test.cpp)
+add_sanitizer(utf8_test_cpp17)
 set_target_properties(utf8_test_cpp17 PROPERTIES CXX_STANDARD 17)
 
 add_executable(utf8_test_cpp20 test.cpp)
+add_sanitizer(utf8_test_cpp20)
 set_target_properties(utf8_test_cpp20 PROPERTIES CXX_STANDARD 20)
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")

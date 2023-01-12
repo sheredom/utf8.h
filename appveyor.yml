@@ -44,6 +44,8 @@ build_script:
   - if "%VSVERSION%"=="Visual Studio 16 2019" cmake -G "%VSVERSION%" -A "%PLATFORM%" ../test
   - msbuild /m /p:Configuration="%CONFIGURATION%" /p:Platform="%PLATFORM%" utf8.sln
   - copy %CONFIGURATION%\utf8_test.exe utf8_test.exe
+  - copy %CONFIGURATION%\utf8_no_malloc_test.exe utf8_no_malloc_test.exe
 
 test_script:
   - utf8_test.exe
+  - utf8_no_malloc_test.exe
