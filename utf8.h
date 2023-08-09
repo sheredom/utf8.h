@@ -681,7 +681,8 @@ utf8_int8_t *utf8ncpy(utf8_int8_t *utf8_restrict dst,
   }
 
   if (check_index < index &&
-      (index - check_index) < utf8codepointcalcsize(&d[check_index])) {
+      ((index - check_index) < utf8codepointcalcsize(&d[check_index]) ||
+       (index - check_index) == n)) {
     index = check_index;
   }
 
