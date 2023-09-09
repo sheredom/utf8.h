@@ -104,7 +104,7 @@ typedef char utf8_int8_t;
 
 /* Return less than 0, 0, greater than 0 if src1 < src2, src1 == src2, src1 >
  * src2 respectively, case insensitive. */
-utf8_constexpr14 utf8_nonnull utf8_pure int
+utf8_constexpr14 utf8_nonnull int
 utf8casecmp(const utf8_int8_t *src1, const utf8_int8_t *src2);
 
 /* Append the utf8 string src onto the utf8 string dst. */
@@ -112,7 +112,7 @@ utf8_nonnull utf8_weak utf8_int8_t *
 utf8cat(utf8_int8_t *utf8_restrict dst, const utf8_int8_t *utf8_restrict src);
 
 /* Find the first match of the utf8 codepoint chr in the utf8 string src. */
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *
+utf8_constexpr14 utf8_nonnull utf8_int8_t *
 utf8chr(const utf8_int8_t *src, utf8_int32_t chr);
 
 /* Return less than 0, 0, greater than 0 if src1 < src2,
@@ -144,7 +144,7 @@ utf8_constexpr14 utf8_nonnull utf8_pure size_t utf8nlen(const utf8_int8_t *str,
 /* Return less than 0, 0, greater than 0 if src1 < src2, src1 == src2, src1 >
  * src2 respectively, case insensitive. Checking at most n bytes of each utf8
  * string. */
-utf8_constexpr14 utf8_nonnull utf8_pure int
+utf8_constexpr14 utf8_nonnull int
 utf8ncasecmp(const utf8_int8_t *src1, const utf8_int8_t *src2, size_t n);
 
 /* Append the utf8 string src onto the utf8 string dst,
@@ -204,12 +204,12 @@ utf8_constexpr14 utf8_nonnull utf8_pure size_t
 utf8spn(const utf8_int8_t *src, const utf8_int8_t *accept);
 
 /* The position of the utf8 string needle in the utf8 string haystack. */
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *
+utf8_constexpr14 utf8_nonnull utf8_int8_t *
 utf8str(const utf8_int8_t *haystack, const utf8_int8_t *needle);
 
 /* The position of the utf8 string needle in the utf8 string haystack, case
  * insensitive. */
-utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *
+utf8_constexpr14 utf8_nonnull utf8_int8_t *
 utf8casestr(const utf8_int8_t *haystack, const utf8_int8_t *needle);
 
 /* Return 0 on success, or the position of the invalid
