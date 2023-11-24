@@ -27,6 +27,14 @@
 
 // We don't care about the results. We only want to check compilation
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+
+#if __has_warning("-Wunsafe-buffer-usage")
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
+#endif
+
 #if defined(__cplusplus) && __cplusplus >= 201402L
 constexpr void test() {
   constexpr utf8_int8_t in_str[20]{};
@@ -61,6 +69,10 @@ constexpr void test() {
 }
 #else
 static void test() {}
+#endif
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
 #endif
 
 int main() { test(); }
