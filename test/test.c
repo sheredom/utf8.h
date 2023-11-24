@@ -26,4 +26,8 @@
 
 #include "utf8.h"
 
-int main(const int argc, const char* const argv[]) { (void)argc; (void)argv; return 0; }
+int main(const int argc, const char *const argv[]) {
+  (void)argc;
+  (void)argv;
+  return 0;
+}

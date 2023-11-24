@@ -713,7 +713,7 @@ UTEST(utf8casestr, latin) {
 
 UTEST(utf8chr, a) { ASSERT_EQ(data + 21, utf8chr(data, 0x3bc)); }
 
-UTEST(utf8chr, b) { ASSERT_EQ(0, utf8chr(data, 0x20ac)); }
+UTEST(utf8chr, b) { ASSERT_EQ(NULL, utf8chr(data, 0x20ac)); }
 
 UTEST(utf8chr, null_terminator) { ASSERT_EQ(data + 104, utf8chr(data, '\0')); }
 
@@ -755,13 +755,19 @@ UTEST(utf8cspn, cspnmultisearch) {
 
 UTEST(utf8rchr, a) { ASSERT_EQ(data + 21, utf8rchr(data, 0x3bc)); }
 
-UTEST(utf8rchr, b) { ASSERT_EQ(0, utf8rchr(data, 0x20ac)); }
+UTEST(utf8rchr, b) { ASSERT_EQ(NULL, utf8rchr(data, 0x20ac)); }
 
 UTEST(utf8rchr, null_terminator) {
   ASSERT_EQ(data + 104, utf8rchr(data, '\0'));
 }
 
 UTEST(utf8rchr, 0x20) { ASSERT_EQ(data + 90, utf8rchr(data, 0x20)); }
+
+UTEST(utf8rchr, overrun) {
+  const char ascii[] = "Hello\0Hello ";
+
+  ASSERT_EQ(4, utf8rchr(ascii, 'o') - ascii);
+}
 
 UTEST(utf8dup, data) {
   void *const dup = utf8dup(data);
@@ -992,11 +998,11 @@ UTEST(utf8valid, n) {
   ASSERT_EQ(invalid, utf8valid(invalid));
 }
 
-UTEST(utf8valid, data) { ASSERT_EQ(0, utf8valid(data)); }
+UTEST(utf8valid, data) { ASSERT_EQ(NULL, utf8valid(data)); }
 
-UTEST(utf8valid, ascii) { ASSERT_EQ(0, utf8valid("ab")); }
+UTEST(utf8valid, ascii) { ASSERT_EQ(NULL, utf8valid("ab")); }
 
-UTEST(utf8valid, empty) { ASSERT_EQ(0, utf8valid("")); }
+UTEST(utf8valid, empty) { ASSERT_EQ(NULL, utf8valid("")); }
 
 UTEST(utf8nvalid, a) {
   char valid[3];
@@ -1039,11 +1045,11 @@ UTEST(utf8nvalid, c) {
   ASSERT_EQ(invalid, utf8nvalid(valid, invalid_size));
 }
 
-UTEST(utf8nvalid, data) { ASSERT_EQ(0, utf8nvalid(data, 105)); }
+UTEST(utf8nvalid, data) { ASSERT_EQ(NULL, utf8nvalid(data, 105)); }
 
-UTEST(utf8nvalid, ascii) { ASSERT_EQ(0, utf8nvalid("ab", 3)); }
+UTEST(utf8nvalid, ascii) { ASSERT_EQ(NULL, utf8nvalid("ab", 3)); }
 
-UTEST(utf8nvalid, empty) { ASSERT_EQ(0, utf8nvalid("", 1)); }
+UTEST(utf8nvalid, empty) { ASSERT_EQ(NULL, utf8nvalid("", 1)); }
 
 UTEST(utf8ncat, ascii_cat_data) {
   char cat[512] = {'\0'};
@@ -1064,7 +1070,7 @@ UTEST(utf8ncat, bad_cat) {
 
 UTEST(utf8ncat, zero_n) {
   char cat[512] = {'\0'};
-  ASSERT_EQ(0, utf8valid(utf8ncat(cat, data, 0)));
+  ASSERT_EQ(NULL, utf8valid(utf8ncat(cat, data, 0)));
 }
 
 UTEST(utf8ncmp, lt_large) { ASSERT_LT(0, utf8ncmp(data, lt, 4000)); }
@@ -1122,13 +1128,13 @@ UTEST(utf8ncpy, truncated_copy_valid) {
   char cpy3[1] = {'\0'};
 
   utf8ncpy(cpy1, data, 32);
-  ASSERT_EQ(0, utf8valid(cpy1));
+  ASSERT_EQ(NULL, utf8valid(cpy1));
 
   utf8ncpy(cpy2, data, 3);
-  ASSERT_EQ(0, utf8valid(cpy2));
+  ASSERT_EQ(NULL, utf8valid(cpy2));
 
   utf8ncpy(cpy3, data, 1);
-  ASSERT_EQ(0, utf8valid(cpy3));
+  ASSERT_EQ(NULL, utf8valid(cpy3));
 }
 
 UTEST(utf8ncpy, truncated_copy_null_terminated) {
