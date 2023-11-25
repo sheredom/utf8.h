@@ -765,8 +765,12 @@ UTEST(utf8rchr, 0x20) { ASSERT_EQ(data + 90, utf8rchr(data, 0x20)); }
 
 UTEST(utf8rchr, overrun) {
   const char ascii[] = "Hello\0Hello ";
-
   ASSERT_EQ(4, utf8rchr(ascii, 'o') - ascii);
+}
+
+UTEST(utf8rchr, underrun) {
+  const char ascii[] = "Helloo";
+  ASSERT_EQ(5, utf8rchr(ascii, 'o') - ascii);
 }
 
 UTEST(utf8dup, data) {

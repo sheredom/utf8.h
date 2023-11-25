@@ -745,8 +745,6 @@ utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
   return c;
 }
 
-#include <stdio.h>
-
 utf8_constexpr14_impl utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
 
   utf8_int8_t *match = utf8_null;
@@ -799,7 +797,7 @@ utf8_constexpr14_impl utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
       match = (utf8_int8_t *)src;
       src += offset;
 
-      if ('\0' == src[offset]) {
+      if ('\0' == *src) {
         break;
       }
     } else {
