@@ -568,7 +568,7 @@ utf8_constexpr14_impl int utf8ncasecmp(const utf8_int8_t *src1,
       const utf8_int32_t c1 = (0xe0 & *s1);
       const utf8_int32_t c2 = (0xe0 & *s2);
 
-      if (c1 < c2) {
+      if (c1 != c2) {
         return c1 - c2;
       } else {
         return 0;
@@ -579,7 +579,7 @@ utf8_constexpr14_impl int utf8ncasecmp(const utf8_int8_t *src1,
       const utf8_int32_t c1 = (0xf0 & *s1);
       const utf8_int32_t c2 = (0xf0 & *s2);
 
-      if (c1 < c2) {
+      if (c1 != c2) {
         return c1 - c2;
       } else {
         return 0;
@@ -590,7 +590,7 @@ utf8_constexpr14_impl int utf8ncasecmp(const utf8_int8_t *src1,
       const utf8_int32_t c1 = (0xf8 & *s1);
       const utf8_int32_t c2 = (0xf8 & *s2);
 
-      if (c1 < c2) {
+      if (c1 != c2) {
         return c1 - c2;
       } else {
         return 0;

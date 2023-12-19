@@ -1210,6 +1210,10 @@ UTEST(utf8ncasecmp, basic_ascii) {
 #endif
 }
 
+UTEST(utf8ncasecmp, latin_extended_a) {
+	ASSERT_EQ(96, utf8ncasecmp("Camón Romasan", "camu", 4));
+}
+
 UTEST(utf8codepoint, data) {
   utf8_int32_t codepoint;
   void *v;
