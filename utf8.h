@@ -71,18 +71,29 @@ typedef int32_t utf8_int32_t;
 extern "C" {
 #endif
 
+#if defined(__TINYC__)
+#define UTF8_ATTRIBUTE(a) __attribute((a))
+#else
+#define UTF8_ATTRIBUTE(a) __attribute__((a))
+#endif
+
 #if defined(_MSC_VER)
 #define utf8_nonnull
 #define utf8_pure
 #define utf8_restrict __restrict
 #define utf8_weak __inline
 #elif defined(__clang__) || defined(__GNUC__)
-#define utf8_nonnull __attribute__((nonnull))
-#define utf8_pure __attribute__((pure))
+#define utf8_nonnull UTF8_ATTRIBUTE(nonnull)
+#define utf8_pure UTF8_ATTRIBUTE(pure)
 #define utf8_restrict __restrict__
-#define utf8_weak __attribute__((weak))
+#define utf8_weak UTF8_ATTRIBUTE(weak)
+#elif defined(__TINYC__)
+#define utf8_nonnull UTF8_ATTRIBUTE(nonnull)
+#define utf8_pure UTF8_ATTRIBUTE(pure)
+#define utf8_restrict
+#define utf8_weak UTF8_ATTRIBUTE(weak)
 #else
-#error Non clang, non gcc, non MSVC compiler found!
+#error Non clang, non gcc, non MSVC, non tcc compiler found!
 #endif
 
 #ifdef __cplusplus
