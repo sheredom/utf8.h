@@ -10,15 +10,20 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest, macos-11, macos-14]
         type: [Debug, RelWithDebInfo, MinSizeRel, Release]
-        compiler: [default, clang, gcc]
+        compiler: [default, clang, gcc, tcc]
         exclude:
-          - {os: "macOS-latest", compiler: "clang"}
+          - {os: "macos-11", compiler: "clang"}
+          - {os: "macos-11", compiler: "gcc"}
+          - {os: "macos-11", compiler: "tcc"}
+          - {os: "macos-14", compiler: "clang"}
+          - {os: "macos-14", compiler: "gcc"}
+          - {os: "macos-14", compiler: "tcc"}
+          - {os: "ubuntu-latest", compiler: "default"}
+          - {os: "ubuntu-latest", compiler: "default"}
           - {os: "windows-latest", compiler: "gcc"}
-          - {os: "macOS-latest", compiler: "gcc"}
-          - {os: "ubuntu-latest", compiler: "default"}
-          - {os: "ubuntu-latest", compiler: "default"}
+          - {os: "windows-latest", compiler: "tcc"}
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -29,7 +34,7 @@ jobs:
 
     - name: Setup dependencies
       if: startsWith(matrix.os, 'ubuntu')
-      run: sudo apt-get install -y gcc-10 g++-10 clang
+      run: sudo apt-get install -y gcc-10 g++-10 clang tcc
 
     - name: Configure CMake
       shell: bash
@@ -42,6 +47,12 @@ jobs:
       if: matrix.compiler == 'gcc'
       working-directory: ${{github.workspace}}/build
       run: cmake $GITHUB_WORKSPACE/test -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10
+
+    - name: Configure CMake with TCC (Ubuntu)
+      shell: bash
+      if: matrix.compiler == 'tcc' && startsWith(matrix.os, 'ubuntu')
+      working-directory: ${{github.workspace}}/build
+      run: cmake $GITHUB_WORKSPACE/test -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=tcc -DCMAKE_CXX_COMPILER=g++-10
 
     - name: Configure CMake with Clang (Ubuntu)
       shell: bash
