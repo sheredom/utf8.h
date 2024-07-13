@@ -110,7 +110,7 @@ extern "C" {
 #define utf8_null 0
 #endif
 
-#if (defined(utf8_cplusplus) && utf8_cplusplus >= 201402L)
+#if defined(utf8_cplusplus) && utf8_cplusplus >= 201402L && (!defined(_MSC_VER) || (defined(_MSC_VER) && _MSC_VER >= 1910))
 #define utf8_constexpr14 constexpr
 #define utf8_constexpr14_impl constexpr
 #else
