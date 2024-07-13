@@ -35,7 +35,7 @@
 #endif
 #endif
 
-#if defined(utf8_cplusplus) && utf8_cplusplus >= 201402L
+#if defined(utf8_cplusplus) && utf8_cplusplus >= 201402L && (!defined(_MSC_VER) || (defined(_MSC_VER) && _MSC_VER >= 1910))
 constexpr void test() {
   constexpr utf8_int8_t in_str[20]{};
   constexpr utf8_int32_t in_chr{};
