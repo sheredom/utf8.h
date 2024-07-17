@@ -10,16 +10,16 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-11, macos-14]
+        os: [ubuntu-latest, windows-latest, macos-13, macos-latest]
         type: [Debug, RelWithDebInfo, MinSizeRel, Release]
         compiler: [default, clang, gcc, tcc]
         exclude:
-          - {os: "macos-11", compiler: "clang"}
-          - {os: "macos-11", compiler: "gcc"}
-          - {os: "macos-11", compiler: "tcc"}
-          - {os: "macos-14", compiler: "clang"}
-          - {os: "macos-14", compiler: "gcc"}
-          - {os: "macos-14", compiler: "tcc"}
+          - {os: "macos-13", compiler: "clang"}
+          - {os: "macos-13", compiler: "gcc"}
+          - {os: "macos-13", compiler: "tcc"}
+          - {os: "macos-latest", compiler: "clang"}
+          - {os: "macos-latest", compiler: "gcc"}
+          - {os: "macos-latest", compiler: "tcc"}
           - {os: "ubuntu-latest", compiler: "default"}
           - {os: "ubuntu-latest", compiler: "default"}
           - {os: "windows-latest", compiler: "gcc"}
