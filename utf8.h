@@ -119,7 +119,7 @@ extern "C" {
 #define utf8_constexpr14_impl
 #endif
 
-#if defined(utf8_cplusplus) && utf8_cplusplus >= 202002L
+#if defined(utf8_cplusplus) && utf8_cplusplus >= 202002L && defined(__cpp_char8_t)
 using utf8_int8_t = char8_t; /* Introduced in C++20 */
 #else
 typedef char utf8_int8_t;
