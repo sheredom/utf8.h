@@ -115,3 +115,8 @@ jobs:
       working-directory: ${{github.workspace}}/build
       shell: bash
       run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test_cpp20
+
+    - name: Test c++20 no char_t
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: if [ "${{ matrix.os }}" == "windows-latest" ]; then cd ${{ matrix.type }}; fi; ./utf8_test_cpp20_no_char_t
