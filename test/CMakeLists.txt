@@ -23,8 +23,8 @@
 #
 # For more information, please refer to <http://unlicense.org/>
 
-project(utf8)
 cmake_minimum_required(VERSION 2.8.12)
+project(utf8)
 
 set(UTF8_USE_SANITIZER "" CACHE STRING "Set which Clang Sanitizer to use")
 
@@ -94,6 +94,24 @@ set_target_properties(utf8_test_cpp17 PROPERTIES CXX_STANDARD 17)
 add_executable(utf8_test_cpp20 test.cpp)
 add_sanitizer(utf8_test_cpp20)
 set_target_properties(utf8_test_cpp20 PROPERTIES CXX_STANDARD 20)
+
+add_executable(utf8_test_cpp20_no_char_t test.cpp)
+add_sanitizer(utf8_test_cpp20_no_char_t)
+set_target_properties(utf8_test_cpp20_no_char_t PROPERTIES CXX_STANDARD 20)
+
+if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+  target_compile_options(utf8_test_cpp20_no_char_t PUBLIC "-fno-char8_t")
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+  if("${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
+    target_compile_options(utf8_test_cpp20_no_char_t PUBLIC "/Zc:char8_t-")
+  else()
+    target_compile_options(utf8_test_cpp20_no_char_t PUBLIC "-fno-char8_t")
+  endif()
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
+  target_compile_options(utf8_test_cpp20_no_char_t PUBLIC "/Zc:char8_t-")
+else()
+  message(WARNING "Unknown compiler '${CMAKE_C_COMPILER_ID}'!")
+endif()
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(test.c test.cpp PROPERTIES
