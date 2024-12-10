@@ -100,8 +100,13 @@ extern "C" {
 #define utf8_pure UTF8_ATTRIBUTE(pure)
 #define utf8_restrict
 #define utf8_weak UTF8_ATTRIBUTE(weak)
+#elif defined(__IAR_SYSTEMS_ICC__)
+#define utf8_nonnull
+#define utf8_pure UTF8_ATTRIBUTE(pure)
+#define utf8_restrict __restrict
+#define utf8_weak UTF8_ATTRIBUTE(weak)
 #else
-#error Non clang, non gcc, non MSVC, non tcc compiler found!
+#error Non clang, non gcc, non MSVC, non tcc, non iar compiler found!
 #endif
 
 #ifdef utf8_cplusplus
