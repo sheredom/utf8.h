@@ -23,7 +23,7 @@
 #
 # For more information, please refer to <http://unlicense.org/>
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.15)
 project(utf8)
 
 set(UTF8_USE_SANITIZER "" CACHE STRING "Set which Clang Sanitizer to use")
@@ -48,7 +48,7 @@ add_sanitizer(utf8_test_c90)
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   target_compile_options(utf8_test_c90 PUBLIC "-std=c90")
-elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang")
   if("${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
   else()
     target_compile_options(utf8_test_c90 PUBLIC "-std=c90")
@@ -60,7 +60,7 @@ add_sanitizer(utf8_test_c99)
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   target_compile_options(utf8_test_c99 PUBLIC "-std=c99")
-elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang")
   if("${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
   else()
     target_compile_options(utf8_test_c99 PUBLIC "-std=c99")
@@ -72,7 +72,7 @@ add_sanitizer(utf8_test_c11)
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   target_compile_options(utf8_test_c11 PUBLIC "-std=c11")
-elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang")
   if("${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
   else()
     target_compile_options(utf8_test_c11 PUBLIC "-std=c11")
@@ -101,7 +101,7 @@ set_target_properties(utf8_test_cpp20_no_char_t PROPERTIES CXX_STANDARD 20)
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   target_compile_options(utf8_test_cpp20_no_char_t PUBLIC "-fno-char8_t")
-elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang")
   if("${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}" STREQUAL "MSVC")
     target_compile_options(utf8_test_cpp20_no_char_t PUBLIC "/Zc:char8_t-")
   else()
@@ -116,6 +116,10 @@ endif()
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
   set_source_files_properties(test.c test.cpp PROPERTIES
     COMPILE_FLAGS "-Wall -Wextra -Werror"
+  )
+elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang")
+  set_source_files_properties(test.c test.cpp PROPERTIES
+    COMPILE_FLAGS "-Wall -Wextra -Weverything -Werror -Wno-c++98-compat -Wno-poison-system-directories"
   )
 elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
   set_source_files_properties(test.c test.cpp PROPERTIES
