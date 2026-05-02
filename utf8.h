@@ -1058,7 +1058,7 @@ utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
         return (utf8_int8_t *)str;
       }
 
-      /* ensure each of the 3 following bytes in this 4-byte
+      /* ensure the 3 following bytes in this 4-byte
        * utf8 codepoint began with 0b10xxxxxx */
       if ((0x80 != (0xc0 & str[1])) || (0x80 != (0xc0 & str[2])) ||
           (0x80 != (0xc0 & str[3]))) {
@@ -1085,7 +1085,7 @@ utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
         return (utf8_int8_t *)str;
       }
 
-      /* ensure each of the 2 following bytes in this 3-byte
+      /* ensure the 2 following bytes in this 3-byte
        * utf8 codepoint began with 0b10xxxxxx */
       if ((0x80 != (0xc0 & str[1])) || (0x80 != (0xc0 & str[2]))) {
         return (utf8_int8_t *)str;
@@ -1155,9 +1155,10 @@ int utf8makevalid(utf8_int8_t *str, const utf8_int32_t replacement) {
 
   while ('\0' != *read) {
     if (0xf0 == (0xf8 & *read)) {
-      /* ensure each of the 3 following bytes in this 4-byte
+      /* ensure the 3 following bytes in this 4-byte
        * utf8 codepoint began with 0b10xxxxxx */
-      if ((0x80 != (0xc0 & read[1])) || (0x80 != (0xc0 & read[2])) ||
+      if (!read[1] || !read[2] || !read[3] ||
+          (0x80 != (0xc0 & read[1])) || (0x80 != (0xc0 & read[2])) ||
           (0x80 != (0xc0 & read[3]))) {
         *write++ = r;
         read++;
@@ -1168,9 +1169,10 @@ int utf8makevalid(utf8_int8_t *str, const utf8_int32_t replacement) {
       read = utf8codepoint(read, &codepoint);
       write = utf8catcodepoint(write, codepoint, 4);
     } else if (0xe0 == (0xf0 & *read)) {
-      /* ensure each of the 2 following bytes in this 3-byte
+      /* ensure the 2 following bytes in this 3-byte
        * utf8 codepoint began with 0b10xxxxxx */
-      if ((0x80 != (0xc0 & read[1])) || (0x80 != (0xc0 & read[2]))) {
+      if (!read[1] || !read[2] ||
+          (0x80 != (0xc0 & read[1])) || (0x80 != (0xc0 & read[2]))) {
         *write++ = r;
         read++;
         continue;
@@ -1182,7 +1184,7 @@ int utf8makevalid(utf8_int8_t *str, const utf8_int32_t replacement) {
     } else if (0xc0 == (0xe0 & *read)) {
       /* ensure the 1 following byte in this 2-byte
        * utf8 codepoint began with 0b10xxxxxx */
-      if (0x80 != (0xc0 & read[1])) {
+      if (!read[1] || (0x80 != (0xc0 & read[1]))) {
         *write++ = r;
         read++;
         continue;
