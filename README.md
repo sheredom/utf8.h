@@ -63,7 +63,7 @@ utf8upr | ~~&#10004;~~ |
 utf8lwrcodepoint | ~~&#10004;~~ | &#10004;
 utf8uprcodepoint | ~~&#10004;~~ | &#10004;
 
-## Usage ##
+## Usage
 
 Just `#include "utf8.h"` in your code!
 
@@ -71,7 +71,7 @@ The current supported platforms are Linux, macOS and Windows.
 
 The current supported compilers are gcc, clang, MSVC's cl.exe, and clang-cl.exe.
 
-## Design ##
+## Design
 
 The utf8.h API matches the string.h API as much as possible by design. There are a few major differences though.
 
@@ -79,7 +79,7 @@ utf8.h uses char8_t* in C++ 20 instead of char*
 
 Anywhere in the string.h or strings.h documentation where it refers to 'bytes' I have changed that to utf8 codepoints. For instance, utf8len will return the number of utf8 codepoints in a utf8 string - which does not necessarily equate to the number of bytes.
 
-## API function docs ##
+## API function docs
 
 ```c
 int utf8casecmp(const void *src1, const void *src2);
@@ -292,13 +292,19 @@ insensitive code:
 * [Greek and Coptic](https://en.wikipedia.org/wiki/Greek_and_Coptic)
 * [Cyrillic](https://en.wikipedia.org/wiki/Cyrillic_(Unicode_block))
 
-## Todo ##
+## Todo
 
 - Implement utf8coll (akin to strcoll).
 - Implement utf8fry (akin to strfry).
 - Investigate adding dst buffer sizes for utf8cpy and utf8cat to catch overwrites (as suggested by [@FlohOfWoe](https://twitter.com/FlohOfWoe) in https://twitter.com/FlohOfWoe/status/618669237771608064)
 
-## License ##
+## AI Usage
+
+AI tool use is explicitly permitted in commits to this repository. There is a
+tagged release [pre-ai](https://github.com/sheredom/utf8.h/releases/tag/pre-ai)
+that denotes the last release where AI tooling was not used.
+
+## License
 
 This is free and unencumbered software released into the public domain.
 
