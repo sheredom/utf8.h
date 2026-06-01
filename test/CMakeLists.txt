@@ -73,6 +73,12 @@ else()
   set(UTF8_CXX_USE_STD_FLAG FALSE)
 endif()
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+  set(UTF8_CXX98_COMPAT_FLAG "-Wno-c++98-compat")
+else()
+  set(UTF8_CXX98_COMPAT_FLAG "")
+endif()
+
 # Helper: set compile flags for a C source file (warnings + standard + extras).
 function(utf8_set_c_flags FILE STANDARD)
   set(EXTRA_FLAGS ${ARGN})
@@ -108,16 +114,16 @@ if(${IDX} GREATER -1)
 endif()
 
 # C++ files — each compiled under a specific C++ standard.
-utf8_set_cxx_flags(test.cpp   "" "-Wno-c++98-compat")
-utf8_set_cxx_flags(test98.cpp "-std=gnu++98")
-utf8_set_cxx_flags(test11.cpp "-std=c++11" "-Wno-c++98-compat")
-utf8_set_cxx_flags(test14.cpp "-std=c++14" "-Wno-c++98-compat")
-utf8_set_cxx_flags(test17.cpp "-std=c++17" "-Wno-c++98-compat")
-utf8_set_cxx_flags(test20.cpp "-std=c++20" "-Wno-c++98-compat")
+utf8_set_cxx_flags(test.cpp   "" "${UTF8_CXX98_COMPAT_FLAG}")
+utf8_set_cxx_flags(test98.cpp "-std=gnu++98" "${UTF8_CXX98_COMPAT_FLAG}")
+utf8_set_cxx_flags(test11.cpp "-std=c++11" "${UTF8_CXX98_COMPAT_FLAG}")
+utf8_set_cxx_flags(test14.cpp "-std=c++14" "${UTF8_CXX98_COMPAT_FLAG}")
+utf8_set_cxx_flags(test17.cpp "-std=c++17" "${UTF8_CXX98_COMPAT_FLAG}")
+utf8_set_cxx_flags(test20.cpp "-std=c++20" "${UTF8_CXX98_COMPAT_FLAG}")
 if(MSVC OR CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
-  utf8_set_cxx_flags(test20_no_char_t.cpp "" "/Zc:char8_t-")
+  utf8_set_cxx_flags(test20_no_char_t.cpp "" "${UTF8_CXX98_COMPAT_FLAG} /Zc:char8_t-")
 else()
-  utf8_set_cxx_flags(test20_no_char_t.cpp "-std=c++20" "-Wno-c++98-compat -fno-char8_t")
+  utf8_set_cxx_flags(test20_no_char_t.cpp "-std=c++20" "${UTF8_CXX98_COMPAT_FLAG} -fno-char8_t")
 endif()
 
 set(UTF8_TEST_SOURCES

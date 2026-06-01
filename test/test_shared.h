@@ -16,6 +16,10 @@
 #define UTF8_TEST2(suite, name) UTEST(suite, name)
 #define UTF8_TEST(set, name) UTF8_TEST2(UTF8_SUITE, UTF8_TEST_NAME2(set, name))
 
+#if !defined(_MSC_VER)
+#include <strings.h>
+#endif
+
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wsign-compare"
@@ -815,6 +819,7 @@ UTF8_TEST(utf8ndup, ascii_larger) {
 }
 
 static utf8_int8_t *allocate_from_buffer(utf8_int8_t *user_data, size_t n) {
+  (void)n;
   return user_data;
 }
 
@@ -1119,7 +1124,7 @@ UTF8_TEST(utf8ncpy, check_no_buffer_overflow) {
     ASSERT_EQ(0, buffer[i]);
   }
 
-  ASSERT_EQ((char)0xdd, buffer[10]);
+  ASSERT_EQ(0xddu, (unsigned char)buffer[10]);
 }
 
 UTF8_TEST(utf8ncpy, check_no_n_overflow) {
@@ -1724,6 +1729,9 @@ static void utf8_test_constexpr(void) {}
 #pragma clang diagnostic pop
 #endif
 
-UTF8_TEST(compile, cplusplus) { utf8_test_constexpr(); }
+UTF8_TEST(compile, cplusplus) {
+  (void)utest_result;
+  utf8_test_constexpr();
+}
 
 #endif
