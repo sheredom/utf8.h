@@ -211,7 +211,7 @@ utf8pbrk(const utf8_int8_t *str, const utf8_int8_t *accept);
 
 /* Find the last match of the utf8 codepoint chr in the utf8 string src. */
 utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *
-utf8rchr(const utf8_int8_t *src, int chr);
+utf8rchr(const utf8_int8_t *src, utf8_int32_t chr);
 
 /* Number of bytes in the utf8 string str,
  * including the null terminating byte. */
@@ -776,7 +776,7 @@ utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
   return c;
 }
 
-utf8_constexpr14_impl utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
+utf8_constexpr14_impl utf8_int8_t *utf8rchr(const utf8_int8_t *src, utf8_int32_t chr) {
 
   utf8_int8_t *match = utf8_null;
   utf8_int8_t c[5] = {'\0', '\0', '\0', '\0', '\0'};
@@ -788,22 +788,22 @@ utf8_constexpr14_impl utf8_int8_t *utf8rchr(const utf8_int8_t *src, int chr) {
       src++;
     }
     return (utf8_int8_t *)src;
-  } else if (0 == ((int)0xffffff80 & chr)) {
+  } else if (0 == ((utf8_int32_t)0xffffff80 & chr)) {
     /* 1-byte/7-bit ascii
      * (0b0xxxxxxx) */
     c[0] = (utf8_int8_t)chr;
-  } else if (0 == ((int)0xfffff800 & chr)) {
+  } else if (0 == ((utf8_int32_t)0xfffff800 & chr)) {
     /* 2-byte/11-bit utf8 code point
      * (0b110xxxxx 0b10xxxxxx) */
     c[0] = (utf8_int8_t)(0xc0 | (utf8_int8_t)(chr >> 6));
     c[1] = (utf8_int8_t)(0x80 | (utf8_int8_t)(chr & 0x3f));
-  } else if (0 == ((int)0xffff0000 & chr)) {
+  } else if (0 == ((utf8_int32_t)0xffff0000 & chr)) {
     /* 3-byte/16-bit utf8 code point
      * (0b1110xxxx 0b10xxxxxx 0b10xxxxxx) */
     c[0] = (utf8_int8_t)(0xe0 | (utf8_int8_t)(chr >> 12));
     c[1] = (utf8_int8_t)(0x80 | (utf8_int8_t)((chr >> 6) & 0x3f));
     c[2] = (utf8_int8_t)(0x80 | (utf8_int8_t)(chr & 0x3f));
-  } else { /* if (0 == ((int)0xffe00000 & chr)) { */
+  } else { /* if (0 == ((utf8_int32_t)0xffe00000 & chr)) { */
     /* 4-byte/21-bit utf8 code point
      * (0b11110xxx 0b10xxxxxx 0b10xxxxxx 0b10xxxxxx) */
     c[0] = (utf8_int8_t)(0xf0 | (utf8_int8_t)(chr >> 18));
