@@ -59,10 +59,18 @@
 #endif
 
 #if defined(_MSC_VER) && (_MSC_VER < 1920)
-typedef __int32 utf8_int32_t;
+  #if defined(USING_UINT32_T)
+    typedef unsigned __int32 utf8_int32_t;
+  #else
+    typedef __int32 utf8_int32_t;
+  #endif
 #else
 #include <stdint.h>
-typedef int32_t utf8_int32_t;
+  #if defined(USING_UINT32_T)
+    typedef uint32_t utf8_int32_t;
+  #else
+    typedef int32_t utf8_int32_t;
+  #endif
 #endif
 
 #if defined(__clang__)
@@ -345,7 +353,7 @@ utf8_constexpr14_impl int utf8casecmp(const utf8_int8_t *src1,
 
     /* if they don't match, then we return the difference between the characters
      */
-    return src1_lwr_cp - src2_lwr_cp;
+    return (int)src1_lwr_cp - (int)src2_lwr_cp;
   }
 }
 
@@ -600,7 +608,7 @@ utf8_constexpr14_impl int utf8ncasecmp(const utf8_int8_t *src1,
       const utf8_int32_t c2 = (0xe0 & *s2);
 
       if (c1 != c2) {
-        return c1 - c2;
+        return (int)c1 - (int)c2;
       } else {
         return 0;
       }
@@ -611,7 +619,7 @@ utf8_constexpr14_impl int utf8ncasecmp(const utf8_int8_t *src1,
       const utf8_int32_t c2 = (0xf0 & *s2);
 
       if (c1 != c2) {
-        return c1 - c2;
+        return (int)c1 - (int)c2;
       } else {
         return 0;
       }
@@ -622,7 +630,7 @@ utf8_constexpr14_impl int utf8ncasecmp(const utf8_int8_t *src1,
       const utf8_int32_t c2 = (0xf8 & *s2);
 
       if (c1 != c2) {
-        return c1 - c2;
+        return (int)c1 - (int)c2;
       } else {
         return 0;
       }
@@ -647,7 +655,7 @@ utf8_constexpr14_impl int utf8ncasecmp(const utf8_int8_t *src1,
 
     /* if they don't match, then we return the difference between the characters
      */
-    return src1_lwr_cp - src2_lwr_cp;
+    return (int)src1_lwr_cp - (int)src2_lwr_cp;
   } while (0 < n);
 
   /* both utf8 strings matched */
@@ -1387,7 +1395,7 @@ utf8_constexpr14_impl utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
              ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
              ((0x01cd <= cp) && (0x01dc >= cp))) {
     cp += 1;
-    cp &= ~0x1;
+    cp &= ~(utf8_int32_t)0x1;
   } else {
     switch (cp) {
     default:
@@ -1543,7 +1551,7 @@ utf8_constexpr14_impl utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
              ((0x03d8 <= cp) && (0x03ef >= cp)) ||
              ((0x0460 <= cp) && (0x0481 >= cp)) ||
              ((0x048a <= cp) && (0x04ff >= cp))) {
-    cp &= ~0x1;
+    cp &= ~(utf8_int32_t)0x1;
   } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
              ((0x0179 <= cp) && (0x017e >= cp)) ||
              ((0x01af <= cp) && (0x01b0 >= cp)) ||
@@ -1702,7 +1710,7 @@ utf8rcodepoint(const utf8_int8_t *utf8_restrict str,
     *out_codepoint = ((0x1f & s[0]) << 6) | (0x3f & s[1]);
   } else {
     /* 1 byte utf8 codepoint otherwise */
-    *out_codepoint = s[0];
+    *out_codepoint = (utf8_int32_t)s[0];
   }
 
   do {
