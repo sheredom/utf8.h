@@ -260,12 +260,16 @@ Returns 1 if the given character is uppercase, or 0 if it is not.
 ```c
 void utf8lwr(void *utf8_restrict str);
 ```
-Transform the given string into all lowercase codepoints.
+Transform the given string into all lowercase codepoints in place. This
+function does not allocate memory. All currently supported case mappings
+preserve the number of bytes in the encoded string.
 
 ```c
 void utf8upr(void *utf8_restrict str);
 ```
-Transform the given string into all uppercase codepoints.
+Transform the given string into all uppercase codepoints in place. This
+function does not allocate memory. All currently supported case mappings
+preserve the number of bytes in the encoded string.
 
 ```c
 utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp);

@@ -1330,6 +1330,15 @@ UTF8_TEST(utf8isupper, lower) {
   }
 }
 
+UTF8_TEST(case_mapping, preserves_encoded_size) {
+  utf8_int32_t i;
+
+  for (i = 0; 0 != lowupPairs[i].lower; i++) {
+    ASSERT_EQ(utf8codepointsize(lowupPairs[i].lower),
+              utf8codepointsize(lowupPairs[i].upper));
+  }
+}
+
 UTF8_TEST(utf8lwr, ascii) {
   size_t sz;
   char *str;

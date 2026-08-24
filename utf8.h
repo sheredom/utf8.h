@@ -280,10 +280,14 @@ utf8_constexpr14 int utf8islower(utf8_int32_t chr);
 /* Returns 1 if the given character is uppercase, or 0 if it is not. */
 utf8_constexpr14 int utf8isupper(utf8_int32_t chr);
 
-/* Transform the given string into all lowercase codepoints. */
+/* Transform the given string into all lowercase codepoints in place. This
+ * function does not allocate memory. All currently supported case mappings
+ * preserve the number of bytes in the encoded string. */
 utf8_nonnull utf8_weak void utf8lwr(utf8_int8_t *utf8_restrict str);
 
-/* Transform the given string into all uppercase codepoints. */
+/* Transform the given string into all uppercase codepoints in place. This
+ * function does not allocate memory. All currently supported case mappings
+ * preserve the number of bytes in the encoded string. */
 utf8_nonnull utf8_weak void utf8upr(utf8_int8_t *utf8_restrict str);
 
 /* Make a codepoint lower case if possible. */
@@ -1330,10 +1334,13 @@ void utf8lwr(utf8_int8_t *utf8_restrict str) {
 
   while (cp != 0) {
     const utf8_int32_t lwr_cp = utf8lwrcodepoint(cp);
-    const size_t size = utf8codepointsize(lwr_cp);
+    const size_t original_size = (size_t)(pn - str);
 
-    if (lwr_cp != cp) {
-      utf8catcodepoint(str, lwr_cp, size);
+    /* utf8lwr operates in place, so only write mappings which fit exactly in
+     * the codepoint's existing storage. */
+    if ((lwr_cp != cp) &&
+        (utf8codepointsize(lwr_cp) == original_size)) {
+      utf8catcodepoint(str, lwr_cp, original_size);
     }
 
     str = pn;
@@ -1346,11 +1353,14 @@ void utf8upr(utf8_int8_t *utf8_restrict str) {
   utf8_int8_t *pn = utf8codepoint(str, &cp);
 
   while (cp != 0) {
-    const utf8_int32_t lwr_cp = utf8uprcodepoint(cp);
-    const size_t size = utf8codepointsize(lwr_cp);
+    const utf8_int32_t upr_cp = utf8uprcodepoint(cp);
+    const size_t original_size = (size_t)(pn - str);
 
-    if (lwr_cp != cp) {
-      utf8catcodepoint(str, lwr_cp, size);
+    /* utf8upr operates in place, so only write mappings which fit exactly in
+     * the codepoint's existing storage. */
+    if ((upr_cp != cp) &&
+        (utf8codepointsize(upr_cp) == original_size)) {
+      utf8catcodepoint(str, upr_cp, original_size);
     }
 
     str = pn;
