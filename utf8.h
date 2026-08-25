@@ -1334,13 +1334,10 @@ void utf8lwr(utf8_int8_t *utf8_restrict str) {
 
   while (cp != 0) {
     const utf8_int32_t lwr_cp = utf8lwrcodepoint(cp);
-    const size_t original_size = (size_t)(pn - str);
+    const size_t size = utf8codepointsize(lwr_cp);
 
-    /* utf8lwr operates in place, so only write mappings which fit exactly in
-     * the codepoint's existing storage. */
-    if ((lwr_cp != cp) &&
-        (utf8codepointsize(lwr_cp) == original_size)) {
-      utf8catcodepoint(str, lwr_cp, original_size);
+    if (lwr_cp != cp) {
+      utf8catcodepoint(str, lwr_cp, size);
     }
 
     str = pn;
@@ -1353,14 +1350,11 @@ void utf8upr(utf8_int8_t *utf8_restrict str) {
   utf8_int8_t *pn = utf8codepoint(str, &cp);
 
   while (cp != 0) {
-    const utf8_int32_t upr_cp = utf8uprcodepoint(cp);
-    const size_t original_size = (size_t)(pn - str);
+    const utf8_int32_t lwr_cp = utf8uprcodepoint(cp);
+    const size_t size = utf8codepointsize(lwr_cp);
 
-    /* utf8upr operates in place, so only write mappings which fit exactly in
-     * the codepoint's existing storage. */
-    if ((upr_cp != cp) &&
-        (utf8codepointsize(upr_cp) == original_size)) {
-      utf8catcodepoint(str, upr_cp, original_size);
+    if (lwr_cp != cp) {
+      utf8catcodepoint(str, lwr_cp, size);
     }
 
     str = pn;
