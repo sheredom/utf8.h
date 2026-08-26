@@ -55,6 +55,7 @@ utf8valid | &#10004; | &#10004;
 utf8nvalid | &#10004; | &#10004;
 utf8makevalid | &#10004; |
 utf8codepointsize | &#10004; | &#10004;
+utf8codepointvisualwidth | &#10004; | &#10004;
 utf8catcodepoint | &#10004; |
 utf8isupper |  ~~&#10004;~~ | &#10004;
 utf8islower | ~~&#10004;~~ | &#10004;
@@ -238,6 +239,14 @@ address of the previous utf8 codepoint before the current one in `str`.
 size_t utf8codepointsize(utf8_int32_t chr);
 ```
 Returns the size of the given codepoint in bytes.
+
+```c
+int utf8codepointvisualwidth(utf8_int32_t chr);
+```
+Returns the number of terminal columns the given codepoint occupies when
+printed with a fixed-width font: 0 for zero-width codepoints (the null
+codepoint and combining marks), 2 for wide (double-width) codepoints, 1 for
+ordinary codepoints, and -1 for non-printable control codepoints.
 
 ```c
 void *utf8catcodepoint(void *utf8_restrict str, utf8_int32_t chr, size_t n);
