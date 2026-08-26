@@ -1282,6 +1282,33 @@ UTF8_TEST(utf8codepointsize, size_1) { ASSERT_EQ(1, utf8codepointsize('A')); }
 
 UTF8_TEST(utf8codepointsize, size_4) { ASSERT_EQ(4, utf8codepointsize(0x20C78)); }
 
+UTF8_TEST(utf8codepointvisualwidth, null) {
+  ASSERT_EQ(0, utf8codepointvisualwidth(0));
+}
+
+UTF8_TEST(utf8codepointvisualwidth, ascii) {
+  ASSERT_EQ(1, utf8codepointvisualwidth('A'));
+}
+
+UTF8_TEST(utf8codepointvisualwidth, control) {
+  ASSERT_EQ(-1, utf8codepointvisualwidth(0x01));
+  ASSERT_EQ(-1, utf8codepointvisualwidth(0x7f));
+  ASSERT_EQ(-1, utf8codepointvisualwidth(0x9f));
+}
+
+UTF8_TEST(utf8codepointvisualwidth, combining) {
+  ASSERT_EQ(0, utf8codepointvisualwidth(0x0301));
+  ASSERT_EQ(0, utf8codepointvisualwidth(0x200B));
+  ASSERT_EQ(0, utf8codepointvisualwidth(0xFE0F));
+}
+
+UTF8_TEST(utf8codepointvisualwidth, wide) {
+  ASSERT_EQ(2, utf8codepointvisualwidth(0x4E00));
+  ASSERT_EQ(2, utf8codepointvisualwidth(0xAC00));
+  ASSERT_EQ(2, utf8codepointvisualwidth(0xFF01));
+  ASSERT_EQ(2, utf8codepointvisualwidth(0x20000));
+}
+
 UTF8_TEST(utf8catcodepoint, data) {
   char buffer[129];
   char *p = buffer;
