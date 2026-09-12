@@ -1703,6 +1703,43 @@ UTF8_TEST(utf8makevalid, invalid_replacement) {
   ASSERT_NE(0, utf8makevalid(invalid, 0x80));
 }
 
+UTF8_TEST(utf8makevalid, replaces_non_scalar_values) {
+  const char *const inputs[] = {
+      "A\xed\xa0\x80" "B", "A\xed\xbf\xbf" "B",
+      "A\xf0\x8d\xa0\x80" "B", "A\xf0\x8d\xbf\xbf" "B",
+      "A\xf4\x90\x80\x80" "B", "A\xf4\xbf\xbf\xbf" "B",
+      "A\xf5\x80\x80\x80" "B", "A\xf7\xbf\xbf\xbf" "B"};
+  const char *const expected[] = {"A???B", "A???B", "A????B", "A????B",
+                                 "A????B", "A????B", "A????B", "A????B"};
+  size_t i;
+
+  for (i = 0; i < sizeof(inputs) / sizeof(inputs[0]); i++) {
+    char repaired[7];
+    strcpy(repaired, inputs[i]);
+
+    ASSERT_EQ(0, utf8makevalid(repaired, '?'));
+    EXPECT_STREQ(expected[i], repaired);
+  }
+}
+
+UTF8_TEST(utf8makevalid, preserves_scalar_boundaries) {
+  const char valid[] = "A\x7f\xc2\x80\xdf\xbf\xe0\xa0\x80"
+                       "\xed\x9f\xbf\xee\x80\x80\xef\xbf\xbf"
+                       "\xf0\x90\x80\x80\xf4\x8f\xbf\xbf" "B";
+  char repaired[sizeof(valid)];
+  memcpy(repaired, valid, sizeof(valid));
+
+  ASSERT_EQ(0, utf8makevalid(repaired, '?'));
+  ASSERT_EQ(0, memcmp(valid, repaired, sizeof(valid)));
+}
+
+UTF8_TEST(utf8makevalid, non_scalar_followed_by_truncated_sequence) {
+  char invalid[] = "\xed\xa0\x80\xf0\x9f";
+
+  ASSERT_EQ(0, utf8makevalid(invalid, '!'));
+  ASSERT_STREQ("!!!!!", invalid);
+}
+
 UTF8_TEST(utf8nvalid, exactly_2_bytes) {
   const char terminated[] = "\xc2\xa3";
   ASSERT_EQ(utf8nvalid(terminated, 2), NULL);

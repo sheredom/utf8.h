@@ -1176,7 +1176,15 @@ int utf8makevalid(utf8_int8_t *str, const utf8_int32_t replacement) {
       }
 
       /* 4-byte utf8 code point (began with 0b11110xxx) */
-      read = utf8codepoint(read, &codepoint);
+      (void)utf8codepoint(read, &codepoint);
+      if ((codepoint > 0x10ffff) ||
+          ((codepoint >= 0xd800) && (codepoint <= 0xdfff))) {
+        /* Invalid scalar values cannot be repaired by re-encoding them. */
+        *write++ = r;
+        read++;
+        continue;
+      }
+      read += 4;
       write = utf8catcodepoint(write, codepoint, 4);
     } else if (0xe0 == (0xf0 & *read)) {
       /* ensure each of the 2 following bytes in this 3-byte
@@ -1188,7 +1196,14 @@ int utf8makevalid(utf8_int8_t *str, const utf8_int32_t replacement) {
       }
 
       /* 3-byte utf8 code point (began with 0b1110xxxx) */
-      read = utf8codepoint(read, &codepoint);
+      (void)utf8codepoint(read, &codepoint);
+      if ((codepoint >= 0xd800) && (codepoint <= 0xdfff)) {
+        /* UTF-16 surrogate code points are not valid Unicode scalars. */
+        *write++ = r;
+        read++;
+        continue;
+      }
+      read += 3;
       write = utf8catcodepoint(write, codepoint, 3);
     } else if (0xc0 == (0xe0 & *read)) {
       /* ensure the 1 following byte in this 2-byte
