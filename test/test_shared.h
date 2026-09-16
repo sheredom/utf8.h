@@ -1715,7 +1715,7 @@ UTF8_TEST(utf8makevalid, replaces_non_scalar_values) {
 
   for (i = 0; i < sizeof(inputs) / sizeof(inputs[0]); i++) {
     char repaired[7];
-    strcpy(repaired, inputs[i]);
+    memcpy(repaired, inputs[i], strlen(inputs[i]) + 1);
 
     ASSERT_EQ(0, utf8makevalid(repaired, '?'));
     EXPECT_STREQ(expected[i], repaired);
