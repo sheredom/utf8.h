@@ -1387,6 +1387,14 @@ utf8_constexpr14_impl utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
     cp += 32;
   } else if ((0x0400 <= cp) && (0x040f >= cp)) {
     cp += 80;
+  } else if ((0x0531 <= cp) && (0x0556 >= cp)) {
+    /* Armenian */
+    cp += 48;
+  } else if ((0x13a0 <= cp) && (0x13ef >= cp)) {
+    /* Cherokee to Cherokee Supplement */
+    cp += 0x97d0;
+  } else if ((0x13f0 <= cp) && (0x13f5 >= cp)) {
+    cp += 8;
   } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
              ((0x0132 <= cp) && (0x0137 >= cp)) ||
              ((0x014a <= cp) && (0x0177 >= cp)) ||
@@ -1550,6 +1558,14 @@ utf8_constexpr14_impl utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
     cp -= 32;
   } else if ((0x0450 <= cp) && (0x045f >= cp)) {
     cp -= 80;
+  } else if ((0x0561 <= cp) && (0x0586 >= cp)) {
+    /* Armenian */
+    cp -= 48;
+  } else if ((0xab70 <= cp) && (0xabbf >= cp)) {
+    /* Cherokee Supplement to Cherokee */
+    cp -= 0x97d0;
+  } else if ((0x13f8 <= cp) && (0x13fd >= cp)) {
+    cp -= 8;
   } else if (((0x0100 <= cp) && (0x012f >= cp)) ||
              ((0x0132 <= cp) && (0x0137 >= cp)) ||
              ((0x014a <= cp) && (0x0177 >= cp)) ||
