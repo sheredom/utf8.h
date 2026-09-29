@@ -295,6 +295,8 @@ insensitive code:
 * [Latin Extended-B](https://en.wikipedia.org/wiki/Latin_Extended-B)
 * [Greek and Coptic](https://en.wikipedia.org/wiki/Greek_and_Coptic)
 * [Cyrillic](https://en.wikipedia.org/wiki/Cyrillic_(Unicode_block))
+* [Armenian](https://en.wikipedia.org/wiki/Armenian_(Unicode_block)) (U+0531 to U+0556)
+* [Cherokee](https://en.wikipedia.org/wiki/Cherokee_(Unicode_block)) and [Cherokee Supplement](https://en.wikipedia.org/wiki/Cherokee_Supplement)
 
 ## Todo
 
