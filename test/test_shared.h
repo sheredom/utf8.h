@@ -1956,6 +1956,50 @@ UTF8_TEST(utf8nvalid, exactly_4_bytes) {
 
 #endif
 
+UTF8_TEST(utf8cmp, unsigned_ordering) {
+  /* Ordered by codepoint, including empty strings and a shared prefix. */
+  const utf8_int8_t strings[][5] = {
+      {0},
+      {'a', 0},
+      {'a', (utf8_int8_t)0xc3, (utf8_int8_t)0xa9, 0},
+      {0x7f, 0},
+      {(utf8_int8_t)0xc2, (utf8_int8_t)0x80, 0},
+      {(utf8_int8_t)0xdf, (utf8_int8_t)0xbf, 0},
+      {(utf8_int8_t)0xe0, (utf8_int8_t)0xa0, (utf8_int8_t)0x80, 0},
+      {(utf8_int8_t)0xf0, (utf8_int8_t)0x90, (utf8_int8_t)0x80,
+       (utf8_int8_t)0x80, 0}};
+  size_t i, j;
+
+  for (i = 0; i < sizeof(strings) / sizeof(strings[0]); i++) {
+    for (j = 0; j < sizeof(strings) / sizeof(strings[0]); j++) {
+      if (i < j) {
+        ASSERT_LT(utf8cmp(strings[i], strings[j]), 0);
+        ASSERT_LT(utf8ncmp(strings[i], strings[j], sizeof(strings[0])), 0);
+      } else if (i > j) {
+        ASSERT_GT(utf8cmp(strings[i], strings[j]), 0);
+        ASSERT_GT(utf8ncmp(strings[i], strings[j], sizeof(strings[0])), 0);
+      } else {
+        ASSERT_EQ(utf8cmp(strings[i], strings[j]), 0);
+        ASSERT_EQ(utf8ncmp(strings[i], strings[j], sizeof(strings[0])), 0);
+      }
+    }
+  }
+}
+
+UTF8_TEST(utf8ncmp, unsigned_byte_limit) {
+  const utf8_int8_t prefix[] = {'a', 0};
+  const utf8_int8_t lower[] = {'a', (utf8_int8_t)0xc2, (utf8_int8_t)0x80, 0};
+  const utf8_int8_t higher[] = {'a', (utf8_int8_t)0xc3, (utf8_int8_t)0xa9, 0};
+
+  ASSERT_EQ(utf8ncmp(prefix, lower, 0), 0);
+  ASSERT_EQ(utf8ncmp(prefix, lower, 1), 0);
+  ASSERT_LT(utf8ncmp(prefix, lower, 2), 0);
+  ASSERT_GT(utf8ncmp(lower, prefix, 2), 0);
+  ASSERT_EQ(utf8ncmp(lower, higher, 1), 0);
+  ASSERT_LT(utf8ncmp(lower, higher, 2), 0);
+  ASSERT_GT(utf8ncmp(higher, lower, 2), 0);
+}
+
 #if defined(__cplusplus)
 
 #if defined(__clang__)
@@ -1969,16 +2013,21 @@ UTF8_TEST(utf8nvalid, exactly_4_bytes) {
 static constexpr void utf8_test_constexpr(void) {
   constexpr utf8_int8_t in_str[20]{};
   constexpr utf8_int32_t in_chr{};
+  constexpr utf8_int8_t ascii[] = {'a', 0};
+  constexpr utf8_int8_t nonascii[] = {(utf8_int8_t)0xc3, (utf8_int8_t)0xa9, 0};
   utf8_int32_t out_chr{};
 
   utf8codepoint(in_str, &out_chr);
   utf8rcodepoint(in_str + 1, &out_chr);
   static_assert(utf8chr(in_str, utf8_int32_t{}), "utf8 constexpr fail");
   static_assert(utf8cmp(in_str, in_str) == 0, "utf8 constexpr fail");
+  static_assert(utf8cmp(ascii, nonascii) < 0, "utf8cmp unsigned ordering");
+  static_assert(utf8cmp(in_str, nonascii) < 0, "utf8cmp empty string ordering");
   static_assert(utf8cspn(in_str, in_str) == 0, "utf8 constexpr fail");
   static_assert(utf8len(in_str) == 0, "utf8 constexpr fail");
   static_assert(utf8nlen(in_str, 1) == 0, "utf8 constexpr fail");
   static_assert(utf8ncmp(in_str, in_str, 1) == 0, "utf8 constexpr fail");
+  static_assert(utf8ncmp(ascii, nonascii, 1) < 0, "utf8ncmp unsigned ordering");
   static_assert(utf8pbrk(in_str, in_str) == nullptr, "utf8 constexpr fail");
   static_assert(utf8rchr(in_str, 1) == nullptr, "utf8 constexpr fail");
   static_assert(utf8spn(in_str, in_str) == 0, "utf8 constexpr fail");

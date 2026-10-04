@@ -416,9 +416,9 @@ utf8_constexpr14_impl utf8_int8_t *utf8chr(const utf8_int8_t *src,
 utf8_constexpr14_impl int utf8cmp(const utf8_int8_t *src1,
                                   const utf8_int8_t *src2) {
   while (('\0' != *src1) || ('\0' != *src2)) {
-    if (*src1 < *src2) {
+    if ((unsigned char)*src1 < (unsigned char)*src2) {
       return -1;
-    } else if (*src1 > *src2) {
+    } else if ((unsigned char)*src1 > (unsigned char)*src2) {
       return 1;
     }
 
@@ -682,9 +682,9 @@ utf8_int8_t *utf8ncat(utf8_int8_t *utf8_restrict dst,
 utf8_constexpr14_impl int utf8ncmp(const utf8_int8_t *src1,
                                    const utf8_int8_t *src2, size_t n) {
   while ((0 != n--) && (('\0' != *src1) || ('\0' != *src2))) {
-    if (*src1 < *src2) {
+    if ((unsigned char)*src1 < (unsigned char)*src2) {
       return -1;
-    } else if (*src1 > *src2) {
+    } else if ((unsigned char)*src1 > (unsigned char)*src2) {
       return 1;
     }
 
