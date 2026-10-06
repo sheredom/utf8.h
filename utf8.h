@@ -1088,6 +1088,12 @@ utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
         return (utf8_int8_t *)str;
       }
 
+      /* ensure that the codepoint is not above U+10FFFF */
+      if (((0x07 & str[0]) > 4) ||
+          ((4 == (0x07 & str[0])) && (0 != (0x30 & str[1])))) {
+        return (utf8_int8_t *)str;
+      }
+
       /* 4-byte utf8 code point (began with 0b11110xxx) */
       str += 4;
     } else if (0xe0 == (0xf0 & *str)) {
@@ -1111,6 +1117,11 @@ utf8_constexpr14_impl utf8_int8_t *utf8nvalid(const utf8_int8_t *str,
        * codepoint were not 0, as then we could have used
        * one of the smaller encodings */
       if ((0 == (0x0f & str[0])) && (0 == (0x20 & str[1]))) {
+        return (utf8_int8_t *)str;
+      }
+
+      /* ensure that the codepoint is not a surrogate (U+D800..U+DFFF) */
+      if ((0x0d == (0x0f & str[0])) && (0 != (0x20 & str[1]))) {
         return (utf8_int8_t *)str;
       }
 

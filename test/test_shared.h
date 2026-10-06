@@ -1938,6 +1938,28 @@ UTF8_TEST(utf8makevalid, non_scalar_followed_by_truncated_sequence) {
   ASSERT_STREQ("!!!!!", invalid);
 }
 
+UTF8_TEST(utf8valid, rejects_non_scalar_values) {
+  const char *const inputs[] = {
+      "A\xed\xa0\x80" "B", "A\xed\xbf\xbf" "B",
+      "A\xf4\x90\x80\x80" "B", "A\xf4\xbf\xbf\xbf" "B",
+      "A\xf5\x80\x80\x80" "B", "A\xf7\xbf\xbf\xbf" "B"};
+  size_t i;
+
+  for (i = 0; i < sizeof(inputs) / sizeof(inputs[0]); i++) {
+    EXPECT_EQ(inputs[i] + 1, utf8valid(inputs[i]));
+    EXPECT_EQ(inputs[i] + 1, utf8nvalid(inputs[i], strlen(inputs[i])));
+  }
+}
+
+UTF8_TEST(utf8valid, accepts_scalar_boundaries) {
+  const char valid[] = "A\x7f\xc2\x80\xdf\xbf\xe0\xa0\x80"
+                       "\xed\x9f\xbf\xee\x80\x80\xef\xbf\xbf"
+                       "\xf0\x90\x80\x80\xf4\x8f\xbf\xbf" "B";
+
+  ASSERT_EQ(NULL, utf8valid(valid));
+  ASSERT_EQ(NULL, utf8nvalid(valid, sizeof(valid) - 1));
+}
+
 UTF8_TEST(utf8nvalid, exactly_2_bytes) {
   const char terminated[] = "\xc2\xa3";
   ASSERT_EQ(utf8nvalid(terminated, 2), NULL);
