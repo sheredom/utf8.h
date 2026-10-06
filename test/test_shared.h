@@ -1957,6 +1957,11 @@ UTF8_TEST(utf8nvalid, exactly_4_bytes) {
 
 #endif
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable : 4310) /* 2026-10-07 */
+#endif
+
 UTF8_TEST(utf8cmp, unsigned_ordering) {
   /* Ordered by codepoint, including empty strings and a shared prefix. */
   const utf8_int8_t strings[][5] = {
@@ -2060,4 +2065,8 @@ UTF8_TEST(compile, cplusplus) {
   utf8_test_constexpr();
 }
 
+#endif
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
 #endif
