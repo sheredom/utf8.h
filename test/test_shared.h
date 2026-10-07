@@ -22,7 +22,7 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wold-style-cast" /* 2026-10-07 */
+#pragma clang diagnostic ignored "-Wold-style-cast"
 #pragma clang diagnostic ignored "-Wsign-compare"
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wsign-conversion"
@@ -1959,7 +1959,7 @@ UTF8_TEST(utf8nvalid, exactly_4_bytes) {
 
 #if defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable : 4310) /* 2026-10-07 */
+#pragma warning(disable : 4310)
 #endif
 
 UTF8_TEST(utf8cmp, unsigned_ordering) {
