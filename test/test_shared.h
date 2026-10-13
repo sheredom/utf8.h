@@ -1564,6 +1564,22 @@ UTF8_TEST(utf8lwrcodepoint, armenian_cherokee) {
   ASSERT_EQ(0x13f6, utf8lwrcodepoint(0x13f6));
 }
 
+UTF8_TEST(utf8uprcodepoint, greek_final_sigma) {
+  /* U+03C2 (final sigma) uppercases to U+03A3, the same as U+03C3. */
+  ASSERT_EQ(0x03a3, utf8uprcodepoint(0x03c2));
+  ASSERT_EQ(0x03a3, utf8uprcodepoint(0x03c3));
+  ASSERT_TRUE(utf8islower(0x03c2));
+  ASSERT_FALSE(utf8isupper(0x03c2));
+}
+
+UTF8_TEST(utf8upr, greek_final_sigma) {
+  /* "ος" ends in final sigma; uppercasing must not leave it lowercase. */
+  utf8_int8_t str[] = {'\xce', '\xbf', '\xcf', '\x82', '\0'};
+  const utf8_int8_t expected[] = {'\xce', '\x9f', '\xce', '\xa3', '\0'};
+  utf8upr(str);
+  ASSERT_EQ(0, utf8cmp(str, expected));
+}
+
 UTF8_TEST(utf8uprcodepoint, armenian_cherokee) {
   utf8_int32_t cp;
 

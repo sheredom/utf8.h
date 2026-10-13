@@ -1604,6 +1604,10 @@ utf8_constexpr14_impl utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
     case 0x00ff:
       cp = 0x0178;
       break;
+    case 0x03c2:
+      /* final sigma has no uppercase form of its own */
+      cp = 0x03a3;
+      break;
     case 0x0180:
       cp = 0x0243;
       break;
