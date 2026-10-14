@@ -863,6 +863,116 @@ UTF8_TEST(utf8casestr, latin) {
   ASSERT_EQ(lowersStr, utf8casestr(lowersStr, uppersStr));
 }
 
+UTF8_TEST(utf8ncasestr, widths) {
+  static const utf8_int8_t width_haystack[] = {
+      'A', 0xc3, 0xa9, 0xe2, 0x82, 0xac, 0xf0, 0x9f, 0x8c, 0x8d};
+  static const utf8_int8_t ascii_needle[] = {'a'};
+  static const utf8_int8_t two_byte_needle[] = {0xc3, 0x89};
+  static const utf8_int8_t three_byte_needle[] = {0xe2, 0x82, 0xac};
+  static const utf8_int8_t four_byte_needle[] = {0xf0, 0x9f, 0x8c, 0x8d};
+  static const utf8_int8_t missing_needle[] = {'z'};
+
+  ASSERT_EQ(width_haystack,
+            utf8ncasestr(width_haystack, sizeof(width_haystack), ascii_needle,
+                         sizeof(ascii_needle)));
+  ASSERT_EQ(width_haystack + 1,
+            utf8ncasestr(width_haystack, sizeof(width_haystack),
+                         two_byte_needle, sizeof(two_byte_needle)));
+  ASSERT_EQ(width_haystack + 3,
+            utf8ncasestr(width_haystack, sizeof(width_haystack),
+                         three_byte_needle, sizeof(three_byte_needle)));
+  ASSERT_EQ(width_haystack + 6,
+            utf8ncasestr(width_haystack, sizeof(width_haystack),
+                         four_byte_needle, sizeof(four_byte_needle)));
+  ASSERT_EQ((void *)0,
+            utf8ncasestr(width_haystack, sizeof(width_haystack),
+                         missing_needle, sizeof(missing_needle)));
+}
+
+UTF8_TEST(utf8ncasestr, multilingual_casefold) {
+  static const utf8_int8_t greek_needle[] = {0xce, 0x9c, 0xce, 0xa5};
+  static const utf8_int8_t greek_missing_needle[] = {0xce, 0x9c, 0xce, 0xa6};
+
+  ASSERT_EQ(data + 21, utf8ncasestr(data, sizeof(data) - 1, cmp, sizeof(cmp) - 1));
+  ASSERT_EQ(data + 21,
+            utf8ncasestr(data, sizeof(data) - 1, greek_needle,
+                         sizeof(greek_needle)));
+  ASSERT_EQ((void *)0,
+            utf8ncasestr(data, sizeof(data) - 1, greek_missing_needle,
+                         sizeof(greek_missing_needle)));
+  ASSERT_EQ(lowersStr,
+            utf8ncasestr(lowersStr, sizeof(lowersStr) - 1, uppersStr,
+                         sizeof(uppersStr) - 1));
+}
+
+UTF8_TEST(utf8ncasestr, zero_lengths_and_embedded_nul) {
+  static const utf8_int8_t embedded_haystack[] = {'a', '\0', 'B'};
+  static const utf8_int8_t embedded_needle[] = {'\0', 'b'};
+  static const utf8_int8_t nonempty_needle[] = {'a'};
+
+  ASSERT_EQ(embedded_haystack,
+            utf8ncasestr(embedded_haystack, 0, embedded_needle, 0));
+  ASSERT_EQ(embedded_haystack,
+            utf8ncasestr(embedded_haystack, sizeof(embedded_haystack),
+                         embedded_haystack, 0));
+  ASSERT_EQ((void *)0,
+            utf8ncasestr(embedded_haystack, 0, nonempty_needle,
+                         sizeof(nonempty_needle)));
+  ASSERT_EQ(embedded_haystack + 1,
+            utf8ncasestr(embedded_haystack, sizeof(embedded_haystack),
+                         embedded_needle, sizeof(embedded_needle)));
+}
+
+UTF8_TEST(utf8ncasestr, respects_slice_limits) {
+  static const utf8_int8_t slice_haystack[] = {'f', 'o', 'o', 'b', 'a', 'r'};
+  static const utf8_int8_t slice_needle[] = {'b', 'a', 'r'};
+
+  ASSERT_EQ(slice_haystack + 3,
+            utf8ncasestr(slice_haystack, sizeof(slice_haystack), slice_needle,
+                         sizeof(slice_needle)));
+  ASSERT_EQ((void *)0,
+            utf8ncasestr(slice_haystack, sizeof(slice_haystack) - 1,
+                         slice_needle, sizeof(slice_needle)));
+}
+
+UTF8_TEST(utf8ncasestr, incomplete_codepoints) {
+  static const utf8_int8_t two_byte[] = {0xc3, 0xa9};
+  static const utf8_int8_t three_byte[] = {0xe2, 0x82, 0xac};
+  static const utf8_int8_t four_byte[] = {0xf0, 0x9f, 0x8c, 0x8d};
+
+  ASSERT_EQ((void *)0,
+            utf8ncasestr(two_byte, 1, two_byte, sizeof(two_byte)));
+  ASSERT_EQ((void *)0,
+            utf8ncasestr(three_byte, 2, three_byte, sizeof(three_byte)));
+  ASSERT_EQ((void *)0,
+            utf8ncasestr(four_byte, 3, four_byte, sizeof(four_byte)));
+  ASSERT_EQ((void *)0, utf8ncasestr(two_byte, sizeof(two_byte), two_byte, 1));
+  ASSERT_EQ((void *)0,
+            utf8ncasestr(three_byte, sizeof(three_byte), three_byte, 2));
+  ASSERT_EQ((void *)0,
+            utf8ncasestr(four_byte, sizeof(four_byte), four_byte, 3));
+}
+
+UTF8_TEST(utf8ncasestr, rejects_invalid_scalars) {
+  static const utf8_int8_t invalid_scalar_haystack[] = {(utf8_int8_t)0xff, 'A'};
+  static const utf8_int8_t valid_ascii_needle[] = {'a'};
+  static const utf8_int8_t overlong[] = {(utf8_int8_t)0xc0, (utf8_int8_t)0xaf};
+  static const utf8_int8_t surrogate[] = {
+      (utf8_int8_t)0xed, (utf8_int8_t)0xa0, (utf8_int8_t)0x80};
+  static const utf8_int8_t above_maximum[] = {
+      (utf8_int8_t)0xf4, (utf8_int8_t)0x90,
+      (utf8_int8_t)0x80, (utf8_int8_t)0x80};
+
+  ASSERT_EQ(invalid_scalar_haystack + 1,
+            utf8ncasestr(invalid_scalar_haystack, sizeof(invalid_scalar_haystack), valid_ascii_needle, sizeof(valid_ascii_needle)));
+  ASSERT_EQ((void *)0, utf8ncasestr(invalid_scalar_haystack, sizeof(invalid_scalar_haystack),
+                                  overlong, sizeof(overlong)));
+  ASSERT_EQ((void *)0, utf8ncasestr(invalid_scalar_haystack, sizeof(invalid_scalar_haystack),
+                                  surrogate, sizeof(surrogate)));
+  ASSERT_EQ((void *)0, utf8ncasestr(invalid_scalar_haystack, sizeof(invalid_scalar_haystack),
+                                  above_maximum, sizeof(above_maximum)));
+}
+
 UTF8_TEST(utf8chr, a) { ASSERT_EQ(data + 21, utf8chr(data, 0x3bc)); }
 
 UTF8_TEST(utf8chr, b) { ASSERT_EQ(NULL, utf8chr(data, 0x20ac)); }

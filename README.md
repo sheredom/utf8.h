@@ -53,6 +53,7 @@ utf8size\_lazy | &#10004; | &#10004;
 utf8nsize\_lazy | &#10004; | &#10004;
 utf8valid | &#10004; | &#10004;
 utf8nvalid | &#10004; | &#10004;
+utf8ncasestr | &#10004; | &#10004;
 utf8makevalid | &#10004; |
 utf8codepointsize | &#10004; | &#10004;
 utf8catcodepoint | &#10004; |
@@ -205,6 +206,19 @@ void *utf8casestr(const void *haystack, const void *needle);
 ```
 The position of the utf8 string `needle` in the utf8 string `haystack`, 
 case insensitive.
+
+```c
+void *utf8ncasestr(const void *haystack, size_t haystack_len,
+                   const void *needle, size_t needle_len);
+```
+The position of `needle` in the `haystack` byte slice, case insensitive.
+Arguments are ordered as haystack pointer, haystack byte length, needle
+pointer, and needle byte length. Lengths do not include or imply a terminating
+null byte. Embedded null bytes are searched as U+0000. An empty needle returns
+the haystack pointer, including when the haystack length is zero. A needle
+slice containing an incomplete or invalid UTF-8 codepoint does not match;
+incomplete or invalid bytes in the haystack are skipped, and matches must begin
+and end at complete codepoint boundaries.
 
 ```c
 void *utf8valid(const void *str);
