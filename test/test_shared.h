@@ -954,6 +954,7 @@ UTF8_TEST(utf8ncasestr, incomplete_codepoints) {
 }
 
 UTF8_TEST(utf8ncasestr, rejects_invalid_scalars) {
+#if defined(utf8_cplusplus) && utf8_cplusplus >= 202002L && defined(__cpp_char8_t)
   static const utf8_int8_t invalid_scalar_haystack[] = {(utf8_int8_t)0xff, 'A'};
   static const utf8_int8_t valid_ascii_needle[] = {'a'};
   static const utf8_int8_t overlong[] = {(utf8_int8_t)0xc0, (utf8_int8_t)0xaf};
@@ -962,6 +963,16 @@ UTF8_TEST(utf8ncasestr, rejects_invalid_scalars) {
   static const utf8_int8_t above_maximum[] = {
       (utf8_int8_t)0xf4, (utf8_int8_t)0x90,
       (utf8_int8_t)0x80, (utf8_int8_t)0x80};
+#else
+  static const utf8_int8_t invalid_scalar_haystack[] = {'\xff', 'A'};
+  static const utf8_int8_t valid_ascii_needle[] = {'a'};
+  static const utf8_int8_t overlong[] = {'\xc0', '\xaf'};
+  static const utf8_int8_t surrogate[] = {
+      '\xed', '\xa0', '\x80'};
+  static const utf8_int8_t above_maximum[] = {
+      '\xf4', '\x90',
+      '\x80', '\x80'};
+#endif
 
   ASSERT_EQ(invalid_scalar_haystack + 1,
             utf8ncasestr(invalid_scalar_haystack, sizeof(invalid_scalar_haystack), valid_ascii_needle, sizeof(valid_ascii_needle)));
