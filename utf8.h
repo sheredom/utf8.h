@@ -240,14 +240,7 @@ utf8str(const utf8_int8_t *haystack, const utf8_int8_t *needle);
 utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *
 utf8casestr(const utf8_int8_t *haystack, const utf8_int8_t *needle);
 
-/* Internal bounded decoder used by utf8ncasestr. */
-utf8_constexpr14 int utf8ncasestr_decode(const utf8_int8_t *str, size_t n,
-                                         utf8_int32_t *out_codepoint,
-                                         size_t *out_size);
-
-/* Search bounded byte slices, case insensitive. Arguments are ordered as
- * haystack, haystack_len, needle, needle_len; lengths are in bytes and
- * embedded null bytes are treated as U+0000 rather than terminators. */
+/* The position of needle in haystack, case insensitive. */
 utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *
 utf8ncasestr(const utf8_int8_t *haystack, size_t haystack_len,
              const utf8_int8_t *needle, size_t needle_len);
@@ -330,6 +323,11 @@ utf8_weak utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
                                    utf8_int8_t *(*alloc_func_ptr)(utf8_int8_t *,
                                                                   size_t),
                                    utf8_int8_t *user_data);
+
+/* Implementation helper; use the same linkage as the public functions. */
+utf8_constexpr14 int
+utf8ncasestr_decode_codepoint(const utf8_int8_t *str, size_t n,
+                              utf8_int32_t *out_codepoint, size_t *out_size);
 
 #undef utf8_weak
 #undef utf8_pure
@@ -1063,9 +1061,10 @@ utf8_constexpr14_impl utf8_int8_t *utf8casestr(const utf8_int8_t *haystack,
   }
 }
 
+/* Read one complete UTF-8 codepoint without reading beyond n bytes. */
 utf8_constexpr14_impl int
-utf8ncasestr_decode(const utf8_int8_t *str, size_t n,
-                     utf8_int32_t *out_codepoint, size_t *out_size) {
+utf8ncasestr_decode_codepoint(const utf8_int8_t *str, size_t n,
+                              utf8_int32_t *out_codepoint, size_t *out_size) {
   unsigned char lead = 0, continuation = 0;
   size_t width = 0, index = 0;
   utf8_int32_t codepoint = 0;
@@ -1132,8 +1131,9 @@ utf8ncasestr(const utf8_int8_t *haystack, size_t haystack_len,
 
   /* Reject needles that end within, or contain invalid, codepoints. */
   while (needle_offset < needle_len) {
-    if (!utf8ncasestr_decode(needle + needle_offset, needle_len - needle_offset,
-                        &needle_codepoint, &codepoint_size)) {
+    if (!utf8ncasestr_decode_codepoint(
+            needle + needle_offset, needle_len - needle_offset,
+            &needle_codepoint, &codepoint_size)) {
       return utf8_null;
     }
     needle_offset += codepoint_size;
@@ -1142,9 +1142,9 @@ utf8ncasestr(const utf8_int8_t *haystack, size_t haystack_len,
   haystack_offset = 0;
   while (haystack_offset < haystack_len) {
     haystack_start = haystack_offset;
-    if (!utf8ncasestr_decode(haystack + haystack_offset,
-                        haystack_len - haystack_offset, &haystack_codepoint,
-                        &codepoint_size)) {
+    if (!utf8ncasestr_decode_codepoint(
+            haystack + haystack_offset, haystack_len - haystack_offset,
+            &haystack_codepoint, &codepoint_size)) {
       /* Invalid bytes cannot start a match; continue looking after the byte. */
       haystack_offset++;
       continue;
@@ -1156,16 +1156,17 @@ utf8ncasestr(const utf8_int8_t *haystack, size_t haystack_len,
     matches = 1;
 
     while (needle_offset < needle_len) {
-      if (!utf8ncasestr_decode(haystack + match_haystack_offset,
-                          haystack_len - match_haystack_offset,
-                          &haystack_codepoint,
-                          &haystack_codepoint_size)) {
+      if (!utf8ncasestr_decode_codepoint(
+              haystack + match_haystack_offset,
+              haystack_len - match_haystack_offset, &haystack_codepoint,
+              &haystack_codepoint_size)) {
         matches = 0;
         break;
       }
 
-      if (!utf8ncasestr_decode(needle + needle_offset, needle_len - needle_offset,
-                          &needle_codepoint, &needle_codepoint_size)) {
+      if (!utf8ncasestr_decode_codepoint(
+              needle + needle_offset, needle_len - needle_offset,
+              &needle_codepoint, &needle_codepoint_size)) {
         matches = 0;
         break;
       }
