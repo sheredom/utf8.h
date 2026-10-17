@@ -53,6 +53,7 @@ utf8size\_lazy | &#10004; | &#10004;
 utf8nsize\_lazy | &#10004; | &#10004;
 utf8valid | &#10004; | &#10004;
 utf8nvalid | &#10004; | &#10004;
+utf8ncasestr | &#10004; | &#10004;
 utf8makevalid | &#10004; |
 utf8codepointsize | &#10004; | &#10004;
 utf8codepointvisualwidth | &#10004; | &#10004;
@@ -206,6 +207,12 @@ void *utf8casestr(const void *haystack, const void *needle);
 ```
 The position of the utf8 string `needle` in the utf8 string `haystack`, 
 case insensitive.
+
+```c
+void *utf8ncasestr(const void *haystack, size_t haystack_len,
+                   const void *needle, size_t needle_len);
+```
+The position of `needle` in `haystack`, case insensitive.
 
 ```c
 void *utf8valid(const void *str);

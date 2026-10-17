@@ -240,6 +240,11 @@ utf8str(const utf8_int8_t *haystack, const utf8_int8_t *needle);
 utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *
 utf8casestr(const utf8_int8_t *haystack, const utf8_int8_t *needle);
 
+/* The position of needle in haystack, case insensitive. */
+utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *
+utf8ncasestr(const utf8_int8_t *haystack, size_t haystack_len,
+             const utf8_int8_t *needle, size_t needle_len);
+
 /* Return 0 on success, or the position of the invalid
  * utf8 codepoint on failure. */
 utf8_constexpr14 utf8_nonnull utf8_pure utf8_int8_t *
@@ -324,6 +329,11 @@ utf8_weak utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
                                    utf8_int8_t *(*alloc_func_ptr)(utf8_int8_t *,
                                                                   size_t),
                                    utf8_int8_t *user_data);
+
+/* Implementation helper; use the same linkage as the public functions. */
+utf8_constexpr14 int
+utf8ncasestr_decode_codepoint(const utf8_int8_t *str, size_t n,
+                              utf8_int32_t *out_codepoint, size_t *out_size);
 
 #undef utf8_weak
 #undef utf8_pure
@@ -1055,6 +1065,134 @@ utf8_constexpr14_impl utf8_int8_t *utf8casestr(const utf8_int8_t *haystack,
     /* Roll back to the next code point in the haystack to test */
     haystack = nextH;
   }
+}
+
+/* Read one complete UTF-8 codepoint without reading beyond n bytes. */
+utf8_constexpr14_impl int
+utf8ncasestr_decode_codepoint(const utf8_int8_t *str, size_t n,
+                              utf8_int32_t *out_codepoint, size_t *out_size) {
+  unsigned char lead = 0, continuation = 0;
+  size_t width = 0, index = 0;
+  utf8_int32_t codepoint = 0;
+
+  if (0 == n) {
+    return 0;
+  }
+
+  lead = (unsigned char)str[0];
+  if (lead <= 0x7f) {
+    width = 1;
+    codepoint = (utf8_int32_t)lead;
+  } else if ((0xc2 <= lead) && (0xdf >= lead)) {
+    width = 2;
+    codepoint = (utf8_int32_t)(lead & 0x1f);
+  } else if ((0xe0 <= lead) && (0xef >= lead)) {
+    width = 3;
+    codepoint = (utf8_int32_t)(lead & 0x0f);
+  } else if ((0xf0 <= lead) && (0xf4 >= lead)) {
+    width = 4;
+    codepoint = (utf8_int32_t)(lead & 0x07);
+  } else {
+    return 0;
+  }
+
+  if (n < width) {
+    return 0;
+  }
+
+  for (index = 1; index < width; index++) {
+    continuation = (unsigned char)str[index];
+    if (0x80 != (continuation & 0xc0)) {
+      return 0;
+    }
+
+    if ((1 == index) &&
+        (((0xe0 == lead) && (0xa0 > continuation)) ||
+         ((0xed == lead) && (0x9f < continuation)) ||
+         ((0xf0 == lead) && (0x90 > continuation)) ||
+         ((0xf4 == lead) && (0x8f < continuation)))) {
+      return 0;
+    }
+
+    codepoint = (codepoint << 6) | (utf8_int32_t)(continuation & 0x3f);
+  }
+
+  *out_codepoint = codepoint;
+  *out_size = width;
+  return 1;
+}
+
+utf8_constexpr14_impl utf8_int8_t *
+utf8ncasestr(const utf8_int8_t *haystack, size_t haystack_len,
+             const utf8_int8_t *needle, size_t needle_len) {
+  size_t needle_offset = 0, haystack_offset = 0, haystack_start = 0;
+  size_t codepoint_size = 0, match_haystack_offset = 0;
+  size_t haystack_codepoint_size = 0, needle_codepoint_size = 0;
+  utf8_int32_t needle_codepoint = 0, haystack_codepoint = 0;
+  int matches = 0;
+
+  if (0 == needle_len) {
+    return (utf8_int8_t *)haystack;
+  }
+
+  /* Reject needles that end within, or contain invalid, codepoints. */
+  while (needle_offset < needle_len) {
+    if (!utf8ncasestr_decode_codepoint(
+            needle + needle_offset, needle_len - needle_offset,
+            &needle_codepoint, &codepoint_size)) {
+      return utf8_null;
+    }
+    needle_offset += codepoint_size;
+  }
+
+  haystack_offset = 0;
+  while (haystack_offset < haystack_len) {
+    haystack_start = haystack_offset;
+    if (!utf8ncasestr_decode_codepoint(
+            haystack + haystack_offset, haystack_len - haystack_offset,
+            &haystack_codepoint, &codepoint_size)) {
+      /* Invalid bytes cannot start a match; continue looking after the byte. */
+      haystack_offset++;
+      continue;
+    }
+
+    haystack_offset += codepoint_size;
+    match_haystack_offset = haystack_start;
+    needle_offset = 0;
+    matches = 1;
+
+    while (needle_offset < needle_len) {
+      if (!utf8ncasestr_decode_codepoint(
+              haystack + match_haystack_offset,
+              haystack_len - match_haystack_offset, &haystack_codepoint,
+              &haystack_codepoint_size)) {
+        matches = 0;
+        break;
+      }
+
+      if (!utf8ncasestr_decode_codepoint(
+              needle + needle_offset, needle_len - needle_offset,
+              &needle_codepoint, &needle_codepoint_size)) {
+        matches = 0;
+        break;
+      }
+
+      if (utf8lwrcodepoint(haystack_codepoint) !=
+          utf8lwrcodepoint(needle_codepoint)) {
+        matches = 0;
+        break;
+      }
+
+      match_haystack_offset += haystack_codepoint_size;
+      needle_offset += needle_codepoint_size;
+    }
+
+    if (matches) {
+      return (utf8_int8_t *)(haystack + haystack_start);
+    }
+  }
+
+  return utf8_null;
 }
 
 utf8_constexpr14_impl utf8_int8_t *utf8valid(const utf8_int8_t *str) {
