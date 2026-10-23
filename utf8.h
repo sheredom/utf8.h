@@ -265,6 +265,12 @@ utf8_constexpr14 utf8_nonnull utf8_int8_t *
 utf8codepoint(const utf8_int8_t *utf8_restrict str,
               utf8_int32_t *utf8_restrict out_codepoint);
 
+/* Decode one valid utf8 codepoint from at most n bytes. Returns the address
+ * after the codepoint, or null if n is zero or the input is incomplete or
+ * invalid. Leaves out_codepoint unchanged on failure. */
+utf8_constexpr14 utf8_nonnull utf8_int8_t *
+utf8ncodepoint(const utf8_int8_t *str, utf8_int32_t *out_codepoint, size_t n);
+
 /* Calculates the size of the next utf8 codepoint in str. */
 utf8_constexpr14 utf8_nonnull utf8_pure size_t
 utf8codepointcalcsize(const utf8_int8_t *str);
@@ -329,11 +335,6 @@ utf8_weak utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
                                    utf8_int8_t *(*alloc_func_ptr)(utf8_int8_t *,
                                                                   size_t),
                                    utf8_int8_t *user_data);
-
-/* Implementation helper; use the same linkage as the public functions. */
-utf8_constexpr14 int
-utf8ncasestr_decode_codepoint(const utf8_int8_t *str, size_t n,
-                              utf8_int32_t *out_codepoint, size_t *out_size);
 
 #undef utf8_weak
 #undef utf8_pure
@@ -1067,16 +1068,15 @@ utf8_constexpr14_impl utf8_int8_t *utf8casestr(const utf8_int8_t *haystack,
   }
 }
 
-/* Read one complete UTF-8 codepoint without reading beyond n bytes. */
-utf8_constexpr14_impl int
-utf8ncasestr_decode_codepoint(const utf8_int8_t *str, size_t n,
-                              utf8_int32_t *out_codepoint, size_t *out_size) {
+utf8_constexpr14_impl utf8_int8_t *
+utf8ncodepoint(const utf8_int8_t *str, utf8_int32_t *out_codepoint,
+               size_t n) {
   unsigned char lead = 0, continuation = 0;
   size_t width = 0, index = 0;
   utf8_int32_t codepoint = 0;
 
   if (0 == n) {
-    return 0;
+    return utf8_null;
   }
 
   lead = (unsigned char)str[0];
@@ -1093,17 +1093,17 @@ utf8ncasestr_decode_codepoint(const utf8_int8_t *str, size_t n,
     width = 4;
     codepoint = (utf8_int32_t)(lead & 0x07);
   } else {
-    return 0;
+    return utf8_null;
   }
 
   if (n < width) {
-    return 0;
+    return utf8_null;
   }
 
   for (index = 1; index < width; index++) {
     continuation = (unsigned char)str[index];
     if (0x80 != (continuation & 0xc0)) {
-      return 0;
+      return utf8_null;
     }
 
     if ((1 == index) &&
@@ -1111,15 +1111,14 @@ utf8ncasestr_decode_codepoint(const utf8_int8_t *str, size_t n,
          ((0xed == lead) && (0x9f < continuation)) ||
          ((0xf0 == lead) && (0x90 > continuation)) ||
          ((0xf4 == lead) && (0x8f < continuation)))) {
-      return 0;
+      return utf8_null;
     }
 
     codepoint = (codepoint << 6) | (utf8_int32_t)(continuation & 0x3f);
   }
 
   *out_codepoint = codepoint;
-  *out_size = width;
-  return 1;
+  return (utf8_int8_t *)(str + width);
 }
 
 utf8_constexpr14_impl utf8_int8_t *
@@ -1129,6 +1128,7 @@ utf8ncasestr(const utf8_int8_t *haystack, size_t haystack_len,
   size_t codepoint_size = 0, match_haystack_offset = 0;
   size_t haystack_codepoint_size = 0, needle_codepoint_size = 0;
   utf8_int32_t needle_codepoint = 0, haystack_codepoint = 0;
+  const utf8_int8_t *next_codepoint = utf8_null;
   int matches = 0;
 
   if (0 == needle_len) {
@@ -1137,45 +1137,54 @@ utf8ncasestr(const utf8_int8_t *haystack, size_t haystack_len,
 
   /* Reject needles that end within, or contain invalid, codepoints. */
   while (needle_offset < needle_len) {
-    if (!utf8ncasestr_decode_codepoint(
-            needle + needle_offset, needle_len - needle_offset,
-            &needle_codepoint, &codepoint_size)) {
+    next_codepoint =
+        utf8ncodepoint(needle + needle_offset, &needle_codepoint,
+                       needle_len - needle_offset);
+    if (utf8_null == next_codepoint) {
       return utf8_null;
     }
-    needle_offset += codepoint_size;
+    needle_offset = (size_t)(next_codepoint - needle);
   }
 
   haystack_offset = 0;
   while (haystack_offset < haystack_len) {
     haystack_start = haystack_offset;
-    if (!utf8ncasestr_decode_codepoint(
-            haystack + haystack_offset, haystack_len - haystack_offset,
-            &haystack_codepoint, &codepoint_size)) {
+    next_codepoint =
+        utf8ncodepoint(haystack + haystack_offset, &haystack_codepoint,
+                       haystack_len - haystack_offset);
+    if (utf8_null == next_codepoint) {
       /* Invalid bytes cannot start a match; continue looking after the byte. */
       haystack_offset++;
       continue;
     }
 
+    codepoint_size = (size_t)(next_codepoint - (haystack + haystack_offset));
     haystack_offset += codepoint_size;
     match_haystack_offset = haystack_start;
     needle_offset = 0;
     matches = 1;
 
     while (needle_offset < needle_len) {
-      if (!utf8ncasestr_decode_codepoint(
-              haystack + match_haystack_offset,
-              haystack_len - match_haystack_offset, &haystack_codepoint,
-              &haystack_codepoint_size)) {
+      next_codepoint =
+          utf8ncodepoint(haystack + match_haystack_offset,
+                         &haystack_codepoint,
+                         haystack_len - match_haystack_offset);
+      if (utf8_null == next_codepoint) {
         matches = 0;
         break;
       }
+      haystack_codepoint_size =
+          (size_t)(next_codepoint - (haystack + match_haystack_offset));
 
-      if (!utf8ncasestr_decode_codepoint(
-              needle + needle_offset, needle_len - needle_offset,
-              &needle_codepoint, &needle_codepoint_size)) {
+      next_codepoint =
+          utf8ncodepoint(needle + needle_offset, &needle_codepoint,
+                         needle_len - needle_offset);
+      if (utf8_null == next_codepoint) {
         matches = 0;
         break;
       }
+      needle_codepoint_size =
+          (size_t)(next_codepoint - (needle + needle_offset));
 
       if (utf8lwrcodepoint(haystack_codepoint) !=
           utf8lwrcodepoint(needle_codepoint)) {

@@ -237,6 +237,13 @@ Sets out_codepoint to the current utf8 codepoint in `str`, and returns the
 address of the next utf8 codepoint after the current one in `str`.
 
 ```c
+void *utf8ncodepoint(const void *str, utf8_int32_t *out_codepoint, size_t n);
+```
+Decodes one valid utf8 codepoint using at most `n` bytes and returns the
+address after it. Returns null if `n` is zero or the input is incomplete or
+invalid; `out_codepoint` is unchanged on failure. A NUL byte decodes as U+0000.
+
+```c
 void *utf8rcodepoint(const void *str, utf8_int32_t *out_codepoint);
 ```
 Sets out_codepoint to the current utf8 codepoint in `str`, and returns the
