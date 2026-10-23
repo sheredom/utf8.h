@@ -731,7 +731,8 @@ utf8_int8_t *utf8ncpy(utf8_int8_t *utf8_restrict dst,
     }
   }
 
-  for (check_index = index - 1;
+  /* An empty src leaves index at 0, and index - 1 would wrap around. */
+  for (check_index = index > 0 ? index - 1 : 0;
        check_index > 0 && 0x80 == (0xc0 & d[check_index]); check_index--) {
     /* just moving the index */
   }
