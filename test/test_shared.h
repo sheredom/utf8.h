@@ -2062,6 +2062,34 @@ UTF8_TEST(utf8rcodepoint, latin) {
   ASSERT_EQ(0x3B1, codepoint);
 }
 
+UTF8_TEST(utf8rcodepoint, truncated_multibyte_stops_at_nul) {
+  /* Each lead byte is cut short by the NUL; the bytes after the NUL are not
+   * part of the string and must not be decoded. */
+  static const utf8_int8_t two[] = {'a', '\xc3', '\0', '\xa9'};
+  static const utf8_int8_t three[] = {'a', '\xe2', '\x82', '\0', '\xac'};
+  static const utf8_int8_t four[] = {'a', '\xf0', '\x9f', '\0', '\x98', '\x80'};
+  static const utf8_int8_t *const strs[] = {two, three, four};
+  size_t i;
+
+  for (i = 0; i < sizeof(strs) / sizeof(strs[0]); i++) {
+    utf8_int32_t expected = -1, codepoint = -1;
+
+    utf8codepoint(strs[i] + 1, &expected);
+
+    ASSERT_EQ(strs[i], utf8rcodepoint(strs[i] + 1, &codepoint));
+    ASSERT_EQ(expected, codepoint);
+  }
+}
+
+UTF8_TEST(utf8rcodepoint, truncated_multibyte_no_overread) {
+  utf8_int8_t s[3];
+  utf8_int32_t codepoint = -1;
+  s[0] = 'a';
+  s[1] = '\xf0';
+  s[2] = '\0';
+  ASSERT_EQ(s, utf8rcodepoint(s + 1, &codepoint));
+}
+
 UTF8_TEST(utf8makevalid, a) {
   char invalid[6];
   memset(invalid, 0, 6);
