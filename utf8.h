@@ -1879,21 +1879,8 @@ utf8rcodepoint(const utf8_int8_t *utf8_restrict str,
                utf8_int32_t *utf8_restrict out_codepoint) {
   const utf8_int8_t *s = (const utf8_int8_t *)str;
 
-  if (0xf0 == (0xf8 & s[0])) {
-    /* 4 byte utf8 codepoint */
-    *out_codepoint = ((0x07 & s[0]) << 18) | ((0x3f & s[1]) << 12) |
-                     ((0x3f & s[2]) << 6) | (0x3f & s[3]);
-  } else if (0xe0 == (0xf0 & s[0])) {
-    /* 3 byte utf8 codepoint */
-    *out_codepoint =
-        ((0x0f & s[0]) << 12) | ((0x3f & s[1]) << 6) | (0x3f & s[2]);
-  } else if (0xc0 == (0xe0 & s[0])) {
-    /* 2 byte utf8 codepoint */
-    *out_codepoint = ((0x1f & s[0]) << 6) | (0x3f & s[1]);
-  } else {
-    /* 1 byte utf8 codepoint otherwise */
-    *out_codepoint = s[0];
-  }
+  /* utf8codepoint stops at a NUL, so a truncated sequence is not over-read. */
+  (void)utf8codepoint(s, out_codepoint);
 
   do {
     s--;
