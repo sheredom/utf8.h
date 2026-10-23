@@ -1509,6 +1509,77 @@ UTF8_TEST(utf8codepoint, truncated_multibyte_no_overread) {
   ASSERT_TRUE(next == s + 1);
 }
 
+UTF8_TEST(utf8ncodepoint, widths_and_next_pointer) {
+  static const utf8_int8_t one_byte[] = {'A'};
+  static const utf8_int8_t two_byte[] = {0xc3, 0xa9};
+  static const utf8_int8_t three_byte[] = {0xe2, 0x82, 0xac};
+  static const utf8_int8_t four_byte[] = {0xf0, 0x9f, 0x8c, 0x8d};
+  utf8_int32_t codepoint = -1;
+
+  ASSERT_EQ(one_byte + 1,
+            utf8ncodepoint(one_byte, &codepoint, sizeof(one_byte)));
+  ASSERT_EQ('A', codepoint);
+  ASSERT_EQ(two_byte + 2,
+            utf8ncodepoint(two_byte, &codepoint, sizeof(two_byte)));
+  ASSERT_EQ(0xe9, codepoint);
+  ASSERT_EQ(three_byte + 3,
+            utf8ncodepoint(three_byte, &codepoint, sizeof(three_byte)));
+  ASSERT_EQ(0x20ac, codepoint);
+  ASSERT_EQ(four_byte + 4,
+            utf8ncodepoint(four_byte, &codepoint, sizeof(four_byte)));
+  ASSERT_EQ(0x1f30d, codepoint);
+}
+
+UTF8_TEST(utf8ncodepoint, zero_and_truncated_bounds) {
+  static const utf8_int8_t two_byte[] = {0xc3, 0xa9};
+  static const utf8_int8_t three_byte[] = {0xe2, 0x82, 0xac};
+  static const utf8_int8_t four_byte[] = {0xf0, 0x9f, 0x8c, 0x8d};
+  utf8_int32_t codepoint = 0x1234;
+
+  ASSERT_EQ((void *)0, utf8ncodepoint(two_byte, &codepoint, 0));
+  ASSERT_EQ(0x1234, codepoint);
+  ASSERT_EQ((void *)0, utf8ncodepoint(two_byte, &codepoint, 1));
+  ASSERT_EQ(0x1234, codepoint);
+  ASSERT_EQ((void *)0, utf8ncodepoint(three_byte, &codepoint, 2));
+  ASSERT_EQ(0x1234, codepoint);
+  ASSERT_EQ((void *)0, utf8ncodepoint(four_byte, &codepoint, 3));
+  ASSERT_EQ(0x1234, codepoint);
+}
+
+UTF8_TEST(utf8ncodepoint, rejects_invalid_scalars) {
+  static const utf8_int8_t invalid_lead[] = {0xc0, 0xaf};
+  static const utf8_int8_t invalid_continuation[] = {0xe2, 0x28, 0xac};
+  static const utf8_int8_t surrogate[] = {0xed, 0xa0, 0x80};
+  static const utf8_int8_t out_of_range[] = {0xf4, 0x90, 0x80, 0x80};
+  utf8_int32_t codepoint = 0x1234;
+
+  ASSERT_EQ((void *)0,
+            utf8ncodepoint(invalid_lead, &codepoint, sizeof(invalid_lead)));
+  ASSERT_EQ(0x1234, codepoint);
+  ASSERT_EQ((void *)0, utf8ncodepoint(invalid_continuation, &codepoint,
+                                     sizeof(invalid_continuation)));
+  ASSERT_EQ(0x1234, codepoint);
+  ASSERT_EQ((void *)0,
+            utf8ncodepoint(surrogate, &codepoint, sizeof(surrogate)));
+  ASSERT_EQ(0x1234, codepoint);
+  ASSERT_EQ((void *)0,
+            utf8ncodepoint(out_of_range, &codepoint, sizeof(out_of_range)));
+  ASSERT_EQ(0x1234, codepoint);
+}
+
+UTF8_TEST(utf8ncodepoint, embedded_nul) {
+  static const utf8_int8_t embedded_nul[] = {'\0', 'A'};
+  utf8_int32_t codepoint = -1;
+  const utf8_int8_t *next;
+
+  next = utf8ncodepoint(embedded_nul, &codepoint, sizeof(embedded_nul));
+  ASSERT_EQ(embedded_nul + 1, next);
+  ASSERT_EQ(0, codepoint);
+  next = utf8ncodepoint(next, &codepoint, 1);
+  ASSERT_EQ(embedded_nul + 2, next);
+  ASSERT_EQ('A', codepoint);
+}
+
 UTF8_TEST(utf8lwr, truncated_multibyte_no_overread) {
   utf8_int8_t s[2];
   s[0] = '\xe7';
