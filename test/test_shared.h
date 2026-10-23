@@ -1279,6 +1279,16 @@ UTF8_TEST(utf8ncpy, check_no_n_overflow) {
   ASSERT_EQ(4, buffer[3]);
 }
 
+UTF8_TEST(utf8ncpy, empty_src) {
+  /* The copy must not look at the byte before dst. */
+  char buffer[3] = {1, 2, 3};
+  ASSERT_EQ(buffer, utf8ncpy(buffer, "", 3));
+
+  ASSERT_EQ(0, buffer[0]);
+  ASSERT_EQ(0, buffer[1]);
+  ASSERT_EQ(0, buffer[2]);
+}
+
 UTF8_TEST(utf8ncpy, truncated_copy_valid) {
   char cpy1[32] = {'\0'};
   char cpy2[3] = {'\0'};
