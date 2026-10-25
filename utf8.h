@@ -762,7 +762,7 @@ utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
   size_t bytes = 0;
 
   /* Find the end of the string or stop when n is reached */
-  while ('\0' != src[bytes] && bytes < n) {
+  while (bytes < n && '\0' != src[bytes]) {
     bytes++;
   }
 
@@ -788,7 +788,7 @@ utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
   bytes = 0;
 
   /* copy src byte-by-byte into our new utf8 string */
-  while ('\0' != src[bytes] && bytes < n) {
+  while (bytes < n && '\0' != src[bytes]) {
     c[bytes] = src[bytes];
     bytes++;
   }
