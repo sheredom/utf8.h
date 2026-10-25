@@ -2413,6 +2413,50 @@ UTF8_TEST(utf8nvalid, exactly_4_bytes) {
 #pragma warning(disable : 4310)
 #endif
 
+static utf8_int8_t *utf8ndup_test_allocate(utf8_int8_t *user_data, size_t n) {
+  (void)n;
+  return user_data;
+}
+
+UTF8_TEST(utf8ndup, unterminated_source) {
+  const utf8_int8_t src[] = {'a', 'b', 'c'};
+  const utf8_int8_t expected[] = {'a', 'b', 'c', 0};
+  utf8_int8_t *const dup = utf8ndup(src, sizeof(src));
+  ASSERT_TRUE(dup);
+  ASSERT_EQ(0, memcmp(dup, expected, sizeof(expected)));
+  free(dup);
+}
+
+UTF8_TEST(utf8ndup, zero_limit_no_read) {
+  const utf8_int8_t src[] = {'x'};
+  /* A one-past pointer is valid to pass, but must not be dereferenced. */
+  utf8_int8_t *const dup = utf8ndup(src + sizeof(src), 0);
+  ASSERT_TRUE(dup);
+  ASSERT_EQ(0, dup[0]);
+  free(dup);
+}
+
+UTF8_TEST(utf8ndup_ex, unterminated_source) {
+  const utf8_int8_t src[] = {'a', 'b', 'c'};
+  const utf8_int8_t expected[] = {'a', 'b', 'c', 0};
+  utf8_int8_t buffer[5] = {'x', 'x', 'x', 'x', 'x'};
+  utf8_int8_t *const dup =
+      utf8ndup_ex(src, sizeof(src), utf8ndup_test_allocate, buffer);
+  ASSERT_EQ(buffer, dup);
+  ASSERT_EQ(0, memcmp(dup, expected, sizeof(expected)));
+  ASSERT_EQ('x', buffer[4]);
+}
+
+UTF8_TEST(utf8ndup_ex, zero_limit_no_read) {
+  const utf8_int8_t src[] = {'x'};
+  utf8_int8_t buffer[2] = {'x', 'x'};
+  utf8_int8_t *const dup = utf8ndup_ex(src + sizeof(src), 0,
+                                     utf8ndup_test_allocate, buffer);
+  ASSERT_EQ(buffer, dup);
+  ASSERT_EQ(0, buffer[0]);
+  ASSERT_EQ('x', buffer[1]);
+}
+
 UTF8_TEST(utf8cmp, unsigned_ordering) {
   /* Ordered by codepoint, including empty strings and a shared prefix. */
   const utf8_int8_t strings[][5] = {
