@@ -2413,6 +2413,23 @@ UTF8_TEST(utf8nvalid, exactly_4_bytes) {
 #pragma warning(disable : 4310)
 #endif
 
+UTF8_TEST(utf8ncat, unterminated_source) {
+  const utf8_int8_t src[] = {'a', 'b', 'c'};
+  const utf8_int8_t expected[] = {'x', 'a', 'b', 'c', 0, 'z'};
+  utf8_int8_t dst[] = {'x', 0, 'z', 'z', 'z', 'z'};
+  ASSERT_EQ(dst, utf8ncat(dst, src, sizeof(src)));
+  ASSERT_EQ(0, memcmp(dst, expected, sizeof(expected)));
+}
+
+UTF8_TEST(utf8ncat, zero_limit_no_read) {
+  const utf8_int8_t src[] = {'a'};
+  const utf8_int8_t expected[] = {'x', 0, 'z'};
+  utf8_int8_t dst[] = {'x', 0, 'z'};
+  /* A one-past pointer is valid to pass, but must not be dereferenced. */
+  ASSERT_EQ(dst, utf8ncat(dst, src + sizeof(src), 0));
+  ASSERT_EQ(0, memcmp(dst, expected, sizeof(expected)));
+}
+
 static utf8_int8_t *utf8ndup_test_allocate(utf8_int8_t *user_data, size_t n) {
   (void)n;
   return user_data;
