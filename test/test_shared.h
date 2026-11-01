@@ -863,6 +863,73 @@ UTF8_TEST(utf8casestr, latin) {
   ASSERT_EQ(lowersStr, utf8casestr(lowersStr, uppersStr));
 }
 
+#if !defined(__cplusplus)
+/* ascii runs on either side of multi-byte codepoints exercise the ascii fast
+ * paths and the switch back to the general path */
+static const char ascii_runs[] = "xxxxxxxx\xc3\xa9"
+                                 "xyz\xc3\xa9"
+                                 "abc";
+
+UTF8_TEST(utf8str, ascii_runs) {
+  ASSERT_EQ(ascii_runs + 10, utf8str(ascii_runs, "xyz"));
+  ASSERT_EQ(ascii_runs + 13, utf8str(ascii_runs, "\xc3\xa9"
+                                                 "abc"));
+  ASSERT_EQ((void *)0, utf8str(ascii_runs, "abd"));
+}
+
+UTF8_TEST(utf8casestr, ascii_runs) {
+  ASSERT_EQ(ascii_runs + 10, utf8casestr(ascii_runs, "XYZ\xc3\x89"));
+  ASSERT_EQ(ascii_runs + 13, utf8casestr(ascii_runs, "\xc3\x89"
+                                                     "ABC"));
+  ASSERT_EQ((void *)0, utf8casestr(ascii_runs, "ABD"));
+}
+
+UTF8_TEST(utf8casecmp, ascii_runs) {
+  ASSERT_EQ(0, utf8casecmp("Hello \xc3\x89t\xc3\xa9", "hELLO \xc3\xa9T\xc3\x89"));
+  ASSERT_GT(0, utf8casecmp("abc", "ABD"));
+  ASSERT_LT(0, utf8casecmp("abc\xc3\xa9", "ABC"));
+}
+
+UTF8_TEST(utf8len, ascii_runs) {
+  ASSERT_EQ(16, utf8len(ascii_runs));
+  ASSERT_EQ(9, utf8nlen(ascii_runs, 10));
+  ASSERT_EQ(8, utf8nlen(ascii_runs, 9));
+}
+
+UTF8_TEST(utf8valid, ascii_runs) {
+  static const char bad[] = "abc\x80"
+                            "def";
+  ASSERT_EQ(NULL, utf8valid(ascii_runs));
+  ASSERT_EQ(bad + 3, utf8valid(bad));
+}
+
+/* the ascii fast paths rely on the case mappings only changing A-Z and a-z
+ * among ascii codepoints */
+UTF8_TEST(utf8lwrcodepoint, ascii_only_letters) {
+  utf8_int32_t c;
+  for (c = 0; c < 128; c++) {
+    ASSERT_EQ(('A' <= c && 'Z' >= c) ? c + 32 : c, utf8lwrcodepoint(c));
+    ASSERT_EQ(('a' <= c && 'z' >= c) ? c - 32 : c, utf8uprcodepoint(c));
+  }
+}
+
+UTF8_TEST(utf8lwr, ascii_runs) {
+  char s[] = "ABC\xc3\x89"
+             "DEF";
+  utf8lwr(s);
+  ASSERT_EQ(0, strcmp(s, "abc\xc3\xa9"
+                         "def"));
+}
+
+UTF8_TEST(utf8upr, ascii_runs) {
+  char s[] = "abc\xc3\xa9"
+             "def";
+  utf8upr(s);
+  ASSERT_EQ(0, strcmp(s, "ABC\xc3\x89"
+                         "DEF"));
+}
+#endif
+
 UTF8_TEST(utf8ncasestr, widths) {
   static const utf8_int8_t width_haystack[] = {
       'A', 0xc3, 0xa9, 0xe2, 0x82, 0xac, 0xf0, 0x9f, 0x8c, 0x8d};
