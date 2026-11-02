@@ -349,8 +349,8 @@ utf8_constexpr14_impl int utf8casecmp(const utf8_int8_t *src1,
     /* Fast path: both bytes are ASCII, so each is a whole codepoint whose
      * case mapping only touches A-Z and a-z. */
     if ((0 == (0x80 & *src1)) && (0 == (0x80 & *src2))) {
-      src1_orig_cp = (utf8_int32_t)*src1;
-      src2_orig_cp = (utf8_int32_t)*src2;
+      src1_orig_cp = *src1;
+      src2_orig_cp = *src2;
       src1++;
       src2++;
 
@@ -602,12 +602,10 @@ utf8_constexpr14_impl size_t utf8nlen(const utf8_int8_t *str, size_t n) {
   while ((size_t)(str - t) < n && '\0' != *str) {
     size_t cp_len = 1;
 
-    /* Fast path: a run of ASCII bytes is one codepoint per byte. */
+    /* Fast path: an ASCII byte is a whole codepoint. */
     if (0 == (0x80 & *str)) {
-      do {
-        str++;
-        length++;
-      } while ((size_t)(str - t) < n && '\0' != *str && 0 == (0x80 & *str));
+      str++;
+      length++;
       continue;
     }
 
@@ -1077,10 +1075,9 @@ utf8_constexpr14_impl utf8_int8_t *utf8str(const utf8_int8_t *haystack,
 utf8_constexpr14_impl utf8_int8_t *utf8casestr(const utf8_int8_t *haystack,
                                                const utf8_int8_t *needle) {
   /* the needle's first byte lowered if it is ascii, otherwise 0 */
-  const utf8_int8_t first = (0 != (0x80 & *needle)) ? '\0'
-                            : ('A' <= *needle && 'Z' >= *needle)
-                                ? (utf8_int8_t)(*needle + 32)
-                                : *needle;
+  const utf8_int32_t first = (0 != (0x80 & *needle))            ? 0
+                             : ('A' <= *needle && 'Z' >= *needle) ? *needle + 32
+                                                                  : *needle;
 
   /* if needle has no utf8 codepoints before the null terminating
    * byte then return haystack */
@@ -1095,18 +1092,23 @@ utf8_constexpr14_impl utf8_int8_t *utf8casestr(const utf8_int8_t *haystack,
     utf8_int32_t h_cp = 0, n_cp = 0;
 
     /* skip ascii bytes that cannot start a match, each is a whole codepoint */
-    if ('\0' != first) {
-      while (0 == (0x80 & *haystack) && '\0' != *haystack &&
-             first != (('A' <= *haystack && 'Z' >= *haystack)
-                           ? (utf8_int8_t)(*haystack + 32)
-                           : *haystack)) {
+    if (0 != first) {
+      for (;;) {
+        const utf8_int32_t c = *haystack;
+        const int is_ascii = (0 == (0x80 & c)) && (0 != c);
+        const utf8_int32_t lowered = ('A' <= c && 'Z' >= c) ? c + 32 : c;
+
+        if (!is_ascii || first == lowered) {
+          break;
+        }
         haystack++;
       }
       maybeMatch = haystack;
     }
 
     /* Get the next code point and track it */
-    nextH = haystack = utf8codepoint(haystack, &h_cp);
+    haystack = utf8codepoint(haystack, &h_cp);
+    nextH = haystack;
     n = utf8codepoint(n, &n_cp);
 
     while ((0 != h_cp) && (0 != n_cp)) {
@@ -1712,68 +1714,56 @@ utf8_constexpr14_impl int utf8isupper(utf8_int32_t chr) {
 }
 
 void utf8lwr(utf8_int8_t *utf8_restrict str) {
-  utf8_int32_t cp = 0;
-  utf8_int8_t *pn;
+  for (;;) {
+    utf8_int32_t cp = 0;
+    utf8_int8_t *pn = str;
+    utf8_int32_t mapped_cp = 0;
 
-  /* Fast path: ASCII bytes are whole codepoints, only A-Z change. */
-  while ((0 == (0x80 & *str)) && ('\0' != *str)) {
-    if ('A' <= *str && 'Z' >= *str) {
-      *str = (utf8_int8_t)(*str + 32);
-    }
-    str++;
-  }
-
-  pn = utf8codepoint(str, &cp);
-
-  while (cp != 0) {
-    const utf8_int32_t lwr_cp = utf8lwrcodepoint(cp);
-    const size_t size = utf8codepointsize(lwr_cp);
-
-    if (lwr_cp != cp) {
-      utf8catcodepoint(str, lwr_cp, size);
-    }
-
-    str = pn;
+    /* Fast path: ASCII bytes are whole codepoints, only A-Z change. */
     while ((0 == (0x80 & *str)) && ('\0' != *str)) {
       if ('A' <= *str && 'Z' >= *str) {
-        *str = (utf8_int8_t)(*str + 32);
+        *str += 32;
       }
       str++;
     }
+
     pn = utf8codepoint(str, &cp);
+    if (0 == cp) {
+      return;
+    }
+
+    mapped_cp = utf8lwrcodepoint(cp);
+    if (mapped_cp != cp) {
+      utf8catcodepoint(str, mapped_cp, utf8codepointsize(mapped_cp));
+    }
+    str = pn;
   }
 }
 
 void utf8upr(utf8_int8_t *utf8_restrict str) {
-  utf8_int32_t cp = 0;
-  utf8_int8_t *pn;
+  for (;;) {
+    utf8_int32_t cp = 0;
+    utf8_int8_t *pn = str;
+    utf8_int32_t mapped_cp = 0;
 
-  /* Fast path: ASCII bytes are whole codepoints, only a-z change. */
-  while ((0 == (0x80 & *str)) && ('\0' != *str)) {
-    if ('a' <= *str && 'z' >= *str) {
-      *str = (utf8_int8_t)(*str - 32);
-    }
-    str++;
-  }
-
-  pn = utf8codepoint(str, &cp);
-
-  while (cp != 0) {
-    const utf8_int32_t lwr_cp = utf8uprcodepoint(cp);
-    const size_t size = utf8codepointsize(lwr_cp);
-
-    if (lwr_cp != cp) {
-      utf8catcodepoint(str, lwr_cp, size);
-    }
-
-    str = pn;
+    /* Fast path: ASCII bytes are whole codepoints, only a-z change. */
     while ((0 == (0x80 & *str)) && ('\0' != *str)) {
       if ('a' <= *str && 'z' >= *str) {
-        *str = (utf8_int8_t)(*str - 32);
+        *str -= 32;
       }
       str++;
     }
+
     pn = utf8codepoint(str, &cp);
+    if (0 == cp) {
+      return;
+    }
+
+    mapped_cp = utf8uprcodepoint(cp);
+    if (mapped_cp != cp) {
+      utf8catcodepoint(str, mapped_cp, utf8codepointsize(mapped_cp));
+    }
+    str = pn;
   }
 }
 
