@@ -464,14 +464,14 @@ static const struct LowerUpperPair lowupPairs[] = {
     {0x04bb, 0x04ba},
     {0x04bd, 0x04bc},
     {0x04bf, 0x04be},
-    {0x04c1, 0x04c0},
-    {0x04c3, 0x04c2},
-    {0x04c5, 0x04c4},
-    {0x04c7, 0x04c6},
-    {0x04c9, 0x04c8},
-    {0x04cb, 0x04ca},
-    {0x04cd, 0x04cc},
-    {0x04cf, 0x04ce},
+    {0x04cf, 0x04c0},
+    {0x04c2, 0x04c1},
+    {0x04c4, 0x04c3},
+    {0x04c6, 0x04c5},
+    {0x04c8, 0x04c7},
+    {0x04ca, 0x04c9},
+    {0x04cc, 0x04cb},
+    {0x04ce, 0x04cd},
     {0x04d1, 0x04d0},
     {0x04d3, 0x04d2},
     {0x04d5, 0x04d4},
@@ -1850,6 +1850,39 @@ UTF8_TEST(case_mapping, preserves_encoded_size) {
     ASSERT_EQ(utf8codepointsize(lowupPairs[i].lower),
               utf8codepointsize(lowupPairs[i].upper));
   }
+}
+
+UTF8_TEST(case_mapping, cyrillic_palochka_block) {
+  /* U+04C0 PALOCHKA pairs with U+04CF, and U+04C1..U+04CE use odd codepoints
+     for uppercase and even codepoints for lowercase, unlike the surrounding
+     Cyrillic blocks. */
+  utf8_int32_t cp;
+  char str[3];
+
+  ASSERT_EQ(0x04cf, utf8lwrcodepoint(0x04c0));
+  ASSERT_EQ(0x04c0, utf8uprcodepoint(0x04cf));
+
+  for (cp = 0x04c1; cp <= 0x04ce; cp += 2) {
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp));
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp + 1));
+    ASSERT_EQ(cp, utf8uprcodepoint(cp + 1));
+    ASSERT_EQ(cp, utf8uprcodepoint(cp));
+  }
+
+  /* Neighbouring even/odd ranges must be unaffected. */
+  ASSERT_EQ(0x04bf, utf8lwrcodepoint(0x04be));
+  ASSERT_EQ(0x04d1, utf8lwrcodepoint(0x04d0));
+  ASSERT_EQ(0x04d0, utf8uprcodepoint(0x04d1));
+
+  /* U+04C2 is already lowercase, so utf8lwr must leave it alone. */
+  str[0] = '\xd3';
+  str[1] = '\x82';
+  str[2] = '\0';
+  utf8lwr(str);
+  ASSERT_EQ(0, strcmp(str, "\xd3\x82"));
+
+  ASSERT_EQ(0, utf8casecmp("\xd3\x81", "\xd3\x82"));
+  ASSERT_EQ(0, utf8casecmp("\xd3\x80", "\xd3\x8f"));
 }
 
 UTF8_TEST(utf8lwr, ascii) {
