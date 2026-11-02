@@ -1705,13 +1705,15 @@ utf8_constexpr14_impl utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
              ((0x0246 <= cp) && (0x024f >= cp)) ||
              ((0x03d8 <= cp) && (0x03ef >= cp)) ||
              ((0x0460 <= cp) && (0x0481 >= cp)) ||
-             ((0x048a <= cp) && (0x04ff >= cp))) {
+             ((0x048a <= cp) && (0x04bf >= cp)) ||
+             ((0x04d0 <= cp) && (0x04ff >= cp))) {
     cp |= 0x1;
   } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
              ((0x0179 <= cp) && (0x017e >= cp)) ||
              ((0x01af <= cp) && (0x01b0 >= cp)) ||
              ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
-             ((0x01cd <= cp) && (0x01dc >= cp))) {
+             ((0x01cd <= cp) && (0x01dc >= cp)) ||
+             ((0x04c1 <= cp) && (0x04ce >= cp))) {
     cp += 1;
     cp &= ~0x1;
   } else {
@@ -1720,6 +1722,9 @@ utf8_constexpr14_impl utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
       break;
     case 0x0178:
       cp = 0x00ff;
+      break;
+    case 0x04c0:
+      cp = 0x04cf;
       break;
     case 0x0243:
       cp = 0x0180;
@@ -1876,13 +1881,15 @@ utf8_constexpr14_impl utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
              ((0x0246 <= cp) && (0x024f >= cp)) ||
              ((0x03d8 <= cp) && (0x03ef >= cp)) ||
              ((0x0460 <= cp) && (0x0481 >= cp)) ||
-             ((0x048a <= cp) && (0x04ff >= cp))) {
+             ((0x048a <= cp) && (0x04bf >= cp)) ||
+             ((0x04d0 <= cp) && (0x04ff >= cp))) {
     cp &= ~0x1;
   } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
              ((0x0179 <= cp) && (0x017e >= cp)) ||
              ((0x01af <= cp) && (0x01b0 >= cp)) ||
              ((0x01b3 <= cp) && (0x01b6 >= cp)) ||
-             ((0x01cd <= cp) && (0x01dc >= cp))) {
+             ((0x01cd <= cp) && (0x01dc >= cp)) ||
+             ((0x04c1 <= cp) && (0x04ce >= cp))) {
     cp -= 1;
     cp |= 0x1;
   } else {
@@ -1891,6 +1898,9 @@ utf8_constexpr14_impl utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
       break;
     case 0x00ff:
       cp = 0x0178;
+      break;
+    case 0x04cf:
+      cp = 0x04c0;
       break;
     case 0x03c2:
       /* final sigma has no uppercase form of its own */
