@@ -2518,6 +2518,95 @@ UTF8_TEST(utf8ncmp, unsigned_byte_limit) {
   ASSERT_GT(utf8ncmp(higher, lower, 2), 0);
 }
 
+/* ascii runs on either side of multi-byte codepoints exercise the ascii fast
+ * paths and the switch back to the general path */
+static const utf8_int8_t ascii_runs[] = {
+    'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', (utf8_int8_t)0xc3, (utf8_int8_t)0xa9,
+    'x', 'y', 'z', (utf8_int8_t)0xc3, (utf8_int8_t)0xa9, 'a', 'b', 'c', 0};
+static const utf8_int8_t ascii_runs_xyz[] = {'x', 'y', 'z', 0};
+static const utf8_int8_t ascii_runs_e_abc[] = {(utf8_int8_t)0xc3,
+                                               (utf8_int8_t)0xa9, 'a', 'b', 'c',
+                                               0};
+static const utf8_int8_t ascii_runs_abd[] = {'a', 'b', 'd', 0};
+static const utf8_int8_t ascii_runs_XYZ_E[] = {
+    'X', 'Y', 'Z', (utf8_int8_t)0xc3, (utf8_int8_t)0x89, 0};
+static const utf8_int8_t ascii_runs_E_ABC[] = {(utf8_int8_t)0xc3,
+                                               (utf8_int8_t)0x89, 'A', 'B', 'C',
+                                               0};
+static const utf8_int8_t ascii_runs_ABD[] = {'A', 'B', 'D', 0};
+
+UTF8_TEST(utf8str, ascii_runs) {
+  ASSERT_EQ(ascii_runs + 10, utf8str(ascii_runs, ascii_runs_xyz));
+  ASSERT_EQ(ascii_runs + 13, utf8str(ascii_runs, ascii_runs_e_abc));
+  ASSERT_TRUE(NULL == utf8str(ascii_runs, ascii_runs_abd));
+}
+
+UTF8_TEST(utf8casestr, ascii_runs) {
+  ASSERT_EQ(ascii_runs + 10, utf8casestr(ascii_runs, ascii_runs_XYZ_E));
+  ASSERT_EQ(ascii_runs + 13, utf8casestr(ascii_runs, ascii_runs_E_ABC));
+  ASSERT_TRUE(NULL == utf8casestr(ascii_runs, ascii_runs_ABD));
+}
+
+UTF8_TEST(utf8casecmp, ascii_runs) {
+  const utf8_int8_t mixed1[] = {'H', 'e', 'l', 'l', 'o', ' ', (utf8_int8_t)0xc3,
+                                (utf8_int8_t)0x89, 't', (utf8_int8_t)0xc3,
+                                (utf8_int8_t)0xa9, 0};
+  const utf8_int8_t mixed2[] = {'h', 'E', 'L', 'L', 'O', ' ', (utf8_int8_t)0xc3,
+                                (utf8_int8_t)0xa9, 'T', (utf8_int8_t)0xc3,
+                                (utf8_int8_t)0x89, 0};
+  const utf8_int8_t abc[] = {'a', 'b', 'c', 0};
+  const utf8_int8_t ABC[] = {'A', 'B', 'C', 0};
+  const utf8_int8_t abc_e[] = {'a', 'b', 'c', (utf8_int8_t)0xc3,
+                               (utf8_int8_t)0xa9, 0};
+
+  ASSERT_EQ(0, utf8casecmp(mixed1, mixed2));
+  ASSERT_GT(0, utf8casecmp(abc, ascii_runs_ABD));
+  ASSERT_LT(0, utf8casecmp(abc_e, ABC));
+}
+
+UTF8_TEST(utf8len, ascii_runs) {
+  ASSERT_EQ(16u, utf8len(ascii_runs));
+  ASSERT_EQ(9u, utf8nlen(ascii_runs, 10));
+  ASSERT_EQ(8u, utf8nlen(ascii_runs, 9));
+}
+
+UTF8_TEST(utf8valid, ascii_runs) {
+  const utf8_int8_t bad[] = {'a', 'b', 'c', (utf8_int8_t)0x80, 'd', 'e', 'f', 0};
+
+  ASSERT_TRUE(NULL == utf8valid(ascii_runs));
+  ASSERT_EQ(bad + 3, utf8valid(bad));
+}
+
+/* the ascii fast paths rely on the case mappings only changing A-Z and a-z
+ * among ascii codepoints */
+UTF8_TEST(utf8lwrcodepoint, ascii_only_letters) {
+  utf8_int32_t c = 0;
+  for (c = 0; c < 128; c++) {
+    ASSERT_EQ(('A' <= c && 'Z' >= c) ? c + 32 : c, utf8lwrcodepoint(c));
+    ASSERT_EQ(('a' <= c && 'z' >= c) ? c - 32 : c, utf8uprcodepoint(c));
+  }
+}
+
+UTF8_TEST(utf8lwr, ascii_runs) {
+  utf8_int8_t s[] = {'A', 'B', 'C', (utf8_int8_t)0xc3, (utf8_int8_t)0x89,
+                     'D', 'E', 'F', 0};
+  const utf8_int8_t expected[] = {'a', 'b', 'c', (utf8_int8_t)0xc3,
+                                  (utf8_int8_t)0xa9, 'd', 'e', 'f', 0};
+
+  utf8lwr(s);
+  ASSERT_EQ(0, utf8cmp(s, expected));
+}
+
+UTF8_TEST(utf8upr, ascii_runs) {
+  utf8_int8_t s[] = {'a', 'b', 'c', (utf8_int8_t)0xc3, (utf8_int8_t)0xa9,
+                     'd', 'e', 'f', 0};
+  const utf8_int8_t expected[] = {'A', 'B', 'C', (utf8_int8_t)0xc3,
+                                  (utf8_int8_t)0x89, 'D', 'E', 'F', 0};
+
+  utf8upr(s);
+  ASSERT_EQ(0, utf8cmp(s, expected));
+}
+
 #if defined(__cplusplus)
 
 #if defined(__clang__)
