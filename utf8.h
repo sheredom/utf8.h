@@ -1330,19 +1330,21 @@ int utf8makevalid(utf8_int8_t *str, const utf8_int32_t replacement) {
   }
 
   while ('\0' != *read) {
-    if (0xf0 == (0xf8 & *read)) {
+    if ((0xf0 == (0xf8 & *read)) && (0x04 >= (0x07 & *read))) {
       /* ensure each of the 3 following bytes in this 4-byte
-       * utf8 codepoint began with 0b10xxxxxx */
+       * utf8 codepoint began with 0b10xxxxxx, and that for a
+       * leading byte of 0xf4 the second byte does not exceed 0x8f */
       if ((0x80 != (0xc0 & read[1])) || (0x80 != (0xc0 & read[2])) ||
-          (0x80 != (0xc0 & read[3]))) {
+          (0x80 != (0xc0 & read[3])) ||
+          ((4 == (0x07 & read[0])) && (0 != (0x30 & read[1])))) {
         *write++ = r;
         read++;
         continue;
       }
 
-      /* 4-byte utf8 code point (began with 0b11110xxx) */
+      /* 4-byte utf8 code point (began with 0b11110000..0b11110100) */
       (void)utf8codepoint(read, &codepoint);
-      if ((codepoint > 0x10ffff) ||
+      if ((0 == codepoint) || (codepoint > 0x10ffff) ||
           ((codepoint >= 0xd800) && (codepoint <= 0xdfff))) {
         /* Invalid scalar values cannot be repaired by re-encoding them. */
         *write++ = r;

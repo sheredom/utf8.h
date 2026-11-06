@@ -2368,6 +2368,153 @@ UTF8_TEST(utf8makevalid, non_scalar_followed_by_truncated_sequence) {
   ASSERT_STREQ("!!!!!", invalid);
 }
 
+UTF8_TEST(utf8makevalid, valid_sequences_preserved) {
+  /* Test valid ASCII, 2-byte, 3-byte, and 4-byte sequences, including
+   * boundary values (U+007F, U+0080, U+07FF, U+0800, U+FFFF, U+10000, U+10FFFF).
+   * Valid sequences must not be altered and utf8makevalid must return 0. */
+  const char valid[] = "ASCII: Hello! "
+                       "2-byte: \xc2\xa2\xdf\xbf "
+                       "3-byte: \xe0\xa0\x80\xef\xbf\xbf "
+                       "4-byte: \xf0\x90\x80\x80\xf0\x9f\x98\x80\xf4\x8f\xbf\xbf";
+  char str[sizeof(valid)];
+  memcpy(str, valid, sizeof(valid));
+
+  ASSERT_EQ(0, utf8makevalid(str, '?'));
+  ASSERT_EQ(0, memcmp(valid, str, sizeof(valid)));
+}
+
+UTF8_TEST(utf8makevalid, invalid_four_byte_lead_bytes) {
+  /* Under RFC 3629, 4-byte sequences are strictly restricted to lead bytes 0xF0..0xF4.
+   * Bytes 0xF5..0xFF can never start any valid UTF-8 sequence and must be rejected
+   * immediately without attempting to consume continuation bytes. */
+  const char *const inputs[] = {
+      "\xf5", "\xf6", "\xf7", "\xf8", "\xf9", "\xfa", "\xfb", "\xfc", "\xfd", "\xfe", "\xff",
+      "\xf5\x80\x80\x80", "\xf6\x80\x80\x80", "\xf7\x80\x80\x80",
+      "prefix_\xf5_suffix", "prefix_\xf6\x80\x80\x80_suffix",
+      "\xf5hello", "\xf6\x80world"};
+  const char *const expected[] = {
+      "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?",
+      "????", "????", "????",
+      "prefix_?_suffix", "prefix_????_suffix",
+      "?hello", "??world"};
+  size_t i;
+
+  for (i = 0; i < sizeof(inputs) / sizeof(inputs[0]); i++) {
+    char repaired[64];
+    size_t len = strlen(inputs[i]);
+    memcpy(repaired, inputs[i], len + 1);
+
+    ASSERT_EQ(0, utf8makevalid(repaired, '?'));
+    EXPECT_STREQ(expected[i], repaired);
+  }
+}
+
+UTF8_TEST(utf8makevalid, invalid_four_byte_second_byte_range) {
+  /* For lead byte 0xF4, the second byte is restricted to 0x80..0x8F (U+100000..U+10FFFF).
+   * Second bytes 0x90..0xBF exceed the maximum Unicode code point U+10FFFF and must
+   * be rejected for both complete and truncated sequences. */
+  const char *const inputs[] = {
+      "\xf4\x90\x80\x80", "\xf4\x90\x80", "\xf4\x90", "\xf4\x90 ",
+      "\xf4\xbf\xbf\xbf", "\xf4\xbf\x80", "\xf4\xbf",
+      "A\xf4\x90\x80\x80" "B", "A\xf4\xbf\xbf\xbf" "B"};
+  const char *const expected[] = {
+      "????", "???", "??", "?? ",
+      "????", "???", "??",
+      "A????B", "A????B"};
+  size_t i;
+
+  for (i = 0; i < sizeof(inputs) / sizeof(inputs[0]); i++) {
+    char repaired[32];
+    size_t len = strlen(inputs[i]);
+    memcpy(repaired, inputs[i], len + 1);
+
+    ASSERT_EQ(0, utf8makevalid(repaired, '?'));
+    EXPECT_STREQ(expected[i], repaired);
+  }
+}
+
+UTF8_TEST(utf8makevalid, invalid_four_byte_continuation_bytes) {
+  /* Continuation bytes in a 4-byte sequence must all have bits 10xxxxxx (0x80..0xBF).
+   * ASCII or non-continuation bytes in any position must trigger replacement. */
+  const char *const inputs[] = {
+      "\xf1\x20\x80\x80", "\xf1\x80\x20\x80", "\xf1\x80\x80\x20",
+      "\xf2?\x80\x80", "\xf2\x80?\x80", "\xf2\x80\x80?",
+      "\xf3Z\x80\x80", "\xf3\x80Z\x80", "\xf3\x80\x80Z"};
+  const char *const expected[] = {
+      "? ??", "?? ?", "??? ",
+      "????", "????", "????",
+      "?Z??", "??Z?", "???Z"};
+  size_t i;
+
+  for (i = 0; i < sizeof(inputs) / sizeof(inputs[0]); i++) {
+    char repaired[32];
+    size_t len = strlen(inputs[i]);
+    memcpy(repaired, inputs[i], len + 1);
+
+    ASSERT_EQ(0, utf8makevalid(repaired, '?'));
+    EXPECT_STREQ(expected[i], repaired);
+  }
+}
+
+UTF8_TEST(utf8makevalid, truncated_four_byte_sequences) {
+  /* Incomplete 4-byte sequences truncated before reading all continuation bytes
+   * must be replaced without buffer overread. */
+  const char *const inputs[] = {
+      "\xf0", "\xf0\x90", "\xf0\x90\x80",
+      "\xf1", "\xf1\x80", "\xf1\x80\x80",
+      "\xf2", "\xf2\x80", "\xf2\x80\x80",
+      "\xf3", "\xf3\x80", "\xf3\x80\x80",
+      "\xf4", "\xf4\x80", "\xf4\x80\x80",
+      "test\xf0\x90", "test\xf4\x8f\xbf"};
+  const char *const expected[] = {
+      "?", "??", "???",
+      "?", "??", "???",
+      "?", "??", "???",
+      "?", "??", "???",
+      "?", "??", "???",
+      "test??", "test???"};
+  size_t i;
+
+  for (i = 0; i < sizeof(inputs) / sizeof(inputs[0]); i++) {
+    char repaired[32];
+    size_t len = strlen(inputs[i]);
+    memcpy(repaired, inputs[i], len + 1);
+
+    ASSERT_EQ(0, utf8makevalid(repaired, '?'));
+    EXPECT_STREQ(expected[i], repaired);
+  }
+}
+
+UTF8_TEST(utf8makevalid, overlong_four_byte_nul_rejected) {
+  /* An overlong 4-byte encoding of U+0000 (\xf0\x80\x80\x80) must be rejected
+   * rather than written as an embedded NUL byte which would prematurely terminate strings. */
+  char str1[] = "A\xf0\x80\x80\x80" "B";
+  char str2[] = "\xf0\x80\x80\x80";
+
+  ASSERT_EQ(0, utf8makevalid(str1, '?'));
+  EXPECT_STREQ("A????B", str1);
+
+  ASSERT_EQ(0, utf8makevalid(str2, '#'));
+  EXPECT_STREQ("####", str2);
+}
+
+UTF8_TEST(utf8makevalid, mixed_inputs) {
+  /* Complex mixed inputs containing ASCII, valid multibyte UTF-8, truncated sequences,
+   * invalid leading bytes, and out-of-range sequences together. */
+  char mixed1[] = "\xf5" "Start \xc2\xa2 middle \xf0\x9f\x98\x80 \xf4\x90\x80\x80 end \xff";
+  char mixed2[] = "\xf5\xf6\xf7\xf8\xff";
+  char mixed3[] = "";
+
+  ASSERT_EQ(0, utf8makevalid(mixed1, '_'));
+  EXPECT_STREQ("_Start \xc2\xa2 middle \xf0\x9f\x98\x80 ____ end _", mixed1);
+
+  ASSERT_EQ(0, utf8makevalid(mixed2, '?'));
+  EXPECT_STREQ("?????", mixed2);
+
+  ASSERT_EQ(0, utf8makevalid(mixed3, '?'));
+  EXPECT_STREQ("", mixed3);
+}
+
 UTF8_TEST(utf8valid, rejects_non_scalar_values) {
   const char *const inputs[] = {
       "A\xed\xa0\x80" "B", "A\xed\xbf\xbf" "B",
