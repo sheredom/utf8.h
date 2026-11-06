@@ -60,6 +60,13 @@
 
 #if defined(_MSC_VER) && (_MSC_VER < 1920)
 typedef __int32 utf8_int32_t;
+#if (_MSC_VER < 1600)
+#ifdef _WIN64
+#define SIZE_MAX 0xffffffffffffffffULL
+#else
+#define SIZE_MAX 0xffffffffUL
+#endif
+#endif
 #else
 #include <stdint.h>
 typedef int32_t utf8_int32_t;
@@ -88,7 +95,12 @@ extern "C" {
 #if defined(_MSC_VER)
 #define utf8_nonnull
 #define utf8_pure
+#if (_MSC_VER < 1600)
+/*avoiding compiler fatal error C1600: unsupported data type */
+#define utf8_restrict
+#else
 #define utf8_restrict __restrict
+#endif
 #define utf8_weak __inline
 #elif defined(__clang__) || defined(__GNUC__)
 #define utf8_nonnull UTF8_ATTRIBUTE(nonnull)
