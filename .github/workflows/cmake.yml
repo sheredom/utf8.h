@@ -31,7 +31,7 @@ jobs:
 
     - name: Setup dependencies
       if: startsWith(matrix.os, 'ubuntu')
-      run: sudo apt-get install -y gcc-10 g++-10 clang tcc
+      run: sudo apt-get install -y gcc-14 g++-14 clang tcc
 
     - name: Configure CMake
       shell: bash
@@ -43,13 +43,13 @@ jobs:
       shell: bash
       if: matrix.compiler == 'gcc'
       working-directory: ${{github.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE/test -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10
+      run: cmake $GITHUB_WORKSPACE/test -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=gcc-14 -DCMAKE_CXX_COMPILER=g++-14
 
     - name: Configure CMake with TCC (Ubuntu)
       shell: bash
       if: matrix.compiler == 'tcc' && startsWith(matrix.os, 'ubuntu')
       working-directory: ${{github.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE/test -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=tcc -DCMAKE_CXX_COMPILER=g++-10
+      run: cmake $GITHUB_WORKSPACE/test -DCMAKE_BUILD_TYPE=${{ matrix.type }} -DCMAKE_C_COMPILER=tcc -DCMAKE_CXX_COMPILER=g++-14
 
     - name: Configure CMake with Clang (Ubuntu)
       shell: bash
