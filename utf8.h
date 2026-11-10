@@ -339,8 +339,8 @@ utf8_weak utf8_int8_t *utf8dup_ex(const utf8_int8_t *src,
                                                                  size_t),
                                   utf8_int8_t *user_data);
 
-/* Similar to utf8dup, except that at most n bytes of src are copied. If src is
- * longer than n, only n bytes are copied and a null byte is added.
+/* Similar to utf8dup_ex, except that at most n bytes of src are copied. If src
+ * is longer than n, only n bytes are copied and a null byte is added.
  *
  * Returns a new string if successful, 0 otherwise. */
 utf8_weak utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
