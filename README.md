@@ -307,9 +307,14 @@ Make a codepoint upper case if possible.
 ```c
 utf8_int8_t * utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim)
 ```
-Breaks the string pointed to by *stringp into tokens, using the delimiters
-specified in delim. All delimiters found within *stringp are replaced with
-a null byte (NUL). Returns a token, or NULL if no further token is found.
+The utf8sep() function locates, in the utf8 string referenced by *stringp,
+the first occurrence of any character in the utf8 string delim (or the
+terminating `\0' character) and replaces it with a `\0'. The location of the
+next character after the delimiter character (or NULL, if the end of the
+string was reached) is stored in *stringp. The original value of *stringp is
+returned.
+If *stringp is initially NULL, utf8sep() returns NULL.
+
 
 ## Codepoint Case
 
