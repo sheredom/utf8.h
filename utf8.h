@@ -2165,8 +2165,9 @@ utf8_int8_t *
 utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim)
 { utf8_int8_t *p, *t;
 
-  if ((stringp == NULL) || (*stringp == NULL) || (delim == NULL))
-    return NULL;
+  if ((stringp == NULL) || (*stringp == NULL) || (delim == NULL)) {
+    return utf8_null;
+  }
 
   t = p = *stringp;
 
@@ -2175,15 +2176,16 @@ utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim)
     utf8_int32_t c;
 
     n = utf8codepoint(p, &c);
-    if (utf8chr(delim, c) == NULL)
+    if (utf8chr(delim, c) == NULL) {
       p = n;
+    }
     else { 
       *p = '\0';
       *stringp = n;
       return t;
     }
   }
-  *stringp = NULL;
+  *stringp = utf8_null;
   return t;
 }
 
