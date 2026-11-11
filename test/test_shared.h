@@ -2826,7 +2826,7 @@ UTF8_TEST(utf8sep, main)
 }
 
 UTF8_TEST(utf8sep, stringp_null)
-{ utf8_int8_t *p = NULL;
+{ utf8_int8_t *p = (utf8_int8_t *)NULL;
 
   ASSERT_TRUE(NULL == utf8sep(&p, (const utf8_int8_t*)" "));
 }
