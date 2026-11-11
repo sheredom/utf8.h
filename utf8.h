@@ -2162,8 +2162,8 @@ utf8rcodepoint(const utf8_int8_t *utf8_restrict str,
 }
 
 utf8_int8_t *
-utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim)
-{ utf8_int8_t *p, *t;
+utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim) {
+  utf8_int8_t *p, *t;
 
   if ((stringp == NULL) || (*stringp == NULL) || (delim == NULL)) {
     return utf8_null;
