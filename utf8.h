@@ -348,6 +348,15 @@ utf8_weak utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
                                                                   size_t),
                                    utf8_int8_t *user_data);
 
+
+/* Breaks the string pointed to by *stringp into tokens based on the characters
+ * listed in delim. Any delimiters found within *stringp are replaced by a null
+ * byte.
+ *
+ * Returns a pointer to the token; if no more tokens are found, returns NULL.
+ */
+utf8_weak utf8_int8_t *utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim);
+
 #undef utf8_weak
 #undef utf8_pure
 #undef utf8_nonnull
@@ -2150,6 +2159,32 @@ utf8rcodepoint(const utf8_int8_t *utf8_restrict str,
   } while ((0 != (0x80 & s[0])) && (0x80 == (0xc0 & s[0])));
 
   return (utf8_int8_t *)s;
+}
+
+utf8_int8_t *
+utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim)
+{ utf8_int8_t *p, *t;
+
+  if ((stringp == NULL) || (*stringp == NULL) || (delim == NULL))
+    return NULL;
+
+  t = p = *stringp;
+
+  while ('\0' != *p) { 
+    utf8_int8_t *n;
+    utf8_int32_t c;
+
+    n = utf8codepoint(p, &c);
+    if (utf8chr(delim, c) == NULL)
+      p = n;
+    else { 
+      *p = '\0';
+      *stringp = n;
+      return t;
+    }
+  }
+  *stringp = NULL;
+  return t;
 }
 
 #undef utf8_restrict

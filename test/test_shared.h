@@ -2787,6 +2787,125 @@ UTF8_TEST(utf8upr, ascii_runs) {
   ASSERT_EQ(0, utf8cmp(s, expected));
 }
 
+UTF8_TEST(utf8sep, main)
+{ utf8_int8_t s[] = "\xd0\x9c\xd0\xb0\xd0\xbc\xd0\xb0 \xd0\xbc\xd1\x8b\xd0\xbb\xd0\xb0\t\xd1\x80\xd0\xb0\xd0\xbc\xd1\x83", *p, *p1 = s;
+
+  p = utf8sep(&p1, " \t");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\x9c\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, " \t");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd1\x8b\xd0\xbb\xd0\xb0"));
+  p = utf8sep(&p1, " \t");
+  ASSERT_EQ(0, utf8cmp(p, "\xd1\x80\xd0\xb0\xd0\xbc\xd1\x83"));
+  p = utf8sep(&p1, " \t");
+  ASSERT_TRUE(NULL == p);
+}
+
+UTF8_TEST(utf8sep, stringp_null)
+{ utf8_int8_t *p = NULL;
+
+  ASSERT_TRUE(NULL == utf8sep(&p, " "));
+}
+
+UTF8_TEST(utf8sep, stringp_empty)
+{ utf8_int8_t str[] = "", *p, *p1 = str;
+
+  p = utf8sep(&p1, " ");
+  ASSERT_TRUE('\0' == *p);
+}
+
+UTF8_TEST(utf8sep, delim_empty)
+{ utf8_int8_t str[] = "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0", *p, *p1 = str;
+
+  p = utf8sep(&p1, "");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  ASSERT_TRUE(NULL == p1);
+}
+
+UTF8_TEST(utf8sep, delim_begin)
+{ utf8_int8_t str[] = ",\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0", *p, *p1 = str;
+
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE('\0' == *p);
+  p = utf8sep(&p1, ",");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE(NULL == p);
+}
+
+UTF8_TEST(utf8sep, delim_end)
+{ utf8_int8_t str[] = "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0,", *p, *p1 = str;
+
+  p = utf8sep(&p1, ",");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE('\0' == *p);
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE(NULL == p);
+}
+
+UTF8_TEST(utf8sep, delims_middle)
+{ utf8_int8_t str[] = "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0,,\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0", *p, *p1 = str;
+
+  p = utf8sep(&p1, ",");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE('\0' == *p);
+  p = utf8sep(&p1, ",");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE(NULL == p);
+}
+
+UTF8_TEST(utf8sep, delims_only)
+{ utf8_int8_t str[] = ",,,", *p, *p1 = str;
+
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE('\0' == *p);
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE('\0' == *p);
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE('\0' == *p);
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE('\0' == *p);
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE(NULL == p);
+}
+
+UTF8_TEST(utf8sep, delims_many)
+{ utf8_int8_t str[] = "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0,\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0;\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0!", *p, *p1 = str;
+
+  p = utf8sep(&p1, ",;!");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, ",;!");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, ",;!");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, ",;!");
+  ASSERT_TRUE('\0' == *p);
+  p = utf8sep(&p1, ",;!");
+  ASSERT_TRUE(NULL == p);
+}
+
+UTF8_TEST(utf8sep, no_delims_founs)
+{ utf8_int8_t str[] = "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0", *p, *p1 = str;
+
+  p = utf8sep(&p1, ",");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, ",");
+  ASSERT_TRUE(NULL == p);
+}
+
+UTF8_TEST(utf8sep, delim_uft8)
+{ utf8_int8_t s[] = "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0\xd0\x9c\xd0\xb0\xd0\xbc\xd0\xb0", *p, *p1 = s;
+
+  p = utf8sep(&p1, "\xd0\x9c");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xbc\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, "\xd0\x9c");
+  ASSERT_EQ(0, utf8cmp(p, "\xd0\xb0\xd0\xbc\xd0\xb0"));
+  p = utf8sep(&p1, "\xd0\x9c");
+  ASSERT_TRUE(NULL == p);
+}
+
 #if defined(__cplusplus)
 
 #if defined(__clang__)

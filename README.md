@@ -28,7 +28,7 @@ strncpy | utf8ncpy | &#10004; |
 strndup | utf8ndup | &#10004; |
 strpbrk | utf8pbrk | &#10004; | &#10004;
 strrchr | utf8rchr | &#10004; | &#10004;
-strsep | utf8sep | |
+strsep | utf8sep | &#10004; |
 strspn | utf8spn | &#10004; | &#10004;
 strstr | utf8str | &#10004; | &#10004;
 strtok | utf8tok | |
@@ -303,6 +303,13 @@ Make a codepoint lower case if possible.
 utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
 ```
 Make a codepoint upper case if possible.
+
+```c
+utf8_int8_t * utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim)
+```
+Breaks the string pointed to by *stringp into tokens, using the delimiters
+specified in delim. All delimiters found within *stringp are replaced with
+a null byte (NUL). Returns a token, or NULL if no further token is found.
 
 ## Codepoint Case
 
