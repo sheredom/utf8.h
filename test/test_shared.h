@@ -2787,8 +2787,8 @@ UTF8_TEST(utf8upr, ascii_runs) {
   ASSERT_EQ(0, utf8cmp(s, expected));
 }
 
-UTF8_TEST(utf8sep, main)
-{ utf8_int8_t s[] = {(utf8_int8_t)0xd0, (utf8_int8_t)0x9c,
+UTF8_TEST(utf8sep, main) { 
+  utf8_int8_t s[] = {(utf8_int8_t)0xd0, (utf8_int8_t)0x9c,
                      (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, 
                      (utf8_int8_t)0xd0, (utf8_int8_t)0xbc, 
                      (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, ' ', 
@@ -2825,14 +2825,20 @@ UTF8_TEST(utf8sep, main)
   ASSERT_TRUE(NULL == p);
 }
 
-UTF8_TEST(utf8sep, stringp_null)
-{ utf8_int8_t *p = (utf8_int8_t *)NULL;
+UTF8_TEST(utf8sep, stringp_null) { 
+#if defined(__cplusplus) && __cplusplus >= 201103L
+  utf8_int8_t *p = nullptr;
+#elif defined(__cplusplus)
+  utf8_int8_t *p = static_cast<utf8_int8_t *>(0);
+#else
+  utf8_int8_t *p = NULL;
+#endif
 
   ASSERT_TRUE(NULL == utf8sep(&p, (const utf8_int8_t*)" "));
 }
 
-UTF8_TEST(utf8sep, stringp_empty)
-{ utf8_int8_t str[] = { '\0' };
+UTF8_TEST(utf8sep, stringp_empty) { 
+  utf8_int8_t str[] = { '\0' };
   const utf8_int8_t delim[] = {' ', '\0'};
   utf8_int8_t *p, *p1 = str;
 
@@ -2840,8 +2846,8 @@ UTF8_TEST(utf8sep, stringp_empty)
   ASSERT_TRUE('\0' == *p);
 }
 
-UTF8_TEST(utf8sep, delim_empty)
-{ utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc, 
+UTF8_TEST(utf8sep, delim_empty) { 
+  utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc, 
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, 
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, '\0'};
@@ -2857,8 +2863,8 @@ UTF8_TEST(utf8sep, delim_empty)
   ASSERT_TRUE(NULL == p1);
 }
 
-UTF8_TEST(utf8sep, delim_begin)
-{ utf8_int8_t str[]            = {',', (utf8_int8_t)0xd0, (utf8_int8_t)0xbc, 
+UTF8_TEST(utf8sep, delim_begin) { 
+  utf8_int8_t str[]            = {',', (utf8_int8_t)0xd0, (utf8_int8_t)0xbc, 
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, '\0'};
@@ -2877,8 +2883,8 @@ UTF8_TEST(utf8sep, delim_begin)
   ASSERT_TRUE(NULL == p);
 }
 
-UTF8_TEST(utf8sep, delim_end)
-{ utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
+UTF8_TEST(utf8sep, delim_end) { 
+  utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, ',', '\0'};
@@ -2897,8 +2903,8 @@ UTF8_TEST(utf8sep, delim_end)
   ASSERT_TRUE(NULL == p);
 }
 
-UTF8_TEST(utf8sep, delims_middle)
-{ utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
+UTF8_TEST(utf8sep, delims_middle) { 
+  utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, ',', ',', 
@@ -2923,8 +2929,8 @@ UTF8_TEST(utf8sep, delims_middle)
   ASSERT_TRUE(NULL == p);
 }
 
-UTF8_TEST(utf8sep, delims_only)
-{ utf8_int8_t str[] = {',', ',', ',', '\0'};
+UTF8_TEST(utf8sep, delims_only) { 
+  utf8_int8_t str[] = {',', ',', ',', '\0'};
   const utf8_int8_t delim[] = {',', '\0'};
   utf8_int8_t *p, *p1 = str;
 
@@ -2940,8 +2946,8 @@ UTF8_TEST(utf8sep, delims_only)
   ASSERT_TRUE(NULL == p);
 }
 
-UTF8_TEST(utf8sep, delims_many)
-{ utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
+UTF8_TEST(utf8sep, delims_many) { 
+  utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, ',', 
@@ -2972,8 +2978,8 @@ UTF8_TEST(utf8sep, delims_many)
   ASSERT_TRUE(NULL == p);
 }
 
-UTF8_TEST(utf8sep, no_delims_founs)
-{ utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
+UTF8_TEST(utf8sep, no_delims_founs) { 
+  utf8_int8_t str[]            = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                   (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, '\0'};
@@ -2990,8 +2996,8 @@ UTF8_TEST(utf8sep, no_delims_founs)
   ASSERT_TRUE(NULL == p);
 }
 
-UTF8_TEST(utf8sep, delim_uft8)
-{ utf8_int8_t str[]             = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
+UTF8_TEST(utf8sep, delim_uft8) { 
+  utf8_int8_t str[]             = {(utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                    (utf8_int8_t)0xd0, (utf8_int8_t)0xb0,
                                    (utf8_int8_t)0xd0, (utf8_int8_t)0xbc,
                                    (utf8_int8_t)0xd0, (utf8_int8_t)0xb0, 
