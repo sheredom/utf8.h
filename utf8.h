@@ -348,13 +348,13 @@ utf8_weak utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
                                                                   size_t),
                                    utf8_int8_t *user_data);
 
-
-/* Breaks the string pointed to by *stringp into tokens based on the characters
- * listed in delim. Any delimiters found within *stringp are replaced by a null
- * byte.
- *
- * Returns a pointer to the token; if no more tokens are found, returns NULL.
- */
+/* The utf8sep() function locates, in the utf8 string referenced by *stringp,
+ * the first occurrence of any character in the utf8 string delim (or the
+ * terminating `\0' character) and replaces it with a `\0'. The location of the
+ * next character after the delimiter character (or NULL, if the end of the
+ * string was reached) is stored in *stringp. The original value of *stringp is
+ * returned.
+ * If *stringp is initially NULL, utf8sep() returns NULL.*/
 utf8_weak utf8_int8_t *utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim);
 
 #undef utf8_weak
