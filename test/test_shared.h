@@ -2585,6 +2585,45 @@ UTF8_TEST(utf8nvalid, exactly_4_bytes) {
   ASSERT_EQ(utf8nvalid(terminated, 4), NULL);
 }
 
+/* ------------------------------------------------------------------ */
+/* String-level regression tests for missing Unicode case-mapping      */
+/* blocks (issue #131). C-only: string literals use char*, not char8_t */
+/* ------------------------------------------------------------------ */
+
+/* utf8lwr on Cyrillic Supplement uppercase characters */
+UTF8_TEST(utf8lwr, cyrillic_supplement_string) {
+  /* U+0500 U+0502 U+0526 -> U+0501 U+0503 U+0527 */
+  char str[] = "\xd4\x80\xd4\x82\xd4\xa6";
+  const char ref[] = "\xd4\x81\xd4\x83\xd4\xa7";
+  utf8lwr(str);
+  ASSERT_EQ(0, strcmp(str, ref));
+}
+
+/* utf8upr on Cyrillic Supplement lowercase characters */
+UTF8_TEST(utf8upr, cyrillic_supplement_string) {
+  char str[] = "\xd4\x81\xd4\x83\xd4\xa7";
+  const char ref[] = "\xd4\x80\xd4\x82\xd4\xa6";
+  utf8upr(str);
+  ASSERT_EQ(0, strcmp(str, ref));
+}
+
+/* utf8casecmp on Cyrillic Supplement pairs */
+UTF8_TEST(utf8casecmp, cyrillic_supplement) {
+  /* U+0500 Ԁ vs U+0501 ԁ */
+  ASSERT_EQ(0, utf8casecmp("\xd4\x80", "\xd4\x81"));
+  /* U+0526 Ԧ vs U+0527 ԧ */
+  ASSERT_EQ(0, utf8casecmp("\xd4\xa6", "\xd4\xa7"));
+}
+
+/* utf8casecmp on Latin Extended-D pairs */
+UTF8_TEST(utf8casecmp, latin_extended_d) {
+  /* U+A722 Ꜣ vs U+A723 ꜣ */
+  ASSERT_EQ(0, utf8casecmp("\xea\x9c\xa2", "\xea\x9c\xa3"));
+  /* U+A732 Ꜳ vs U+A733 ꜳ */
+  ASSERT_EQ(0, utf8casecmp("\xea\x9c\xb2", "\xea\x9c\xb3"));
+}
+
+/* ------------------------------------------------------------------ */
 
 #endif
 
@@ -2836,6 +2875,144 @@ static constexpr void utf8_test_constexpr(void) {
 #else
 static void utf8_test_constexpr(void) {}
 #endif
+
+/* ------------------------------------------------------------------ */
+/* Regression tests: codepoint-level case mapping for missing blocks  */
+/* (issue #131) These tests run in both C and C++.                    */
+/* ------------------------------------------------------------------ */
+
+/* Cyrillic Supplement U+0500..U+052E: even=upper, odd=lower */
+UTF8_TEST(utf8lwrcodepoint, cyrillic_supplement) {
+  utf8_int32_t cp;
+  for (cp = 0x0500; cp <= 0x052e; cp += 2) {
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp));
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp + 1));
+  }
+  /* Boundaries just outside the range must not be remapped */
+  ASSERT_EQ(0x04ff, utf8lwrcodepoint(0x04ff));
+  ASSERT_EQ(0x0530, utf8lwrcodepoint(0x0530));
+}
+
+UTF8_TEST(utf8uprcodepoint, cyrillic_supplement) {
+  utf8_int32_t cp;
+  for (cp = 0x0501; cp <= 0x052f; cp += 2) {
+    ASSERT_EQ(cp - 1, utf8uprcodepoint(cp));
+    ASSERT_EQ(cp - 1, utf8uprcodepoint(cp - 1));
+  }
+}
+
+/* Latin Extended-C U+2C60..U+2C76 */
+UTF8_TEST(utf8lwrcodepoint, latin_extended_c) {
+  /* U+2C60 Ⱡ -> U+2C61 ⱡ */
+  ASSERT_EQ(0x2c61, utf8lwrcodepoint(0x2c60));
+  ASSERT_EQ(0x2c61, utf8lwrcodepoint(0x2c61));
+  ASSERT_EQ(0x026b, utf8lwrcodepoint(0x2c62)); /* Ɫ -> ɫ */
+  ASSERT_EQ(0x1d7d, utf8lwrcodepoint(0x2c63)); /* Ᵽ -> ᵽ */
+  ASSERT_EQ(0x027d, utf8lwrcodepoint(0x2c64)); /* Ɽ -> ɽ */
+  /* U+2C67..U+2C6C alternating pairs */
+  ASSERT_EQ(0x2c68, utf8lwrcodepoint(0x2c67));
+  ASSERT_EQ(0x2c6a, utf8lwrcodepoint(0x2c69));
+  ASSERT_EQ(0x2c6c, utf8lwrcodepoint(0x2c6b));
+  ASSERT_EQ(0x0251, utf8lwrcodepoint(0x2c6d)); /* Ɑ -> ɑ */
+  ASSERT_EQ(0x0271, utf8lwrcodepoint(0x2c6e)); /* Ɱ -> ɱ */
+  ASSERT_EQ(0x0250, utf8lwrcodepoint(0x2c6f)); /* Ɐ -> ɐ */
+  ASSERT_EQ(0x0252, utf8lwrcodepoint(0x2c70)); /* Ɒ -> ɒ */
+  ASSERT_EQ(0x2c73, utf8lwrcodepoint(0x2c72));
+  ASSERT_EQ(0x2c76, utf8lwrcodepoint(0x2c75));
+}
+
+UTF8_TEST(utf8uprcodepoint, latin_extended_c) {
+  ASSERT_EQ(0x2c60, utf8uprcodepoint(0x2c61));
+  ASSERT_EQ(0x2c62, utf8uprcodepoint(0x026b));
+  ASSERT_EQ(0x2c63, utf8uprcodepoint(0x1d7d));
+  ASSERT_EQ(0x2c64, utf8uprcodepoint(0x027d));
+  ASSERT_EQ(0x2c67, utf8uprcodepoint(0x2c68));
+  ASSERT_EQ(0x2c6d, utf8uprcodepoint(0x0251));
+  ASSERT_EQ(0x2c6e, utf8uprcodepoint(0x0271));
+  ASSERT_EQ(0x2c6f, utf8uprcodepoint(0x0250));
+  ASSERT_EQ(0x2c70, utf8uprcodepoint(0x0252));
+  ASSERT_EQ(0x2c72, utf8uprcodepoint(0x2c73));
+  ASSERT_EQ(0x2c75, utf8uprcodepoint(0x2c76));
+}
+
+/* Latin Extended-D */
+UTF8_TEST(utf8lwrcodepoint, latin_extended_d) {
+  utf8_int32_t cp;
+  for (cp = 0xa722; cp <= 0xa72e; cp += 2) {
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp));
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp + 1));
+  }
+  for (cp = 0xa732; cp <= 0xa76e; cp += 2) {
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp));
+  }
+  ASSERT_EQ(0xa77a, utf8lwrcodepoint(0xa779));
+  ASSERT_EQ(0xa77c, utf8lwrcodepoint(0xa77b));
+  ASSERT_EQ(0x1d79, utf8lwrcodepoint(0xa77d)); /* Ᵹ -> ᵹ */
+  for (cp = 0xa77e; cp <= 0xa786; cp += 2) {
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp));
+  }
+  ASSERT_EQ(0xa78c, utf8lwrcodepoint(0xa78b));
+  ASSERT_EQ(0x0265, utf8lwrcodepoint(0xa78d)); /* Ɥ -> ɥ */
+  ASSERT_EQ(0xa791, utf8lwrcodepoint(0xa790));
+  ASSERT_EQ(0xa793, utf8lwrcodepoint(0xa792));
+  for (cp = 0xa796; cp <= 0xa7a8; cp += 2) {
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp));
+  }
+  ASSERT_EQ(0x0266, utf8lwrcodepoint(0xa7aa));
+  ASSERT_EQ(0x025c, utf8lwrcodepoint(0xa7ab));
+  ASSERT_EQ(0x0261, utf8lwrcodepoint(0xa7ac));
+  ASSERT_EQ(0x026c, utf8lwrcodepoint(0xa7ad));
+  ASSERT_EQ(0x026a, utf8lwrcodepoint(0xa7ae));
+  ASSERT_EQ(0x029e, utf8lwrcodepoint(0xa7b0));
+  ASSERT_EQ(0x0287, utf8lwrcodepoint(0xa7b1));
+  ASSERT_EQ(0x029d, utf8lwrcodepoint(0xa7b2));
+  ASSERT_EQ(0xab53, utf8lwrcodepoint(0xa7b3));
+  for (cp = 0xa7b4; cp <= 0xa7c2; cp += 2) {
+    ASSERT_EQ(cp + 1, utf8lwrcodepoint(cp));
+  }
+}
+
+UTF8_TEST(utf8uprcodepoint, latin_extended_d) {
+  ASSERT_EQ(0xa722, utf8uprcodepoint(0xa723));
+  ASSERT_EQ(0xa732, utf8uprcodepoint(0xa733));
+  ASSERT_EQ(0xa779, utf8uprcodepoint(0xa77a));
+  ASSERT_EQ(0xa77d, utf8uprcodepoint(0x1d79));
+  ASSERT_EQ(0xa78b, utf8uprcodepoint(0xa78c));
+  ASSERT_EQ(0xa78d, utf8uprcodepoint(0x0265));
+  ASSERT_EQ(0xa790, utf8uprcodepoint(0xa791));
+  ASSERT_EQ(0xa796, utf8uprcodepoint(0xa797));
+  ASSERT_EQ(0xa7aa, utf8uprcodepoint(0x0266));
+  ASSERT_EQ(0xa7ab, utf8uprcodepoint(0x025c));
+  ASSERT_EQ(0xa7b0, utf8uprcodepoint(0x029e));
+  ASSERT_EQ(0xa7b3, utf8uprcodepoint(0xab53));
+  ASSERT_EQ(0xa7b4, utf8uprcodepoint(0xa7b5));
+}
+
+/* Cyrillic Extended-C U+1C80..U+1C88 */
+UTF8_TEST(utf8uprcodepoint, cyrillic_extended_c) {
+  ASSERT_EQ(0x0412, utf8uprcodepoint(0x1c80)); /* ᲀ -> В */
+  ASSERT_EQ(0x0414, utf8uprcodepoint(0x1c81)); /* ᲁ -> Д */
+  ASSERT_EQ(0x041e, utf8uprcodepoint(0x1c82)); /* ᲂ -> О */
+  ASSERT_EQ(0x0421, utf8uprcodepoint(0x1c83)); /* ᲃ -> С */
+  ASSERT_EQ(0x0422, utf8uprcodepoint(0x1c84)); /* ᲄ -> Т */
+  ASSERT_EQ(0x0422, utf8uprcodepoint(0x1c85)); /* ᲅ -> Т */
+  ASSERT_EQ(0x042a, utf8uprcodepoint(0x1c86)); /* ᲆ -> Ъ */
+  ASSERT_EQ(0x0462, utf8uprcodepoint(0x1c87));
+  ASSERT_EQ(0xa64a, utf8uprcodepoint(0x1c88));
+}
+
+UTF8_TEST(utf8lwrcodepoint, cyrillic_extended_c) {
+  /* Historic lowercase Cyrillic forms are already lowercase; unchanged */
+  ASSERT_EQ(0x1c80, utf8lwrcodepoint(0x1c80));
+  ASSERT_EQ(0x1c81, utf8lwrcodepoint(0x1c81));
+  ASSERT_EQ(0x1c82, utf8lwrcodepoint(0x1c82));
+  ASSERT_EQ(0x1c83, utf8lwrcodepoint(0x1c83));
+  ASSERT_EQ(0x1c84, utf8lwrcodepoint(0x1c84));
+  ASSERT_EQ(0x1c85, utf8lwrcodepoint(0x1c85));
+  ASSERT_EQ(0x1c86, utf8lwrcodepoint(0x1c86));
+}
+
+/* ------------------------------------------------------------------ */
 
 #if defined(__clang__)
 #pragma clang diagnostic pop
