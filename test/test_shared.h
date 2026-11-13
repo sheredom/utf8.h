@@ -2587,7 +2587,7 @@ UTF8_TEST(utf8nvalid, exactly_4_bytes) {
 
 /* ------------------------------------------------------------------ */
 /* String-level regression tests for missing Unicode case-mapping      */
-/* blocks (issue #131). C-only: string literals use char*, not char8_t */
+/* blocks. C-only: string literals use char*, not char8_t              */
 /* ------------------------------------------------------------------ */
 
 /* utf8lwr on Cyrillic Supplement uppercase characters */
@@ -2878,7 +2878,7 @@ static void utf8_test_constexpr(void) {}
 
 /* ------------------------------------------------------------------ */
 /* Regression tests: codepoint-level case mapping for missing blocks  */
-/* (issue #131) These tests run in both C and C++.                    */
+/* These tests run in both C and C++.                                 */
 /* ------------------------------------------------------------------ */
 
 /* Cyrillic Supplement U+0500..U+052E: even=upper, odd=lower */
