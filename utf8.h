@@ -1811,7 +1811,19 @@ utf8_constexpr14_impl utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
              ((0x03d8 <= cp) && (0x03ef >= cp)) ||
              ((0x0460 <= cp) && (0x0481 >= cp)) ||
              ((0x048a <= cp) && (0x04bf >= cp)) ||
-             ((0x04d0 <= cp) && (0x04ff >= cp))) {
+             ((0x04d0 <= cp) && (0x04ff >= cp)) ||
+             /* Cyrillic Supplement: even codepoints are uppercase */
+             ((0x0500 <= cp) && (0x052e >= cp)) ||
+             /* Latin Extended-C: even=upper ranges */
+             ((0x2c60 <= cp) && (0x2c61 >= cp)) ||
+             ((0x2c72 <= cp) && (0x2c73 >= cp)) ||
+             /* Latin Extended-D: even=upper ranges */
+             ((0xa722 <= cp) && (0xa72f >= cp)) ||
+             ((0xa732 <= cp) && (0xa76f >= cp)) ||
+             ((0xa77e <= cp) && (0xa787 >= cp)) ||
+             ((0xa790 <= cp) && (0xa793 >= cp)) ||
+             ((0xa796 <= cp) && (0xa7a9 >= cp)) ||
+             ((0xa7b4 <= cp) && (0xa7c3 >= cp))) {
     cp |= 0x1;
   } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
              ((0x0179 <= cp) && (0x017e >= cp)) ||
@@ -1951,6 +1963,89 @@ utf8_constexpr14_impl utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp) {
     case 0x03fa:
       cp = 0x03fb;
       break;
+    /* Latin Extended-C individual mappings */
+    case 0x2c60:
+      cp = 0x2c61;
+      break;
+    case 0x2c62:
+      cp = 0x026b;
+      break;
+    case 0x2c63:
+      cp = 0x1d7d;
+      break;
+    case 0x2c64:
+      cp = 0x027d;
+      break;
+    /* Latin Extended-C odd=upper pairs (upper odd -> lower even = upper+1) */
+    case 0x2c67:
+      cp = 0x2c68;
+      break;
+    case 0x2c69:
+      cp = 0x2c6a;
+      break;
+    case 0x2c6b:
+      cp = 0x2c6c;
+      break;
+    case 0x2c75:
+      cp = 0x2c76;
+      break;
+    case 0x2c6d:
+      cp = 0x0251;
+      break;
+    case 0x2c6e:
+      cp = 0x0271;
+      break;
+    case 0x2c6f:
+      cp = 0x0250;
+      break;
+    case 0x2c70:
+      cp = 0x0252;
+      break;
+    /* Latin Extended-D individual mappings */
+    /* Odd=upper pairs: A779->A77A, A77B->A77C, A78B->A78C */
+    case 0xa779:
+      cp = 0xa77a;
+      break;
+    case 0xa77b:
+      cp = 0xa77c;
+      break;
+    case 0xa78b:
+      cp = 0xa78c;
+      break;
+    case 0xa77d:
+      cp = 0x1d79;
+      break;
+    case 0xa78d:
+      cp = 0x0265;
+      break;
+    case 0xa7aa:
+      cp = 0x0266;
+      break;
+    case 0xa7ab:
+      cp = 0x025c;
+      break;
+    case 0xa7ac:
+      cp = 0x0261;
+      break;
+    case 0xa7ad:
+      cp = 0x026c;
+      break;
+    case 0xa7ae:
+      cp = 0x026a;
+      break;
+    case 0xa7b0:
+      cp = 0x029e;
+      break;
+    case 0xa7b1:
+      cp = 0x0287;
+      break;
+    case 0xa7b2:
+      cp = 0x029d;
+      break;
+    case 0xa7b3:
+      cp = 0xab53;
+      break;
+    /* U+1C80..U+1C88 are historic lowercase Cyrillic forms; already lowercase */
     }
   }
 
@@ -1987,7 +2082,18 @@ utf8_constexpr14_impl utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
              ((0x03d8 <= cp) && (0x03ef >= cp)) ||
              ((0x0460 <= cp) && (0x0481 >= cp)) ||
              ((0x048a <= cp) && (0x04bf >= cp)) ||
-             ((0x04d0 <= cp) && (0x04ff >= cp))) {
+             ((0x04d0 <= cp) && (0x04ff >= cp)) ||
+             /* Cyrillic Supplement: odd codepoints are lowercase (even=upper) */
+             ((0x0501 <= cp) && (0x052f >= cp)) ||
+             /* Latin Extended-C: odd=lower ranges (even=upper) */
+             ((0x2c73 <= cp) && (0x2c73 >= cp)) ||
+             /* Latin Extended-D: odd=lower ranges (even=upper) */
+             ((0xa722 <= cp) && (0xa72f >= cp)) ||
+             ((0xa732 <= cp) && (0xa76f >= cp)) ||
+             ((0xa77e <= cp) && (0xa787 >= cp)) ||
+             ((0xa790 <= cp) && (0xa793 >= cp)) ||
+             ((0xa796 <= cp) && (0xa7a9 >= cp)) ||
+             ((0xa7b4 <= cp) && (0xa7c3 >= cp))) {
     cp &= ~0x1;
   } else if (((0x0139 <= cp) && (0x0148 >= cp)) ||
              ((0x0179 <= cp) && (0x017e >= cp)) ||
@@ -2130,6 +2236,117 @@ utf8_constexpr14_impl utf8_int32_t utf8uprcodepoint(utf8_int32_t cp) {
       break;
     case 0x03fb:
       cp = 0x03fa;
+      break;
+    /* Latin Extended-C individual reverse mappings (lowercase -> uppercase) */
+    case 0x2c61:
+      cp = 0x2c60;
+      break;
+    /* Latin Extended-C even=lower (odd=upper) pairs: upr(even) = even-1 */
+    case 0x2c68:
+      cp = 0x2c67;
+      break;
+    case 0x2c6a:
+      cp = 0x2c69;
+      break;
+    case 0x2c6c:
+      cp = 0x2c6b;
+      break;
+    case 0x2c73:
+      cp = 0x2c72;
+      break;
+    case 0x2c76:
+      cp = 0x2c75;
+      break;
+    case 0x026b:
+      cp = 0x2c62;
+      break;
+    case 0x1d7d:
+      cp = 0x2c63;
+      break;
+    case 0x027d:
+      cp = 0x2c64;
+      break;
+    case 0x0251:
+      cp = 0x2c6d;
+      break;
+    case 0x0271:
+      cp = 0x2c6e;
+      break;
+    case 0x0250:
+      cp = 0x2c6f;
+      break;
+    case 0x0252:
+      cp = 0x2c70;
+      break;
+    /* Latin Extended-D individual reverse mappings */
+    /* Even=lower (odd=upper) pairs: upr(even) = even-1 */
+    case 0xa77a:
+      cp = 0xa779;
+      break;
+    case 0xa77c:
+      cp = 0xa77b;
+      break;
+    case 0xa78c:
+      cp = 0xa78b;
+      break;
+    case 0x1d79:
+      cp = 0xa77d;
+      break;
+    case 0x0265:
+      cp = 0xa78d;
+      break;
+    case 0x0266:
+      cp = 0xa7aa;
+      break;
+    case 0x025c:
+      cp = 0xa7ab;
+      break;
+    case 0x0261:
+      cp = 0xa7ac;
+      break;
+    case 0x026c:
+      cp = 0xa7ad;
+      break;
+    case 0x026a:
+      cp = 0xa7ae;
+      break;
+    case 0x029e:
+      cp = 0xa7b0;
+      break;
+    case 0x0287:
+      cp = 0xa7b1;
+      break;
+    case 0x029d:
+      cp = 0xa7b2;
+      break;
+    case 0xab53:
+      cp = 0xa7b3;
+      break;
+    /* Cyrillic Extended-C: historic lowercase -> Cyrillic uppercase */
+    case 0x1c80:
+      cp = 0x0412;
+      break;
+    case 0x1c81:
+      cp = 0x0414;
+      break;
+    case 0x1c82:
+      cp = 0x041e;
+      break;
+    case 0x1c83:
+      cp = 0x0421;
+      break;
+    case 0x1c84:
+    case 0x1c85:
+      cp = 0x0422;
+      break;
+    case 0x1c86:
+      cp = 0x042a;
+      break;
+    case 0x1c87:
+      cp = 0x0462;
+      break;
+    case 0x1c88:
+      cp = 0xa64a;
       break;
     }
   }
