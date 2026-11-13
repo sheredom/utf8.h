@@ -2826,13 +2826,7 @@ UTF8_TEST(utf8sep, main) {
 }
 
 UTF8_TEST(utf8sep, stringp_null) { 
-#if defined(__cplusplus) && __cplusplus >= 201103L
-  utf8_int8_t *p = nullptr;
-#elif defined(__cplusplus)
-  utf8_int8_t *p = static_cast<utf8_int8_t *>(0);
-#else
-  utf8_int8_t *p = NULL;
-#endif
+  utf8_int8_t *p = utf8_null;
 
   ASSERT_TRUE(NULL == utf8sep(&p, (const utf8_int8_t*)" "));
 }
