@@ -28,7 +28,7 @@ strncpy | utf8ncpy | &#10004; |
 strndup | utf8ndup | &#10004; |
 strpbrk | utf8pbrk | &#10004; | &#10004;
 strrchr | utf8rchr | &#10004; | &#10004;
-strsep | utf8sep | |
+strsep | utf8sep | &#10004; |
 strspn | utf8spn | &#10004; | &#10004;
 strstr | utf8str | &#10004; | &#10004;
 strtok | utf8tok | |
@@ -303,6 +303,18 @@ Make a codepoint lower case if possible.
 utf8_int32_t utf8uprcodepoint(utf8_int32_t cp);
 ```
 Make a codepoint upper case if possible.
+
+```c
+utf8_int8_t * utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim)
+```
+The utf8sep() function locates, in the utf8 string referenced by *stringp,
+the first occurrence of any character in the utf8 string delim (or the
+terminating `\0' character) and replaces it with a `\0'. The location of the
+next character after the delimiter character (or NULL, if the end of the
+string was reached) is stored in *stringp. The original value of *stringp is
+returned.
+If *stringp is initially NULL, utf8sep() returns NULL.
+
 
 ## Codepoint Case
 

@@ -348,6 +348,15 @@ utf8_weak utf8_int8_t *utf8ndup_ex(const utf8_int8_t *src, size_t n,
                                                                   size_t),
                                    utf8_int8_t *user_data);
 
+/* The utf8sep() function locates, in the utf8 string referenced by *stringp,
+ * the first occurrence of any character in the utf8 string delim (or the
+ * terminating `\0' character) and replaces it with a `\0'. The location of the
+ * next character after the delimiter character (or NULL, if the end of the
+ * string was reached) is stored in *stringp. The original value of *stringp is
+ * returned.
+ * If *stringp is initially NULL, utf8sep() returns NULL.*/
+utf8_weak utf8_int8_t *utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim);
+
 #undef utf8_weak
 #undef utf8_pure
 #undef utf8_nonnull
@@ -2150,6 +2159,34 @@ utf8rcodepoint(const utf8_int8_t *utf8_restrict str,
   } while ((0 != (0x80 & s[0])) && (0x80 == (0xc0 & s[0])));
 
   return (utf8_int8_t *)s;
+}
+
+utf8_int8_t *
+utf8sep(utf8_int8_t ** stringp, const utf8_int8_t *delim)
+{ utf8_int8_t *p, *t;
+
+  if ((utf8_null == stringp) || (utf8_null == *stringp) || (utf8_null == delim)) {
+    return utf8_null;
+  }
+
+  t = p = *stringp;
+
+  while ('\0' != *p) { 
+    utf8_int8_t *n;
+    utf8_int32_t c;
+
+    n = utf8codepoint(p, &c);
+    if (utf8_null == utf8chr(delim, c)) {
+      p = n;
+    }
+    else { 
+      *p = '\0';
+      *stringp = n;
+      return t;
+    }
+  }
+  *stringp = utf8_null;
+  return t;
 }
 
 #undef utf8_restrict
