@@ -863,6 +863,25 @@ UTF8_TEST(utf8casestr, latin) {
   ASSERT_EQ(lowersStr, utf8casestr(lowersStr, uppersStr));
 }
 
+UTF8_TEST(utf8casestr, final_sigma) {
+  /* "ΟΔΟΣ", the capital sigma matches both sigma and final sigma, just like
+   * utf8casecmp does. */
+  static const utf8_int8_t haystack_upper[] = {'\xce', '\x9f', '\xce', '\x94',
+                                               '\xce', '\x9f', '\xce', '\xa3',
+                                               '\0'};
+  static const utf8_int8_t needle_final[] = {'\xce', '\xbf', '\xce', '\xb4',
+                                             '\xce', '\xbf', '\xcf', '\x82',
+                                             '\0'};
+  static const utf8_int8_t needle_medial[] = {'\xce', '\xbf', '\xce', '\xb4',
+                                              '\xce', '\xbf', '\xcf', '\x83',
+                                              '\0'};
+
+  ASSERT_EQ(0, utf8casecmp(haystack_upper, needle_final));
+  ASSERT_EQ(0, utf8casecmp(haystack_upper, needle_medial));
+  ASSERT_EQ(haystack_upper, utf8casestr(haystack_upper, needle_final));
+  ASSERT_EQ(haystack_upper, utf8casestr(haystack_upper, needle_medial));
+}
+
 UTF8_TEST(utf8ncasestr, widths) {
   static const utf8_int8_t width_haystack[] = {
       'A', 0xc3, 0xa9, 0xe2, 0x82, 0xac, 0xf0, 0x9f, 0x8c, 0x8d};
@@ -887,6 +906,22 @@ UTF8_TEST(utf8ncasestr, widths) {
   ASSERT_EQ((void *)0,
             utf8ncasestr(width_haystack, sizeof(width_haystack),
                          missing_needle, sizeof(missing_needle)));
+}
+
+UTF8_TEST(utf8ncasestr, final_sigma) {
+  static const utf8_int8_t haystack_upper[] = {'\xce', '\x9f', '\xce', '\x94',
+                                               '\xce', '\x9f', '\xce', '\xa3'};
+  static const utf8_int8_t needle_final[] = {'\xce', '\xbf', '\xce', '\xb4',
+                                             '\xce', '\xbf', '\xcf', '\x82'};
+  static const utf8_int8_t needle_medial[] = {'\xce', '\xbf', '\xce', '\xb4',
+                                              '\xce', '\xbf', '\xcf', '\x83'};
+
+  ASSERT_EQ(haystack_upper,
+            utf8ncasestr(haystack_upper, sizeof(haystack_upper), needle_final,
+                         sizeof(needle_final)));
+  ASSERT_EQ(haystack_upper,
+            utf8ncasestr(haystack_upper, sizeof(haystack_upper), needle_medial,
+                         sizeof(needle_medial)));
 }
 
 UTF8_TEST(utf8ncasestr, multilingual_casefold) {

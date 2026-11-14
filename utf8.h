@@ -1101,7 +1101,7 @@ utf8_constexpr14_impl utf8_int8_t *utf8casestr(const utf8_int8_t *haystack,
     const utf8_int8_t *maybeMatch = haystack;
     const utf8_int8_t *nextH = haystack;
     const utf8_int8_t *n = needle;
-    utf8_int32_t h_cp = 0, n_cp = 0;
+    utf8_int32_t h_cp = 0, n_cp = 0, h_upr_cp = 0, n_upr_cp = 0;
 
     /* skip ascii bytes that cannot start a match, each is a whole codepoint */
     if (0 != first) {
@@ -1124,11 +1124,14 @@ utf8_constexpr14_impl utf8_int8_t *utf8casestr(const utf8_int8_t *haystack,
     n = utf8codepoint(n, &n_cp);
 
     while ((0 != h_cp) && (0 != n_cp)) {
+      h_upr_cp = utf8uprcodepoint(h_cp);
+      n_upr_cp = utf8uprcodepoint(n_cp);
       h_cp = utf8lwrcodepoint(h_cp);
       n_cp = utf8lwrcodepoint(n_cp);
 
-      /* if we find a mismatch, bail out! */
-      if (h_cp != n_cp) {
+      /* if we find a mismatch, bail out! Like utf8casecmp, either the lowered
+       * or the uppered codepoints matching is enough. */
+      if ((h_cp != n_cp) && (h_upr_cp != n_upr_cp)) {
         break;
       }
 
@@ -1270,8 +1273,10 @@ utf8ncasestr(const utf8_int8_t *haystack, size_t haystack_len,
       needle_codepoint_size =
           (size_t)(next_codepoint - (needle + needle_offset));
 
-      if (utf8lwrcodepoint(haystack_codepoint) !=
-          utf8lwrcodepoint(needle_codepoint)) {
+      if ((utf8lwrcodepoint(haystack_codepoint) !=
+           utf8lwrcodepoint(needle_codepoint)) &&
+          (utf8uprcodepoint(haystack_codepoint) !=
+           utf8uprcodepoint(needle_codepoint))) {
         matches = 0;
         break;
       }
