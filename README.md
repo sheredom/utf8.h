@@ -284,15 +284,19 @@ Returns 1 if the given character is uppercase, or 0 if it is not.
 void utf8lwr(void *utf8_restrict str);
 ```
 Transform the given string into all lowercase codepoints in place. This
-function does not allocate memory. All currently supported case mappings
-preserve the number of bytes in the encoded string.
+function does not allocate memory. Each mapping is applied when the mapped
+codepoint encodes to the same or fewer bytes than the original; otherwise
+the original codepoint is kept (an in-place conversion cannot grow the
+string) and conversion continues with the next codepoint.
 
 ```c
 void utf8upr(void *utf8_restrict str);
 ```
 Transform the given string into all uppercase codepoints in place. This
-function does not allocate memory. All currently supported case mappings
-preserve the number of bytes in the encoded string.
+function does not allocate memory. Each mapping is applied when the mapped
+codepoint encodes to the same or fewer bytes than the original; otherwise
+the original codepoint is kept (an in-place conversion cannot grow the
+string) and conversion continues with the next codepoint.
 
 ```c
 utf8_int32_t utf8lwrcodepoint(utf8_int32_t cp);
