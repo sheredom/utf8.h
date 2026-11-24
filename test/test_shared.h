@@ -1987,15 +1987,18 @@ UTF8_TEST(utf8upr, latin_upper) {
 }
 
 UTF8_TEST(utf8lwr, shrinking_mapping_exact_fit) {
-  unsigned char str[8];
+  utf8_int8_t str[4];
 
-  /* U+2C6F lowercases to U+0250 (3 bytes -> 2 bytes); the trailing NUL must
-   * be shifted down rather than left behind. */
-  memset(str, 0, sizeof(str));
-  memcpy(str, "\xe2\xb1\xaf", 3);
-  utf8lwr((utf8_int8_t *)str);
-  ASSERT_EQ(0xc9, str[0]);
-  ASSERT_EQ(0x90, str[1]);
+  /* U+2C6F lowercases to U+0250 (3 bytes -> 2 bytes); the array is sized
+   * to the input exactly, and the trailing NUL must be shifted down rather
+   * than left behind. */
+  str[0] = 0xe2;
+  str[1] = 0xb1;
+  str[2] = 0xaf;
+  str[3] = '\0';
+  utf8lwr(str);
+  ASSERT_EQ(0xc9, (unsigned char)str[0]);
+  ASSERT_EQ(0x90, (unsigned char)str[1]);
   ASSERT_EQ('\0', str[2]);
 }
 
@@ -2021,49 +2024,105 @@ UTF8_TEST(utf8upr, shrinking_mapping_shifts_tail) {
   ASSERT_EQ(0, strcmp((char *)str, "\xd0\x92" "A"));
 }
 
+UTF8_TEST(utf8lwr, shrinking_mappings_adjacent_then_ascii) {
+  utf8_int8_t str[16];
+
+  /* Two adjacent shrinking codepoints followed by ASCII: the write cursor
+   * must stay behind the read cursor across both mappings and the 'A' fast
+   * path must continue from the right position. */
+  memset(str, 0, sizeof(str));
+  memcpy(str, "\xe2\xb1\xaf" "\xe2\xb1\xaf" "A", 7); /* U+2C6F U+2C6F 'A' */
+  utf8lwr(str);
+  ASSERT_EQ(0, strcmp((char *)str, "\xc9\x90" "\xc9\x90" "a"));
+  ASSERT_EQ('\0', str[5]);
+}
+
 UTF8_TEST(utf8upr, growing_mapping_left_unchanged) {
-  unsigned char str[8];
+  utf8_int8_t str[3];
 
   /* U+0250 would uppercase to U+2C6F (2 bytes -> 3 bytes), which cannot be
    * done in place, so the codepoint must be left unchanged. */
-  memset(str, 0, sizeof(str));
-  memcpy(str, "\xc9\x90", 2);
-  utf8upr((utf8_int8_t *)str);
-  ASSERT_EQ(0xc9, str[0]);
-  ASSERT_EQ(0x90, str[1]);
+  str[0] = 0xc9;
+  str[1] = 0x90;
+  str[2] = '\0';
+  utf8upr(str);
+  ASSERT_EQ(0xc9, (unsigned char)str[0]);
+  ASSERT_EQ(0x90, (unsigned char)str[1]);
   ASSERT_EQ('\0', str[2]);
 }
 
-UTF8_TEST(utf8upr, mappings_never_write_past_null_terminator) {
-  /* Encode every codepoint followed by a null terminator and a canary, run
-   * both case mappings, and require the canary to be intact afterwards. */
+UTF8_TEST(utf8upr, mappings_apply_correct_policy_and_guard_survives) {
+  /* Encode every codepoint, run both case mappings, and require (1) the
+   * result matches what the scalar mapping policy predicts, terminated by
+   * a NUL, and (2) the guard bytes at and after the end of the original
+   * string are untouched. The guard is followed by a spare zero byte so a
+   * lost terminator does not run the comparison off the end of the array. */
+  utf8_int8_t buf[4 + 1 + 16 + 1];
   utf8_int32_t cp;
   size_t i;
 
   for (cp = 1; cp <= 0x10ffff; cp++) {
-    unsigned char buf[4 + 1 + 16];
+    utf8_int8_t expected[4];
     utf8_int8_t *end;
+    utf8_int32_t mapped;
+    size_t original_size;
+    size_t expected_size;
 
-    /* The canary sits at a fixed offset: a shrinking mapping leaves the
-     * stale bytes between the new null terminator and the old one intact,
-     * which is fine, so only bytes from the fixed offset on must survive. */
-    memset(buf, 0, sizeof(buf));
-    end = utf8catcodepoint((utf8_int8_t *)buf, cp, 4);
+    /* Uppercase direction. */
+    memset(buf, 0xaa, sizeof(buf));
+    memset(expected, 0, sizeof(expected));
+    end = utf8catcodepoint(buf, cp, 4);
     *end = '\0';
-    memset(end + 1, 0xaa, sizeof(buf) - (size_t)(end + 1 - (utf8_int8_t *)buf));
-    utf8upr((utf8_int8_t *)buf);
-    for (i = 5; i < sizeof(buf); i++) {
-      ASSERT_EQ(0xaa, buf[i]);
+    buf[sizeof(buf) - 1] = '\0';
+    original_size = (size_t)(end - buf) + 1; /* length incl. terminator */
+
+    mapped = utf8uprcodepoint(cp);
+    if (mapped != cp &&
+        utf8codepointsize(mapped) <= utf8codepointsize(cp)) {
+      utf8catcodepoint(expected, mapped, 4);
+      expected_size = utf8codepointsize(mapped);
+    } else {
+      utf8catcodepoint(expected, cp, 4);
+      expected_size = utf8codepointsize(cp);
     }
 
-    memset(buf, 0, sizeof(buf));
-    end = utf8catcodepoint((utf8_int8_t *)buf, cp, 4);
-    *end = '\0';
-    memset(end + 1, 0xaa, sizeof(buf) - (size_t)(end + 1 - (utf8_int8_t *)buf));
-    utf8lwr((utf8_int8_t *)buf);
-    for (i = 5; i < sizeof(buf); i++) {
-      ASSERT_EQ(0xaa, buf[i]);
+    utf8upr(buf);
+    for (i = 0; i < expected_size; i++) {
+      ASSERT_EQ((unsigned char)expected[i], (unsigned char)buf[i]);
     }
+    ASSERT_EQ('\0', buf[expected_size]);
+    for (i = original_size; i < sizeof(buf) - 1; i++) {
+      ASSERT_EQ(0xaa, (unsigned char)buf[i]);
+    }
+    ASSERT_EQ('\0', buf[sizeof(buf) - 1]);
+
+    /* Lowercase direction. */
+    memset(buf, 0xaa, sizeof(buf));
+    memset(expected, 0, sizeof(expected));
+    end = utf8catcodepoint(buf, cp, 4);
+    *end = '\0';
+    buf[sizeof(buf) - 1] = '\0';
+    original_size = (size_t)(end - buf) + 1;
+
+    mapped = utf8lwrcodepoint(cp);
+    if (mapped != cp &&
+        utf8codepointsize(mapped) <= utf8codepointsize(cp)) {
+      utf8catcodepoint(expected, mapped, 4);
+      expected_size = utf8codepointsize(mapped);
+    } else {
+      utf8catcodepoint(expected, cp, 4);
+      expected_size = utf8codepointsize(cp);
+    }
+
+    utf8lwr(buf);
+    for (i = 0; i < expected_size; i++) {
+      ASSERT_EQ((unsigned char)expected[i], (unsigned char)buf[i]);
+    }
+    ASSERT_EQ('\0', buf[expected_size]);
+    for (i = original_size; i < sizeof(buf) - 1; i++) {
+      ASSERT_EQ(0xaa, (unsigned char)buf[i]);
+    }
+    ASSERT_EQ('\0', buf[sizeof(buf) - 1]);
   }
 }
 

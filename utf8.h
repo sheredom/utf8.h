@@ -1746,100 +1746,102 @@ utf8_constexpr14_impl int utf8isupper(utf8_int32_t chr) {
 }
 
 void utf8lwr(utf8_int8_t *utf8_restrict str) {
+  utf8_int8_t *read = str;
+  utf8_int8_t *write = str;
+
   for (;;) {
     utf8_int32_t cp = 0;
-    utf8_int8_t *pn = str;
+    utf8_int8_t *pn = read;
     utf8_int32_t mapped_cp = 0;
+    size_t old_size = 0;
+    size_t i = 0;
 
     /* Fast path: ASCII bytes are whole codepoints, only A-Z change. */
-    while ((0 == (0x80 & *str)) && ('\0' != *str)) {
-      if ('A' <= *str && 'Z' >= *str) {
-        *str += 32;
+    while ((0 == (0x80 & *read)) && ('\0' != *read)) {
+      if ('A' <= *read && 'Z' >= *read) {
+        *write = (utf8_int8_t)(*read + 32);
+      } else {
+        *write = *read;
       }
-      str++;
+      read++;
+      write++;
     }
 
-    pn = utf8codepoint(str, &cp);
+    pn = utf8codepoint(read, &cp);
     if (0 == cp) {
+      *write = '\0';
       return;
     }
 
+    old_size = (size_t)(pn - read);
     mapped_cp = utf8lwrcodepoint(cp);
-    if (mapped_cp != cp) {
-      const size_t new_size = utf8codepointsize(mapped_cp);
-      const size_t old_size = (size_t)(pn - str);
-      if (new_size == old_size) {
-        utf8catcodepoint(str, mapped_cp, new_size);
-        str = pn;
-      } else if (new_size < old_size) {
-        /* The mapped codepoint is shorter: rewrite it and shift the rest
-         * of the string (including the null terminator) down so no stray
-         * bytes are left behind. */
-        utf8_int8_t *out = str + new_size;
-        const size_t tail = utf8size(pn); /* includes the null terminator */
-        size_t i;
-        for (i = 0; i < tail; i++) {
-          out[i] = pn[i];
-        }
-        utf8catcodepoint(str, mapped_cp, new_size);
-        str = out;
-      } else {
-        /* The mapped codepoint is longer, which cannot be done in place:
-         * leave the codepoint unchanged. */
-        str = pn;
-      }
+    if (mapped_cp != cp &&
+        utf8codepointsize(mapped_cp) <= old_size) {
+      /* The mapped codepoint encodes to the same or fewer bytes, so it can
+       * be written in place. The write cursor never passes the read
+       * cursor. */
+      write = utf8catcodepoint(write, mapped_cp,
+                               utf8codepointsize(mapped_cp));
     } else {
-      str = pn;
+      /* Either there is no mapping, or the mapping would need more bytes
+       * than the original codepoint - which an in-place conversion cannot
+       * provide - so the original bytes are kept. */
+      for (i = 0; i < old_size; i++) {
+        write[i] = read[i];
+      }
+      write += old_size;
     }
+    read = pn;
   }
 }
 
 void utf8upr(utf8_int8_t *utf8_restrict str) {
+  utf8_int8_t *read = str;
+  utf8_int8_t *write = str;
+
   for (;;) {
     utf8_int32_t cp = 0;
-    utf8_int8_t *pn = str;
+    utf8_int8_t *pn = read;
     utf8_int32_t mapped_cp = 0;
+    size_t old_size = 0;
+    size_t i = 0;
 
     /* Fast path: ASCII bytes are whole codepoints, only a-z change. */
-    while ((0 == (0x80 & *str)) && ('\0' != *str)) {
-      if ('a' <= *str && 'z' >= *str) {
-        *str -= 32;
+    while ((0 == (0x80 & *read)) && ('\0' != *read)) {
+      if ('a' <= *read && 'z' >= *read) {
+        *write = (utf8_int8_t)(*read - 32);
+      } else {
+        *write = *read;
       }
-      str++;
+      read++;
+      write++;
     }
 
-    pn = utf8codepoint(str, &cp);
+    pn = utf8codepoint(read, &cp);
     if (0 == cp) {
+      *write = '\0';
       return;
     }
 
+    old_size = (size_t)(pn - read);
     mapped_cp = utf8uprcodepoint(cp);
-    if (mapped_cp != cp) {
-      const size_t new_size = utf8codepointsize(mapped_cp);
-      const size_t old_size = (size_t)(pn - str);
-      if (new_size == old_size) {
-        utf8catcodepoint(str, mapped_cp, new_size);
-        str = pn;
-      } else if (new_size < old_size) {
-        /* The mapped codepoint is shorter: rewrite it and shift the rest
-         * of the string (including the null terminator) down so no stray
-         * bytes are left behind. */
-        utf8_int8_t *out = str + new_size;
-        const size_t tail = utf8size(pn); /* includes the null terminator */
-        size_t i;
-        for (i = 0; i < tail; i++) {
-          out[i] = pn[i];
-        }
-        utf8catcodepoint(str, mapped_cp, new_size);
-        str = out;
-      } else {
-        /* The mapped codepoint is longer, which cannot be done in place:
-         * leave the codepoint unchanged. */
-        str = pn;
-      }
+    if (mapped_cp != cp &&
+        utf8codepointsize(mapped_cp) <= old_size) {
+      /* The mapped codepoint encodes to the same or fewer bytes, so it can
+       * be written in place. The write cursor never passes the read
+       * cursor. */
+      write = utf8catcodepoint(write, mapped_cp,
+                               utf8codepointsize(mapped_cp));
     } else {
-      str = pn;
+      /* Either there is no mapping, or the mapping would need more bytes
+       * than the original codepoint - which an in-place conversion cannot
+       * provide - so the original bytes are kept. */
+      for (i = 0; i < old_size; i++) {
+        write[i] = read[i];
+      }
+      write += old_size;
     }
+    read = pn;
   }
 }
 
