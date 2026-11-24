@@ -310,13 +310,17 @@ utf8_constexpr14 utf8_pure int utf8islower(utf8_int32_t chr);
 utf8_constexpr14 utf8_pure int utf8isupper(utf8_int32_t chr);
 
 /* Transform the given string into all lowercase codepoints in place. This
- * function does not allocate memory. All currently supported case mappings
- * preserve the number of bytes in the encoded string. */
+ * function does not allocate memory. Case mappings that shrink the encoded
+ * codepoint are applied and the remainder of the string (including the null
+ * terminator) is shifted down; mappings that would grow it are left
+ * unchanged, because an in-place operation cannot make the string longer. */
 utf8_nonnull utf8_weak void utf8lwr(utf8_int8_t *utf8_restrict str);
 
 /* Transform the given string into all uppercase codepoints in place. This
- * function does not allocate memory. All currently supported case mappings
- * preserve the number of bytes in the encoded string. */
+ * function does not allocate memory. Case mappings that shrink the encoded
+ * codepoint are applied and the remainder of the string (including the null
+ * terminator) is shifted down; mappings that would grow it are left
+ * unchanged, because an in-place operation cannot make the string longer. */
 utf8_nonnull utf8_weak void utf8upr(utf8_int8_t *utf8_restrict str);
 
 /* Make a codepoint lower case if possible. */
@@ -1762,9 +1766,31 @@ void utf8lwr(utf8_int8_t *utf8_restrict str) {
 
     mapped_cp = utf8lwrcodepoint(cp);
     if (mapped_cp != cp) {
-      utf8catcodepoint(str, mapped_cp, utf8codepointsize(mapped_cp));
+      const size_t new_size = utf8codepointsize(mapped_cp);
+      const size_t old_size = (size_t)(pn - str);
+      if (new_size == old_size) {
+        utf8catcodepoint(str, mapped_cp, new_size);
+        str = pn;
+      } else if (new_size < old_size) {
+        /* The mapped codepoint is shorter: rewrite it and shift the rest
+         * of the string (including the null terminator) down so no stray
+         * bytes are left behind. */
+        utf8_int8_t *out = str + new_size;
+        const size_t tail = utf8size(pn); /* includes the null terminator */
+        size_t i;
+        for (i = 0; i < tail; i++) {
+          out[i] = pn[i];
+        }
+        utf8catcodepoint(str, mapped_cp, new_size);
+        str = out;
+      } else {
+        /* The mapped codepoint is longer, which cannot be done in place:
+         * leave the codepoint unchanged. */
+        str = pn;
+      }
+    } else {
+      str = pn;
     }
-    str = pn;
   }
 }
 
@@ -1789,9 +1815,31 @@ void utf8upr(utf8_int8_t *utf8_restrict str) {
 
     mapped_cp = utf8uprcodepoint(cp);
     if (mapped_cp != cp) {
-      utf8catcodepoint(str, mapped_cp, utf8codepointsize(mapped_cp));
+      const size_t new_size = utf8codepointsize(mapped_cp);
+      const size_t old_size = (size_t)(pn - str);
+      if (new_size == old_size) {
+        utf8catcodepoint(str, mapped_cp, new_size);
+        str = pn;
+      } else if (new_size < old_size) {
+        /* The mapped codepoint is shorter: rewrite it and shift the rest
+         * of the string (including the null terminator) down so no stray
+         * bytes are left behind. */
+        utf8_int8_t *out = str + new_size;
+        const size_t tail = utf8size(pn); /* includes the null terminator */
+        size_t i;
+        for (i = 0; i < tail; i++) {
+          out[i] = pn[i];
+        }
+        utf8catcodepoint(str, mapped_cp, new_size);
+        str = out;
+      } else {
+        /* The mapped codepoint is longer, which cannot be done in place:
+         * leave the codepoint unchanged. */
+        str = pn;
+      }
+    } else {
+      str = pn;
     }
-    str = pn;
   }
 }
 
