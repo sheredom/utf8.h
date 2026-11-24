@@ -1986,6 +1986,87 @@ UTF8_TEST(utf8upr, latin_upper) {
   free(str);
 }
 
+UTF8_TEST(utf8lwr, shrinking_mapping_exact_fit) {
+  unsigned char str[8];
+
+  /* U+2C6F lowercases to U+0250 (3 bytes -> 2 bytes); the trailing NUL must
+   * be shifted down rather than left behind. */
+  memset(str, 0, sizeof(str));
+  memcpy(str, "\xe2\xb1\xaf", 3);
+  utf8lwr((utf8_int8_t *)str);
+  ASSERT_EQ(0xc9, str[0]);
+  ASSERT_EQ(0x90, str[1]);
+  ASSERT_EQ('\0', str[2]);
+}
+
+UTF8_TEST(utf8lwr, shrinking_mapping_shifts_tail) {
+  unsigned char str[16];
+
+  /* U+2C6F lowercases to U+0250; "A" must shift down into the space the
+   * third byte used to occupy. */
+  memset(str, 0, sizeof(str));
+  memcpy(str, "\xe2\xb1\xaf" "A", 4);
+  utf8lwr((utf8_int8_t *)str);
+  ASSERT_EQ(0, strcmp((char *)str, "\xc9\x90" "a"));
+}
+
+UTF8_TEST(utf8upr, shrinking_mapping_shifts_tail) {
+  unsigned char str[16];
+
+  /* U+1C80 uppercases to U+0412 (3 bytes -> 2 bytes); "a" must shift down
+   * into the space the third byte used to occupy. */
+  memset(str, 0, sizeof(str));
+  memcpy(str, "\xe1\xb2\x80" "a", 4);
+  utf8upr((utf8_int8_t *)str);
+  ASSERT_EQ(0, strcmp((char *)str, "\xd0\x92" "A"));
+}
+
+UTF8_TEST(utf8upr, growing_mapping_left_unchanged) {
+  unsigned char str[8];
+
+  /* U+0250 would uppercase to U+2C6F (2 bytes -> 3 bytes), which cannot be
+   * done in place, so the codepoint must be left unchanged. */
+  memset(str, 0, sizeof(str));
+  memcpy(str, "\xc9\x90", 2);
+  utf8upr((utf8_int8_t *)str);
+  ASSERT_EQ(0xc9, str[0]);
+  ASSERT_EQ(0x90, str[1]);
+  ASSERT_EQ('\0', str[2]);
+}
+
+UTF8_TEST(utf8upr, mappings_never_write_past_null_terminator) {
+  /* Encode every codepoint followed by a null terminator and a canary, run
+   * both case mappings, and require the canary to be intact afterwards. */
+  utf8_int32_t cp;
+  size_t i;
+
+  for (cp = 1; cp <= 0x10ffff; cp++) {
+    unsigned char buf[4 + 1 + 16];
+    utf8_int8_t *end;
+
+    /* The canary sits at a fixed offset: a shrinking mapping leaves the
+     * stale bytes between the new null terminator and the old one intact,
+     * which is fine, so only bytes from the fixed offset on must survive. */
+    memset(buf, 0, sizeof(buf));
+    end = utf8catcodepoint((utf8_int8_t *)buf, cp, 4);
+    *end = '\0';
+    memset(end + 1, 0xaa, sizeof(buf) - (size_t)(end + 1 - (utf8_int8_t *)buf));
+    utf8upr((utf8_int8_t *)buf);
+    for (i = 5; i < sizeof(buf); i++) {
+      ASSERT_EQ(0xaa, buf[i]);
+    }
+
+    memset(buf, 0, sizeof(buf));
+    end = utf8catcodepoint((utf8_int8_t *)buf, cp, 4);
+    *end = '\0';
+    memset(end + 1, 0xaa, sizeof(buf) - (size_t)(end + 1 - (utf8_int8_t *)buf));
+    utf8lwr((utf8_int8_t *)buf);
+    for (i = 5; i < sizeof(buf); i++) {
+      ASSERT_EQ(0xaa, buf[i]);
+    }
+  }
+}
+
 UTF8_TEST(utf8casecmp, basic_ascii) {
   ASSERT_EQ(-15, utf8casecmp(".gdoc", ".GSHeeT"));
   ASSERT_EQ(-4, utf8casecmp(".gsheet", ".gSLiDe"));
